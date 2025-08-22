@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+<<<<<<< HEAD
 import { Button } from '../../components/ui/Button';
+=======
+>>>>>>> 5f8c9efc29470c475ebc526d6feb3f2b3260f6d6
 
 const LibraryPage = () => {
   // Sample data for subjects
