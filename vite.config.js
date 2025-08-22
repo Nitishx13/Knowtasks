@@ -4,7 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Knowtasks/',
+  base: process.env.NODE_ENV === 'production' ? '/' : '/Knowtasks/',
   plugins: [react()],
   resolve: {
     alias: {

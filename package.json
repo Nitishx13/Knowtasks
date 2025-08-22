@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://nitishx13.github.io/Knowtasks",
+  "homepage": "https://knowtasks.vercel.app",
   "repository": {
     "type": "git",
     "url": "https://github.com/Nitishx13/Knowtasks.git"
