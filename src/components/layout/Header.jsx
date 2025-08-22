@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '../ui/button';
+import { Button } from '../ui/Button';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { Menu, X, ChevronRight } from 'lucide-react';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase/config';
-import { Button } from '../ui/button';
+import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
 
 const DashboardLayout = ({ children }) => {

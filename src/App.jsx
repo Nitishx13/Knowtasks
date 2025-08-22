@@ -6,15 +6,15 @@ import MainLayout from './components/layout/MainLayout.jsx';
 import DashboardRoutes from './components/layout/DashboardRoutes.jsx';
 
 // Import pages
-import HomePage from './pages/home/HomePage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import NotesPage from './pages/notes/NotesPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
-import SettingsPage from './pages/dashboard/SettingsPage';
-import LibraryPage from './pages/dashboard/LibraryPage';
-import ResearchPage from './pages/dashboard/ResearchPage';
-import SummarizePage from './pages/dashboard/SummarizePage';
+import HomePage from './pages/home/HomePage.jsx';
+import LoginPage from './pages/auth/LoginPage.jsx';
+import RegisterPage from './pages/auth/RegisterPage.jsx';
+import NotesPage from './pages/notes/NotesPage.jsx';
+import DashboardPage from './pages/dashboard/DashboardPage.jsx';
+import SettingsPage from './pages/dashboard/SettingsPage.jsx';
+import LibraryPage from './pages/dashboard/LibraryPage.jsx';
+import ResearchPage from './pages/dashboard/ResearchPage.jsx';
+import SummarizePage from './pages/dashboard/SummarizePage.jsx';
 
 function App() {
   return (

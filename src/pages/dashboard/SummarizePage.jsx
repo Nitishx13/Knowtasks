@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui/Button';
 import { summarizeService } from '../../services/api';
 
 const SummarizePage = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '../ui/button';
+import { Button } from '../ui/Button';
 import Header from './Header';
 
 const MainLayout = ({ children }) => {
