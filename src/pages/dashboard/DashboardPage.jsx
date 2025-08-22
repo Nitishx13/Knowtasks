@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
 import { summarizeService } from '../../services/api';
 
@@ -145,7 +145,7 @@ const DashboardPage = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link to="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -157,7 +157,7 @@ const DashboardPage = () => {
             </div>
           </Link>
 
-          <Link to="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -169,7 +169,7 @@ const DashboardPage = () => {
             </div>
           </Link>
 
-          <Link to="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -181,7 +181,7 @@ const DashboardPage = () => {
             </div>
           </Link>
 
-          <Link to="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -267,7 +267,7 @@ const DashboardPage = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-white">Recent Summaries</h2>
-          <Link to="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View All →</Link>
+          <Link href="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View All →</Link>
         </div>
         
         {recentSummaries.length > 0 ? (
@@ -310,7 +310,7 @@ const DashboardPage = () => {
                         {summary.date}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link to="/dashboard/library" className="text-white hover:text-gray-300 mr-3">View</Link>
+                        <Link href="/dashboard/library" className="text-white hover:text-gray-300 mr-3">View</Link>
                         <button className="text-gray-400 hover:text-gray-300">Share</button>
                       </td>
                     </tr>
@@ -329,7 +329,7 @@ const DashboardPage = () => {
               </div>
               <h4 className="text-lg font-medium mb-2 text-white">No summaries yet</h4>
               <p className="text-gray-400 mb-6">Get started by creating your first summary.</p>
-              <Link to="/dashboard/summarize" className="bg-black hover:bg-gray-800 text-white border border-white/30 hover:border-white px-4 py-2 rounded-md font-medium transition-colors inline-block">
+              <Link href="/dashboard/summarize" className="bg-black hover:bg-gray-800 text-white border border-white/30 hover:border-white px-4 py-2 rounded-md font-medium transition-colors inline-block">
                 + New Summary
               </Link>
             </div>

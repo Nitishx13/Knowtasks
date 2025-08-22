@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { authService } from '../../services/api';
 
 const RegisterPage = () => {
@@ -28,7 +29,7 @@ const RegisterPage = () => {
     }));
   };
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +52,7 @@ const RegisterPage = () => {
         console.log('Registration successful:', response.user);
         
         // Redirect to dashboard
-        navigate('/dashboard');
+        router.push('/dashboard');
       } else if (authMethod === 'phone' && phoneAuth.codeSent) {
         // Phone verification - in a real app, this would be implemented
         alert('Phone registration not implemented in this demo');
@@ -107,7 +108,7 @@ const RegisterPage = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-dark">Create your account</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link to="/login" className="font-medium text-primary hover:text-primary/90">
+            <Link href="/login" className="font-medium text-primary hover:text-primary/90">
               sign in to your existing account
             </Link>
           </p>
@@ -278,13 +279,13 @@ const RegisterPage = () => {
         </div>
         
         <div className="text-center mt-4">
-          <Link to="/login" className="text-sm text-gray-600 hover:text-primary">
+          <Link href="/login" className="text-sm text-gray-600 hover:text-primary">
             Already have an account? Sign in
           </Link>
         </div>
         
         <div className="text-center mt-4">
-          <Link to="/" className="text-sm text-gray-600 hover:text-primary">
+          <Link href="/" className="text-sm text-gray-600 hover:text-primary">
             ← Back to home
           </Link>
         </div>

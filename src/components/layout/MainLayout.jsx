@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '../ui/Button';
-import Header from './Header';
+import Link from 'next/link';
+import { Button } from '@components/ui/Button';
+import Header from '@components/layout/Header';
 
 const MainLayout = ({ children }) => {
 
@@ -24,7 +24,7 @@ const MainLayout = ({ children }) => {
         <div className="container py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
             <div className="md:pr-8">
-              <Link to="/" className="flex items-center mb-4 group">
+              <Link href="/" className="flex items-center mb-4 group">
                 <div className="relative w-10 h-10 flex items-center justify-center mr-2 transition-transform duration-300 group-hover:scale-110 overflow-hidden rounded-md border-2 border-black">
                   {/* Black and white design */}
                   <div className="absolute top-0 w-full h-1/2 bg-black"></div>
@@ -59,25 +59,25 @@ const MainLayout = ({ children }) => {
               <h3 className="text-black font-bold mb-4 text-base uppercase tracking-wide">Product</h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link to="/features" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/features" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Features
                   </Link>
                 </li>
                 <li>
-                  <Link to="/pricing" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/pricing" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link to="/testimonials" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/testimonials" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Testimonials
                   </Link>
                 </li>
                 <li>
-                  <Link to="/faq" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/faq" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     FAQ
                   </Link>
@@ -89,25 +89,25 @@ const MainLayout = ({ children }) => {
               <h3 className="text-black font-bold mb-4 text-base uppercase tracking-wide">Company</h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link to="/about" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/about" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/careers" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/careers" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Careers
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/contact" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Contact
                   </Link>
                 </li>
                 <li>
-                  <Link to="/blog" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/blog" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Blog
                   </Link>
@@ -119,19 +119,19 @@ const MainLayout = ({ children }) => {
               <h3 className="text-black font-bold mb-4 text-base uppercase tracking-wide">Legal</h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link to="/privacy" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/privacy" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/terms" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/terms" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Terms of Service
                   </Link>
                 </li>
                 <li>
-                  <Link to="/cookies" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                  <Link href="/cookies" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Cookie Policy
                   </Link>

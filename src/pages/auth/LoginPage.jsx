@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { authService } from '../../services/api';
 
 const LoginPage = () => {
@@ -26,7 +27,7 @@ const LoginPage = () => {
     }));
   };
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ const LoginPage = () => {
         localStorage.setItem('token', response.token);
         
         // Redirect to dashboard
-        navigate('/dashboard');
+        router.push('/dashboard');
       } else if (authMethod === 'phone' && phoneAuth.codeSent) {
         // Phone verification - in a real app, this would be implemented
         alert('Phone authentication not implemented in this demo');
@@ -97,7 +98,7 @@ const LoginPage = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-dark">Sign in to your account</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link to="/register" className="font-medium text-primary hover:text-primary/90">
+            <Link href="/register" className="font-medium text-primary hover:text-primary/90">
               create a new account
             </Link>
           </p>
@@ -260,7 +261,7 @@ const LoginPage = () => {
         </div>
         
         <div className="text-center mt-4">
-          <Link to="/" className="text-sm text-gray-600 hover:text-primary">
+          <Link href="/" className="text-sm text-gray-600 hover:text-primary">
             ← Back to home
           </Link>
         </div>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '../ui/Button';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { Button } from '@components/ui/Button';
+import { Sheet, SheetContent, SheetTrigger } from '@components/ui/sheet';
 import { Menu, X, ChevronRight } from 'lucide-react';
 
 const Header = () => {
-  const location = useLocation();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -30,7 +31,7 @@ const Header = () => {
         <div className="flex justify-between items-center">
           {/* Enhanced Logo Design */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center group">
+            <Link href="/" className="flex items-center group">
               <div className="relative w-12 h-12 flex items-center justify-center mr-3 transition-transform duration-300 group-hover:scale-110 overflow-hidden rounded-lg border-2 border-black shadow-md">
                 {/* Gradient background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-orange-700"></div>
@@ -76,7 +77,7 @@ const Header = () => {
                     className="w-full max-w-2xl h-32 md:h-40 p-3 md:p-4 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
                     placeholder="Paste your content here..."
                   ></textarea>
-                  <Link to="/dashboard/summarize" className="w-full max-w-xs md:max-w-md">
+                  <Link href="/dashboard/summarize" className="w-full max-w-xs md:max-w-md">
                     <Button className="w-full bg-orange-500 text-white hover:bg-orange-600 font-bold px-6 md:px-8 py-3 rounded-xl shadow-md">
                       Generate Summary
                     </Button>
@@ -114,7 +115,7 @@ const Header = () => {
                     className="w-full h-28 md:h-32 p-3 md:p-4 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
                     placeholder="Paste your content here..."
                   ></textarea>
-                  <Link to="/dashboard/summarize" className="w-full">
+                  <Link href="/dashboard/summarize" className="w-full">
                     <Button className="w-full bg-orange-500 text-white hover:bg-orange-600 font-bold py-3 rounded-xl shadow-md group">
                       <span className="flex items-center justify-center text-sm md:text-base">
                         Generate Summary

@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase/config';
-import { Button } from '../ui/Button';
-import { cn } from '../../lib/utils';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { auth } from '@/firebase/config';
+import { Button } from '@components/ui/Button';
+import { cn } from '@/lib/utils';
 
 const DashboardLayout = ({ children }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const handleLogout = async () => {
     try {
       await auth.signOut();
       // Redirect to login page after logout
-      navigate('/login');
+      router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
       alert('Failed to logout. Please try again.');
@@ -21,7 +21,7 @@ const DashboardLayout = ({ children }) => {
   };
 
   const isActive = (path) => {
-    return location.pathname === path ? 'bg-primary/10 text-primary' : 'hover:bg-accent text-muted-foreground hover:text-foreground';
+    return router.pathname === path ? 'bg-primary/10 text-primary' : 'hover:bg-accent text-muted-foreground hover:text-foreground';
   };
 
   return (
@@ -68,7 +68,7 @@ const DashboardLayout = ({ children }) => {
         <nav className="mt-6 px-3">
           <ul className="space-y-2">
             <li>
-              <Link to="/dashboard" className={cn(
+              <Link href="/dashboard" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
                 isActive('/dashboard') === 'bg-primary/10 text-primary' 
                   ? "bg-white/10 text-white" 
@@ -81,7 +81,7 @@ const DashboardLayout = ({ children }) => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/research" className={cn(
+              <Link href="/dashboard/research" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
                 isActive('/dashboard/research') === 'bg-primary/10 text-primary'
                   ? "bg-white/10 text-white"
@@ -94,7 +94,7 @@ const DashboardLayout = ({ children }) => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/summarize" className={cn(
+              <Link href="/dashboard/summarize" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
                 isActive('/dashboard/summarize') === 'bg-primary/10 text-primary'
                   ? "bg-white/10 text-white"
@@ -107,7 +107,7 @@ const DashboardLayout = ({ children }) => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/library" className={cn(
+              <Link href="/dashboard/library" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
                 isActive('/dashboard/library') === 'bg-primary/10 text-primary'
                   ? "bg-white/10 text-white"
@@ -120,7 +120,7 @@ const DashboardLayout = ({ children }) => {
               </Link>
             </li>
             <li className="pt-6">
-              <Link to="/dashboard/settings" className={cn(
+              <Link href="/dashboard/settings" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
                 isActive('/dashboard/settings') === 'bg-primary/10 text-primary'
                   ? "bg-white/10 text-white"

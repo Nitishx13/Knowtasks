@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { notesService } from '../../services/api';
 
