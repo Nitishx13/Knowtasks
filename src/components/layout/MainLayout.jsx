@@ -141,7 +141,7 @@ const MainLayout = ({ children }) => {
           </div>
           
           <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Notedly.ai. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Knowtasks. All rights reserved.</p>
             <div className="flex space-x-5 mt-6 md:mt-0">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors transform hover:scale-110 duration-200">
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

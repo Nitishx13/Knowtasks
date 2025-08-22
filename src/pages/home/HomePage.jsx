@@ -65,7 +65,7 @@ const HomePage = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    NOTEDLY.AI
+                    KNOWTASKS
                   </div>
                 </div>
               </div>
@@ -363,7 +363,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-400">Computer Science Student</p>
                 </div>
               </div>
-              <p className="text-gray-300 leading-relaxed">"Notedly's seamless experience and intuitive design make it my top pick for creative projects. It's a game changer that continuously boosts my productivity—highly recommended!"</p>
+              <p className="text-gray-300 leading-relaxed">"Knowtasks's seamless experience and intuitive design make it my top pick for creative projects. It's a game changer that continuously boosts my productivity—highly recommended!"</p>
               <div className="mt-4 border-t border-gray-800 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-white">
@@ -387,7 +387,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-400">Graduate Student</p>
                 </div>
               </div>
-              <p className="text-gray-300 leading-relaxed">"Love how Notedly accelerates my development and that of my teams. The AI-generated notes are comprehensive and save me hours of reading time."</p>
+              <p className="text-gray-300 leading-relaxed">"Love how Knowtasks accelerates my development and that of my teams. The AI-generated notes are comprehensive and save me hours of reading time."</p>
               <div className="mt-4 border-t border-gray-800 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-white">
@@ -411,7 +411,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-400">PhD Candidate</p>
                 </div>
               </div>
-              <p className="text-gray-300 leading-relaxed">"Notedly, the real AI partner! It's been such a huge help in getting my research tasks done—no stress reading at all. Plus, I've got to say, this is the best note-taking app I've ever used!"</p>
+              <p className="text-gray-300 leading-relaxed">"Knowtasks, the real AI partner! It's been such a huge help in getting my research tasks done—no stress reading at all. Plus, I've got to say, this is the best note-taking app I've ever used!"</p>
               <div className="mt-4 border-t border-gray-800 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-white">
@@ -428,7 +428,7 @@ const HomePage = () => {
           
           <div className="mt-12 text-center">
             <Link href="/dashboard" className="inline-flex items-center gap-2 px-8 py-3 bg-gray-800 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-white/10 transition-all duration-300 hover:-translate-y-1">
-              Try Notedly Free
+              Try Knowtasks Free
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -492,7 +492,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-400">Medical Student</p>
                 </div>
               </div>
-              <p className="text-gray-300 leading-relaxed">"As a med student, I have mountains of reading. Notedly.ai's smart notes feature extracts key concepts from dense medical texts and organizes them perfectly. The AI-generated summaries save me hours of work."</p>
+              <p className="text-gray-300 leading-relaxed">"As a med student, I have mountains of reading. Knowtasks's smart notes feature extracts key concepts from dense medical texts and organizes them perfectly. The AI-generated summaries save me hours of work."</p>
               <div className="flex text-white mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -545,7 +545,7 @@ const HomePage = () => {
           
           <div className="mt-12 text-center">
             <Link href="/dashboard" className="inline-flex items-center gap-2 px-8 py-3 bg-gray-800 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-white/10 transition-all duration-300 hover:-translate-y-1">
-              Start Using Notedly Today
+              Start Using Knowtasks Today
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
