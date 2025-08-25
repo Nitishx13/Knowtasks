@@ -1,192 +1,206 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
+import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const ResearchPage = () => {
-  const [query, setQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [researchResults, setResearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('all');
 
-  // Sample research topics for suggestions
-  const suggestedTopics = [
-    'Quantum Computing Basics',
-    'Climate Change Effects',
-    'Artificial Intelligence Ethics',
-    'Renewable Energy Sources',
-    'Behavioral Economics',
-    'Neural Networks',
-  ];
-
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!searchQuery.trim()) return;
     
     setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
-      setResults({
-        summary: `Research results for "${query}"`,
-        sources: [
-          { title: 'Understanding ' + query, url: '#', publisher: 'Academic Journal', date: '2023' },
-          { title: query + ' and Its Applications', url: '#', publisher: 'Research Gate', date: '2022' },
-          { title: 'The Future of ' + query, url: '#', publisher: 'Science Direct', date: '2023' },
-        ],
-        relatedTopics: [
-          query + ' in Modern Context',
-          'Advanced ' + query + ' Techniques',
-          'History of ' + query,
-          query + ' Case Studies',
-        ]
-      });
+      const mockResults = [
+        {
+          id: 1,
+          title: 'Machine Learning Fundamentals',
+          type: 'article',
+          source: 'Research Paper',
+          date: '2023-11-15',
+          summary: 'Comprehensive overview of machine learning basics including supervised and unsupervised learning algorithms.',
+          url: '#',
+          tags: ['AI', 'Machine Learning', 'Algorithms']
+        },
+        {
+          id: 2,
+          title: 'Deep Learning Applications in Healthcare',
+          type: 'video',
+          source: 'Conference Talk',
+          date: '2023-11-10',
+          summary: 'Exploring how deep learning is revolutionizing medical diagnosis and treatment planning.',
+          url: '#',
+          tags: ['Healthcare', 'Deep Learning', 'Medical AI']
+        },
+        {
+          id: 3,
+          title: 'Natural Language Processing Trends',
+          type: 'article',
+          source: 'Tech Blog',
+          date: '2023-11-08',
+          summary: 'Latest developments in NLP including transformer models and their applications.',
+          url: '#',
+          tags: ['NLP', 'Transformers', 'AI']
+        }
+      ];
+      
+      setResearchResults(mockResults);
       setIsLoading(false);
-    }, 1500);
+    }, 2000);
   };
 
+  const filteredResults = researchResults.filter(result => {
+    if (activeFilter === 'all') return true;
+    return result.type === activeFilter;
+  });
+
   return (
-    <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-white">Research Assistant</h1>
-        <p className="text-gray-400 text-lg">Get comprehensive research on any topic</p>
+    <DashboardLayout>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Research Hub</h1>
+        <p className="text-gray-600 text-base md:text-lg">Discover and analyze research materials across various topics</p>
       </div>
 
       {/* Search Section */}
-      <div className="bg-black backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl mb-8">
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
         <form onSubmit={handleSearch} className="space-y-4">
-          <div className="relative">
+          <div>
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+              Research Topic
+            </label>
             <input
               type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Enter a research topic or question..."
-              className="w-full px-5 py-4 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+              id="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Enter your research topic or question..."
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
             />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="absolute right-2 top-2 px-6 py-2 bg-black text-white border border-white rounded-lg hover:bg-gray-800 transition-colors duration-300 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Researching...
-                </span>
-              ) : 'Research'}
-            </button>
           </div>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full md:w-auto bg-gray-900 text-white hover:bg-gray-800"
+          >
+            {isLoading ? 'Searching...' : 'Search Research'}
+          </Button>
         </form>
-
-        {/* Suggested Topics */}
-        {!results && (
-          <div className="mt-6">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Suggested Topics</h3>
-            <div className="flex flex-wrap gap-2">
-              {suggestedTopics.map((topic, index) => (
-                <button
-                  key={index}
-                  onClick={() => setQuery(topic)}
-                  className="px-4 py-2 bg-gray-800 text-white text-sm rounded-full hover:bg-gray-700 transition-colors duration-300"
-                >
-                  {topic}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Results Section */}
-      {isLoading && (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-16 h-16 border-4 border-gray-700 border-t-white rounded-full animate-spin mb-4"></div>
-          <p className="text-white text-lg">Researching your topic...</p>
-          <p className="text-gray-400 text-sm mt-2">This may take a moment</p>
-        </div>
-      )}
-
-      {results && !isLoading && (
-        <div className="space-y-8">
-          {/* Summary */}
-          <div className="bg-black backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 className="text-xl font-bold text-white mb-4">Summary</h2>
-            <p className="text-gray-300 leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
-            </p>
-            <div className="mt-4 flex justify-end">
-              <button className="text-white hover:text-gray-300 text-sm font-medium flex items-center">
-                <span>Generate Detailed Report</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Sources */}
-          <div className="bg-black backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 className="text-xl font-bold text-white mb-4">Sources</h2>
-            <div className="space-y-4">
-              {results.sources.map((source, index) => (
-                <div key={index} className="flex justify-between items-center border-b border-gray-700 pb-4 last:border-0 last:pb-0">
-                  <div>
-                    <h3 className="text-white font-medium">{source.title}</h3>
-                    <p className="text-sm text-gray-400">{source.publisher} • {source.date}</p>
-                  </div>
-                  <a href={source.url} className="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors duration-300">
-                    View
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Related Topics */}
-          <div className="bg-black backdrop-blur-md p-6 rounded-2xl border border-gray-700 shadow-xl">
-            <h2 className="text-xl font-bold text-white mb-4">Related Topics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {results.relatedTopics.map((topic, index) => (
-                <button
-                  key={index}
-                  onClick={() => setQuery(topic)}
-                  className="p-4 bg-gray-800 text-white rounded-xl hover:bg-gray-700 transition-colors duration-300 text-left flex justify-between items-center"
-                >
-                  <span>{topic}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-between items-center">
-            <button 
-              onClick={() => setResults(null)} 
-              className="px-6 py-3 bg-gray-800 text-white rounded-xl hover:bg-gray-700 transition-colors duration-300 flex items-center"
+      {/* Filters */}
+      {researchResults.length > 0 && (
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveFilter('all')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeFilter === 'all' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              New Research
+              All
             </button>
-            <button className="px-6 py-3 bg-black text-white border border-white rounded-xl hover:bg-gray-800 transition-colors duration-300 flex items-center">
-              Save Research
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
+            <button
+              onClick={() => setActiveFilter('article')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeFilter === 'article' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Articles
+            </button>
+            <button
+              onClick={() => setActiveFilter('video')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeFilter === 'video' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Videos
+            </button>
+            <button
+              onClick={() => setActiveFilter('paper')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeFilter === 'paper' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Papers
             </button>
           </div>
         </div>
       )}
 
-      {/* Footer with AI message */}
-      <div className="text-center text-sm text-gray-500 py-4 border-t border-gray-800 mt-8">
-        <p>🤖 Powered by Knowtasks</p>
-      </div>
-    </>
+      {/* Results */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Searching research materials...</p>
+        </div>
+      )}
+
+      {!isLoading && researchResults.length > 0 && (
+        <div className="space-y-6">
+          {filteredResults.map((result) => (
+            <div key={result.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    result.type === 'video' ? 'bg-red-100' : 'bg-blue-100'
+                  }`}>
+                    {result.type === 'video' ? (
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{result.title}</h3>
+                    <p className="text-sm text-gray-500">{result.source} • {result.date}</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
+                  View
+                </Button>
+              </div>
+              
+              <p className="text-gray-600 mb-4">{result.summary}</p>
+              
+              <div className="flex flex-wrap gap-2">
+                {result.tags.map((tag, index) => (
+                  <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && researchResults.length === 0 && searchQuery && (
+        <div className="text-center py-12">
+          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
+          <p className="text-gray-600">Try adjusting your search terms or filters</p>
+        </div>
+      )}
+    </DashboardLayout>
   );
 };
 
