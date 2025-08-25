@@ -31,13 +31,8 @@ app.prepare().then(() => {
     // Handle login event
     socket.on('login', async (credentials) => {
       try {
-        console.log('Socket login attempt with credentials:', credentials);
-        
         // Make a request to the login API
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`;
-        console.log('Making request to login API:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -45,12 +40,9 @@ app.prepare().then(() => {
           body: JSON.stringify(credentials)
         });
 
-        console.log('Login API response status:', response.status);
         const data = await response.json();
-        console.log('Login API response data:', data);
 
         if (response.ok) {
-          console.log('Login successful, emitting login_success event');
           // Emit success event with user data
           socket.emit('login_success', data);
           
@@ -68,7 +60,6 @@ app.prepare().then(() => {
             timestamp: new Date()
           });
         } else {
-          console.log('Login failed, emitting login_error event');
           // Emit error event
           socket.emit('login_error', data);
         }

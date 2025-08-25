@@ -84,58 +84,31 @@ export function verifyToken(token) {
 
 /**
  * Middleware to authenticate requests
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @param {Function} next - Next function to call if authenticated
  */
 export function authenticate(req, res, next) {
-  try {
-    // Extract token from Authorization header or cookies
-    let token;
-    
-    // Check Authorization header (Bearer token)
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    }
-    
-    // If no token in Authorization header, check cookies
-    if (!token && req.cookies) {
-      token = req.cookies.token;
-    }
-    
-    // If still no token, return authentication error
-    if (!token) {
-      return res.status(401).json({ 
-        success: false,
-        error: 'Authentication required',
-        message: 'No authentication token provided'
-      });
-    }
-    
-    // Verify the token
-    const payload = verifyToken(token);
-    if (!payload) {
-      return res.status(401).json({ 
-        success: false,
-        error: 'Authentication failed',
-        message: 'Invalid or expired token'
-      });
-    }
-    
-    // Attach user info to the request object
-    req.user = {
-      id: payload.sub,
-      email: payload.email,
-      name: payload.name
-    };
-    next();
-  } catch (error) {
-    console.error('Authentication error:', error);
-    return res.status(500).json({ 
-      success: false,
-      error: 'Server error',
-      message: 'An error occurred during authentication'
-    });
+  // Get token from Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authentication required' });
   }
+  
+  const token = authHeader.split(' ')[1];
+  const payload = verifyToken(token);
+  
+  if (!payload) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+  
+  // Attach user info to request
+  req.user = {
+    id: payload.sub,
+    email: payload.email,
+    name: payload.name
+  };
+  
+  // Call next function
+  return next(req, res);
 }

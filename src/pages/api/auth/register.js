@@ -1,6 +1,6 @@
 // Next.js API route for user registration
-import { generateToken } from '../../../../api/utils/auth';
-import User from '../../../../api/models/user';
+import { generateToken } from '../../../api/utils/auth';
+import User from '../../../api/models/user';
 
 export default function handler(req, res) {
   // CORS headers

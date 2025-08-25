@@ -97,16 +97,6 @@ class User {
       role: 'user',
       createdAt: new Date('2023-01-01'),
       updatedAt: new Date('2023-01-01')
-    },
-    {
-      id: '3',
-      email: 'test@example.com',
-      // This is 'password123' hashed with our mock implementation
-      password: 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',
-      name: 'Test Example User',
-      role: 'user',
-      createdAt: new Date('2023-01-01'),
-      updatedAt: new Date('2023-01-01')
     }
   ];
 

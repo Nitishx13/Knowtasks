@@ -69,36 +69,25 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      console.log('Attempting login with credentials:', credentials);
-      
-      // Direct API call instead of socket
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
+      return new Promise((resolve, reject) => {
+        socketAuth.login(credentials, {
+          onSuccess: (response) => {
+            setUser(response.user);
+            setToken(response.token);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            localStorage.setItem('token', response.token);
+            setLoading(false);
+            resolve(response);
+          },
+          onError: (error) => {
+            setError(error.message || 'Login failed');
+            setLoading(false);
+            reject(error);
+          }
+        });
       });
-      
-      const data = await response.json();
-      console.log('Login API response:', data);
-      
-      if (response.ok) {
-        setUser(data.user);
-        setToken(data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        setLoading(false);
-        return data;
-      } else {
-        const errorMsg = data.message || 'Login failed';
-        setError(errorMsg);
-        setLoading(false);
-        throw new Error(errorMsg);
-      }
     } catch (err) {
-      const errorMsg = err.message || 'Login failed';
-      setError(errorMsg);
+      setError(err.message || 'Login failed');
       setLoading(false);
       throw err;
     }

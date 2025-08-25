@@ -1,5 +1,5 @@
 // Next.js API route for getting current user profile
-import { authenticate } from '../../../../api/utils/auth';
+import { authenticate } from '../../../api/utils/auth';
 
 export default function handler(req, res) {
   // CORS headers
