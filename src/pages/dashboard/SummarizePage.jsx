@@ -2,45 +2,65 @@ import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { summarizeService } from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { useUploadThing } from '@uploadthing/react';
+import { generateComponents } from '@uploadthing/react';
+
+const { UploadButton } = generateComponents();
 
 const SummarizePage = () => {
-  const [fileUploaded, setFileUploaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [summary, setSummary] = useState(null);
-  const [fileName, setFileName] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setFileUploaded(true);
-      setFileName(file.name);
-    } else {
-      setFileUploaded(false);
-      setFileName('');
+  const { startUpload, isUploading } = useUploadThing("pdfUploader", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setUploadedFile({
+          url: res[0].url,
+          name: res[0].name
+        });
+        setUploadProgress(100);
+      }
+    },
+    onUploadProgress: (progress) => {
+      setUploadProgress(progress);
+    },
+    onUploadError: (error) => {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    },
+  });
+
+  const handleFileUpload = async (files) => {
+    if (files && files.length > 0) {
+      setUploadProgress(0);
+      await startUpload(files);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!fileUploaded) return;
+    if (!uploadedFile) {
+      alert('Please upload a PDF file first');
+      return;
+    }
     
     setIsLoading(true);
     
     try {
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput && fileInput.files.length > 0) {
-        const response = await summarizeService.summarizeFile(fileInput.files[0]);
-        
-        if (response && response.success) {
-          setSummary({
-            ...response.summary,
-            date: new Date(response.summary.date).toLocaleDateString()
-          });
-        } else {
-          throw new Error('Failed to generate summary');
-        }
+      const response = await summarizeService.uploadAndSummarize(
+        uploadedFile.url, 
+        uploadedFile.name
+      );
+      
+      if (response && response.success) {
+        setSummary({
+          ...response.summary,
+          date: new Date(response.summary.date).toLocaleDateString()
+        });
       } else {
-        throw new Error('No file selected');
+        throw new Error(response.error || 'Failed to generate summary');
       }
     } catch (error) {
       console.error('Summarization error:', error);
@@ -52,11 +72,8 @@ const SummarizePage = () => {
 
   const resetForm = () => {
     setSummary(null);
-    setFileUploaded(false);
-    setFileName('');
-    // Reset file input
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) fileInput.value = '';
+    setUploadedFile(null);
+    setUploadProgress(0);
   };
 
   return (
@@ -83,30 +100,61 @@ const SummarizePage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* File Upload Area */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="pdf-upload"
-                />
-                <label htmlFor="pdf-upload" className="cursor-pointer">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-900 font-medium mb-2">
-                    {fileUploaded ? fileName : 'Click to upload PDF'}
-                  </p>
-                  <p className="text-gray-500 text-sm">
-                    {fileUploaded ? 'File selected successfully' : 'or drag and drop your PDF here'}
-                  </p>
-                </label>
+                <UploadButton
+                  endpoint="pdfUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]) {
+                      setUploadedFile({
+                        url: res[0].url,
+                        name: res[0].name
+                      });
+                      setUploadProgress(100);
+                    }
+                  }}
+                  onUploadProgress={(progress) => {
+                    setUploadProgress(progress);
+                  }}
+                  onUploadError={(error) => {
+                    console.error('Upload error:', error);
+                    alert('Upload failed. Please try again.');
+                  }}
+                  className="w-full"
+                >
+                  {({ ready, isUploading, uploadProgress }) => (
+                    <div className="cursor-pointer">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        {isUploading ? (
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
+                        ) : (
+                          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )}
+                      </div>
+                      <p className="text-gray-900 font-medium mb-2">
+                        {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        {uploadedFile ? 'File uploaded successfully' : 'or drag and drop your PDF here'}
+                      </p>
+                      {isUploading && (
+                        <div className="mt-4">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-gray-600 h-2 rounded-full transition-all duration-300" 
+                              style={{ width: `${uploadProgress}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2">Uploading... {uploadProgress}%</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </UploadButton>
               </div>
 
               {/* File Info */}
-              {fileUploaded && (
+              {uploadedFile && (
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -115,7 +163,7 @@ const SummarizePage = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{fileName}</p>
+                      <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
                       <p className="text-xs text-gray-500">PDF Document</p>
                     </div>
                   </div>
@@ -125,7 +173,7 @@ const SummarizePage = () => {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                disabled={!fileUploaded || isLoading}
+                disabled={!uploadedFile || isLoading || isUploading}
                 className="w-full bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -185,7 +233,7 @@ const SummarizePage = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">Summary Generated</h2>
-                  <p className="text-sm text-gray-500">Document: {fileName}</p>
+                  <p className="text-sm text-gray-500">Document: {summary.fileName}</p>
                 </div>
               </div>
               <Button onClick={resetForm} variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
@@ -199,10 +247,10 @@ const SummarizePage = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Document Summary</h3>
             <div className="prose max-w-none">
               <p className="text-gray-700 leading-relaxed mb-6">
-                {summary?.content || 'This is a comprehensive summary of your uploaded PDF document. The AI has analyzed the content and extracted the key points, main ideas, and important information to provide you with a concise overview.'}
+                {summary.content}
               </p>
               
-              {summary?.keyPoints && (
+              {summary.keyPoints && summary.keyPoints.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 mb-3">Key Points:</h4>
                   <ul className="space-y-2">
@@ -215,6 +263,28 @@ const SummarizePage = () => {
                   </ul>
                 </div>
               )}
+
+              {/* Document Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500">Word Count</p>
+                    <p className="font-medium text-gray-900">{summary.wordCount}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Document Type</p>
+                    <p className="font-medium text-gray-900">{summary.documentType || 'PDF'}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Estimated Pages</p>
+                    <p className="font-medium text-gray-900">{summary.estimatedPages || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Generated</p>
+                    <p className="font-medium text-gray-900">{summary.date}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

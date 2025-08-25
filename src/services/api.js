@@ -1,186 +1,125 @@
 // API service for making requests to the backend
 
-const API_URL = '/api';
+const API_BASE_URL = '/api';
 
-// Helper function to handle API responses
-const handleResponse = async (response) => {
-  const data = await response.json();
-  
-  if (!response.ok) {
-    const error = data.error || response.statusText;
-    return Promise.reject(error);
-  }
-  
-  return data;
+// Helper function to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` })
+  };
 };
 
-// Authentication services
+// Auth API calls
 export const authService = {
-  // Login with email and password
-  login: async (email, password) => {
-    const response = await fetch(`${API_URL}/auth/login`, {
+  login: async (credentials) => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify(credentials),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Register a new user
-  register: async (name, email, password) => {
-    const response = await fetch(`${API_URL}/auth/register`, {
+
+  register: async (userData) => {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify(userData),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Login with Google
-  googleLogin: async (token) => {
-    const response = await fetch(`${API_URL}/auth/google`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
+
+  getProfile: async () => {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: getAuthHeaders(),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Logout (client-side only)
-  logout: () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  }
 };
 
-// Summarization services
+// Summarization API calls
 export const summarizeService = {
-  // Summarize text
+  // Upload and summarize PDF
+  uploadAndSummarize: async (fileUrl, fileName) => {
+    const response = await fetch(`${API_BASE_URL}/summarize/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fileUrl, fileName }),
+    });
+    return response.json();
+  },
+
+  // Get user's summaries
+  getUserSummaries: async () => {
+    const response = await fetch(`${API_BASE_URL}/summarize/list`, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return response.json();
+  },
+
+  // Legacy methods for backward compatibility
   summarizeText: async (text) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/summarize/text`, {
+    const response = await fetch(`${API_BASE_URL}/summarize`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ text })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, type: 'text' }),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Summarize video
+
   summarizeVideo: async (url) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/summarize/video`, {
+    const response = await fetch(`${API_BASE_URL}/summarize`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ url })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, type: 'video' }),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Summarize file
+
   summarizeFile: async (file) => {
-    const token = localStorage.getItem('token');
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await fetch(`${API_URL}/summarize/file`, {
+    const response = await fetch(`${API_BASE_URL}/summarize`, {
       method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file, type: 'file' }),
     });
-    
-    return handleResponse(response);
-  }
+    return response.json();
+  },
 };
 
-// Notes services
+// Notes API calls
 export const notesService = {
-  // Get all notes
   getNotes: async () => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/notes`, {
-      method: 'GET',
-      headers: { 
-        'Authorization': `Bearer ${token}`
-      }
+    const response = await fetch(`${API_BASE_URL}/notes`, {
+      headers: getAuthHeaders(),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Get a specific note
-  getNote: async (id) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/notes/${id}`, {
-      method: 'GET',
-      headers: { 
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    return handleResponse(response);
-  },
-  
-  // Create a new note
-  createNote: async (title, content) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/notes`, {
+
+  createNote: async (noteData) => {
+    const response = await fetch(`${API_BASE_URL}/notes`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ title, content })
+      headers: getAuthHeaders(),
+      body: JSON.stringify(noteData),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Update a note
-  updateNote: async (id, title, content) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/notes/${id}`, {
+
+  updateNote: async (id, noteData) => {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
       method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ title, content })
+      headers: getAuthHeaders(),
+      body: JSON.stringify(noteData),
     });
-    
-    return handleResponse(response);
+    return response.json();
   },
-  
-  // Delete a note
+
   deleteNote: async (id) => {
-    const token = localStorage.getItem('token');
-    
-    const response = await fetch(`${API_URL}/notes/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
       method: 'DELETE',
-      headers: { 
-        'Authorization': `Bearer ${token}`
-      }
+      headers: getAuthHeaders(),
     });
-    
-    return handleResponse(response);
-  }
+    return response.json();
+  },
 };
