@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { summarizeService } from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useUploadThing } from '@uploadthing/react';
-import { generateComponents } from '@uploadthing/react';
+import { useUploadThing, UploadButton } from '@uploadthing/react';
 
-const { UploadButton } = generateComponents();
+// UploadButton is now directly imported from '@uploadthing/react'
 
 const SummarizePage = () => {
   const [isLoading, setIsLoading] = useState(false);

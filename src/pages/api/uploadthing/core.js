@@ -1,4 +1,4 @@
-import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { createUploadthing } from "uploadthing/next";
 import { getAuth } from "@clerk/nextjs/server";
 
 const f = createUploadthing();
@@ -20,6 +20,6 @@ export const uploadRouter = {
       
       return { uploadedBy: metadata.userId, fileUrl: file.url };
     }),
-} satisfies FileRouter;
+};
 
-export type OurFileRouter = typeof uploadRouter;
+// export type OurFileRouter = typeof uploadRouter;
