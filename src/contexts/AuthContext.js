@@ -29,16 +29,17 @@ export const AuthProvider = ({ children }) => {
         // Connect to socket
         connectSocket();
         
-        // Check if user is already logged in
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-        
-        if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+        // Check if user is already logged in (only in browser environment)
+        if (typeof window !== 'undefined') {
+          const storedToken = localStorage.getItem('token');
+          const storedUser = localStorage.getItem('user');
           
-          // Verify token validity with server
-          socketAuth.checkAuth(storedToken, (status) => {
+          if (storedToken && storedUser) {
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+            
+            // Verify token validity with server
+            socketAuth.checkAuth(storedToken, (status) => {
             if (status.authenticated) {
               setUser(status.user);
             } else {
@@ -46,6 +47,8 @@ export const AuthProvider = ({ children }) => {
               logout();
             }
           });
+            }
+          }
         }
       } catch (err) {
         console.error('Auth initialization error:', err);

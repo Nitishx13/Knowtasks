@@ -4,7 +4,10 @@ const API_BASE_URL = '/api';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('authToken');
+  let token;
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('authToken');
+  }
   return {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` })

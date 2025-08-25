@@ -12,17 +12,19 @@ const Header = () => {
 
   // Handle scroll effect for header
   useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
-    };
+    if (typeof window !== 'undefined') {
+      const handleScroll = () => {
+        const isScrolled = window.scrollY > 10;
+        if (isScrolled !== scrolled) {
+          setScrolled(isScrolled);
+        }
+      };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, [scrolled]);
 
   return (

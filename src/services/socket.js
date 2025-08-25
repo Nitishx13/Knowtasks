@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 let socket;
 
 export const initializeSocket = () => {
-  if (!socket) {
+  if (!socket && typeof window !== 'undefined') {
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
     console.log('Initializing socket with URL:', socketUrl);
     socket = io(`${socketUrl}/auth`, {
