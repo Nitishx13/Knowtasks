@@ -1,42 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
-import { summarizeService } from '../../services/api';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useUploadThing, UploadButton } from '@uploadthing/react';
-
-// UploadButton is now directly imported from '@uploadthing/react'
 
 const SummarizePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
-
-  const { startUpload, isUploading } = useUploadThing("pdfUploader", {
-    onClientUploadComplete: (res) => {
-      if (res && res[0]) {
-        setUploadedFile({
-          url: res[0].url,
-          name: res[0].name
-        });
-        setUploadProgress(100);
-      }
-    },
-    onUploadProgress: (progress) => {
-      setUploadProgress(progress);
-    },
-    onUploadError: (error) => {
-      console.error('Upload error:', error);
-      alert('Upload failed. Please try again.');
-    },
-  });
-
-  const handleFileUpload = async (files) => {
-    if (files && files.length > 0) {
-      setUploadProgress(0);
-      await startUpload(files);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,33 +16,36 @@ const SummarizePage = () => {
     }
     
     setIsLoading(true);
-    
-    try {
-      const response = await summarizeService.uploadAndSummarize(
-        uploadedFile.url, 
-        uploadedFile.name
-      );
-      
-      if (response && response.success) {
-        setSummary({
-          ...response.summary,
-          date: new Date(response.summary.date).toLocaleDateString()
-        });
-      } else {
-        throw new Error(response.error || 'Failed to generate summary');
-      }
-    } catch (error) {
-      console.error('Summarization error:', error);
-      alert(`Error: ${error.message || 'Failed to generate summary'}`);
-    } finally {
+    // Simulated delay for UI demonstration
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      setSummary({
+        fileName: uploadedFile.name,
+        content: 'This is a placeholder summary content.',
+        keyPoints: ['Key point 1', 'Key point 2', 'Key point 3'],
+        wordCount: '500',
+        documentType: 'PDF',
+        estimatedPages: '5',
+        date: new Date().toLocaleDateString()
+      });
+    }, 2000);
   };
 
   const resetForm = () => {
     setSummary(null);
     setUploadedFile(null);
     setUploadProgress(0);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadedFile({
+        name: file.name,
+        size: file.size
+      });
+      setUploadProgress(100);
+    }
   };
 
   return (
@@ -99,57 +72,44 @@ const SummarizePage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* File Upload Area */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                <UploadButton
-                  endpoint="pdfUploader"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]) {
-                      setUploadedFile({
-                        url: res[0].url,
-                        name: res[0].name
-                      });
-                      setUploadProgress(100);
-                    }
-                  }}
-                  onUploadProgress={(progress) => {
-                    setUploadProgress(progress);
-                  }}
-                  onUploadError={(error) => {
-                    console.error('Upload error:', error);
-                    alert('Upload failed. Please try again.');
-                  }}
-                  className="w-full"
-                >
-                  {({ ready, isUploading, uploadProgress }) => (
-                    <div className="cursor-pointer">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        {isUploading ? (
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-600"></div>
-                        ) : (
-                          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                          </svg>
-                        )}
-                      </div>
-                      <p className="text-gray-900 font-medium mb-2">
-                        {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
-                      </p>
-                      <p className="text-gray-500 text-sm">
-                        {uploadedFile ? 'File uploaded successfully' : 'or drag and drop your PDF here'}
-                      </p>
-                      {isUploading && (
-                        <div className="mt-4">
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-gray-600 h-2 rounded-full transition-all duration-300" 
-                              style={{ width: `${uploadProgress}%` }}
-                            ></div>
-                          </div>
-                          <p className="text-sm text-gray-500 mt-2">Uploading... {uploadProgress}%</p>
-                        </div>
+                <label className="cursor-pointer w-full">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <div className="cursor-pointer">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      {uploadProgress < 100 ? (
+                        <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
                       )}
                     </div>
-                  )}
-                </UploadButton>
+                    <p className="text-gray-900 font-medium mb-2">
+                      {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      {uploadedFile ? 'File uploaded successfully' : 'or drag and drop your PDF here'}
+                    </p>
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <div className="mt-4">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gray-600 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">Uploading... {uploadProgress}%</p>
+                      </div>
+                    )}
+                  </div>
+                </label>
               </div>
 
               {/* File Info */}
