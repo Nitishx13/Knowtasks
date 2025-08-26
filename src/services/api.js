@@ -3,43 +3,11 @@
 const API_BASE_URL = '/api';
 
 // Helper function to get auth headers
-const getAuthHeaders = () => {
-  let token;
-  if (typeof window !== 'undefined') {
-    token = localStorage.getItem('authToken');
-  }
+const getAuthHeaders = async () => {
+  // Clerk handles authentication headers automatically for API routes
   return {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` })
   };
-};
-
-// Auth API calls
-export const authService = {
-  login: async (credentials) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-    return response.json();
-  },
-
-  register: async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
-    return response.json();
-  },
-
-  getProfile: async () => {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
-      headers: getAuthHeaders(),
-    });
-    return response.json();
-  },
 };
 
 // Summarization API calls
@@ -48,44 +16,47 @@ export const summarizeService = {
   uploadAndSummarize: async (fileUrl, fileName) => {
     const response = await fetch(`${API_BASE_URL}/summarize/upload`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await getAuthHeaders(),
       body: JSON.stringify({ fileUrl, fileName }),
     });
     return response.json();
   },
 
-  // Get user's summaries
-  getUserSummaries: async () => {
+  // Get all summaries for the current user
+  getSummaries: async () => {
     const response = await fetch(`${API_BASE_URL}/summarize/list`, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: await getAuthHeaders(),
     });
     return response.json();
   },
 
-  // Legacy methods for backward compatibility
-  summarizeText: async (text) => {
-    const response = await fetch(`${API_BASE_URL}/summarize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, type: 'text' }),
+  // Get a specific summary by ID
+  getSummaryById: async (summaryId) => {
+    const response = await fetch(`${API_BASE_URL}/summarize/${summaryId}`, {
+      headers: await getAuthHeaders(),
+    });
+    return response.json();
+  },
+};
+
+// User profile service
+export const profileService = {
+  // Update user profile
+  updateProfile: async (profileData) => {
+    const response = await fetch(`${API_BASE_URL}/profile`, {
+      method: 'PUT',
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(profileData),
     });
     return response.json();
   },
 
-  summarizeVideo: async (url) => {
-    const response = await fetch(`${API_BASE_URL}/summarize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, type: 'video' }),
-    });
-    return response.json();
-  },
-
-  summarizeFile: async (file) => {
-    const response = await fetch(`${API_BASE_URL}/summarize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file, type: 'file' }),
+  // Update notification preferences
+  updateNotifications: async (notificationPreferences) => {
+    const response = await fetch(`${API_BASE_URL}/profile/notifications`, {
+      method: 'PUT',
+      headers: await getAuthHeaders(),
+      body: JSON.stringify(notificationPreferences),
     });
     return response.json();
   },

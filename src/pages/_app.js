@@ -1,11 +1,13 @@
-import '@styles/globals.css';
+import '../styles/globals.css';
 import '../App.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from '../components/ui/toaster';
+import { AuthProvider } from '../contexts/AuthContext';
 
 // Import layouts
-import MainLayout from '@components/layout/MainLayout';
+import MainLayout from '../components/layout/MainLayout';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -19,14 +21,17 @@ function MyApp({ Component, pageProps }) {
   // Wrap everything with ClerkProvider
   return (
     <ClerkProvider {...pageProps}>
-      {!isDashboardRoute ? (
-        <MainLayout>
+      <AuthProvider>
+        {!isDashboardRoute ? (
+          <MainLayout>
+            <Component {...pageProps} />
+          </MainLayout>
+        ) : (
+          // For dashboard routes, the layout will be handled in the dashboard pages
           <Component {...pageProps} />
-        </MainLayout>
-      ) : (
-        // For dashboard routes, the layout will be handled in the dashboard pages
-        <Component {...pageProps} />
-      )}
+        )}
+        <Toaster />
+      </AuthProvider>
     </ClerkProvider>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "../../components/ui/Button";
+import { useToast } from "../../hooks/use-toast";
+import { useAuth } from "../../contexts/AuthContext";
 
 const SettingsPage = () => {
   const { toast } = useToast();
