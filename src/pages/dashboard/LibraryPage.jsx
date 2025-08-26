@@ -1,50 +1,27 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { useSummaries } from '../../hooks/use-summaries';
+import { useToast } from '../../hooks/use-toast';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // Mock data for library items
-  const libraryItems = [
-    {
-      id: 1,
-      title: 'Machine Learning Fundamentals',
-      type: 'summary',
-      category: 'AI',
-      date: '2023-11-15',
-      size: '2.5K words',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'React Development Guide',
-      type: 'research',
-      category: 'Programming',
-      date: '2023-11-10',
-      size: '1.8K words',
-      status: 'in-progress'
-    },
-    {
-      id: 3,
-      title: 'Climate Change Analysis',
-      type: 'summary',
-      category: 'Science',
-      date: '2023-11-08',
-      size: '3.2K words',
-      status: 'completed'
-    },
-    {
-      id: 4,
-      title: 'Business Strategy Framework',
-      type: 'research',
-      category: 'Business',
-      date: '2023-11-05',
-      size: '2.1K words',
-      status: 'completed'
-    }
-  ];
+  const { summaries, isLoading, error, refetch } = useSummaries();
+  const { toast } = useToast();
+  
+  // Format summaries as library items
+  const libraryItems = summaries.map(summary => ({
+    id: summary.id,
+    title: summary.title,
+    type: 'summary',
+    category: summary.documentType || 'Document',
+    date: new Date(summary.createdAt).toLocaleDateString(),
+    size: `${summary.wordCount || 0} words`,
+    status: 'completed',
+    fileName: summary.fileName,
+    originalData: summary
+  }));
 
   const filteredItems = libraryItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -153,13 +130,62 @@ const LibraryPage = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-gray-700 border-gray-300 hover:bg-gray-50"
+                  onClick={() => {
+                    window.location.href = `/dashboard/summarize?id=${item.id}`;
+                  }}
+                >
                   View
                 </Button>
-                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-gray-700 border-gray-300 hover:bg-gray-50"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/dashboard/summarize?id=${item.id}`);
+                    toast({
+                      title: 'Link copied',
+                      description: 'Summary link copied to clipboard',
+                      variant: 'success',
+                    });
+                  }}
+                >
                   Share
                 </Button>
-                <Button variant="outline" size="sm" className="text-red-600 border-red-300 hover:bg-red-50">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                  onClick={async () => {
+                    if (confirm('Are you sure you want to delete this summary?')) {
+                      try {
+                        const response = await fetch(`/api/summarize/${item.id}`, {
+                          method: 'DELETE',
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error('Failed to delete summary');
+                        }
+                        
+                        refetch();
+                        toast({
+                          title: 'Summary deleted',
+                          description: 'The summary has been deleted successfully',
+                          variant: 'success',
+                        });
+                      } catch (error) {
+                        toast({
+                          title: 'Delete failed',
+                          description: error.message || 'Failed to delete summary',
+                          variant: 'destructive',
+                        });
+                      }
+                    }
+                  }}
+                >
                   Delete
                 </Button>
               </div>
@@ -168,7 +194,28 @@ const LibraryPage = () => {
         ))}
       </div>
 
-      {filteredItems.length === 0 && (
+      {isLoading ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Loading your library</h3>
+          <p className="text-gray-600">Please wait while we fetch your documents</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error loading library</h3>
+          <p className="text-gray-600">{error}</p>
+          <Button 
+            onClick={refetch} 
+            className="mt-4 bg-gray-900 text-white hover:bg-gray-800"
+            variant="default"
+          >
+            Try Again
+          </Button>
+        </div>
+      ) : filteredItems.length === 0 ? (
         <div className="text-center py-12">
           <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -176,7 +223,7 @@ const LibraryPage = () => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
           <p className="text-gray-600">Try adjusting your search or filters</p>
         </div>
-      )}
+      ) : null}
     </DashboardLayout>
   );
 };

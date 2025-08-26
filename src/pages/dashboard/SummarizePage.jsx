@@ -1,34 +1,100 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { useUploadThing } from '../../lib/uploadthing-config';
+import { useToast } from '../../hooks/use-toast';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SummarizePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isUploading, setIsUploading] = useState(false);
+  
+  const { startUpload, isUploading: uploadThingIsUploading } = useUploadThing('pdfUploader', {
+    onClientUploadComplete: (res) => {
+      setIsUploading(false);
+      setUploadProgress(100);
+      if (res && res.length > 0) {
+        setUploadedFile({
+          name: res[0].name,
+          size: res[0].size,
+          url: res[0].url
+        });
+        toast({
+          title: 'Upload complete',
+          description: 'Your file has been uploaded successfully.',
+          variant: 'success',
+        });
+      }
+    },
+    onUploadError: (error) => {
+      setIsUploading(false);
+      setUploadProgress(0);
+      toast({
+        title: 'Upload failed',
+        description: error.message || 'Something went wrong during upload.',
+        variant: 'destructive',
+      });
+    },
+    onUploadBegin: () => {
+      setIsUploading(true);
+      setUploadProgress(10);
+    },
+    onUploadProgress: (progress) => {
+      setUploadProgress(progress);
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!uploadedFile) {
-      alert('Please upload a PDF file first');
+    if (!uploadedFile || !uploadedFile.url) {
+      toast({
+        title: 'No file selected',
+        description: 'Please upload a PDF file first',
+        variant: 'destructive',
+      });
       return;
     }
     
     setIsLoading(true);
-    // Simulated delay for UI demonstration
-    setTimeout(() => {
-      setIsLoading(false);
-      setSummary({
-        fileName: uploadedFile.name,
-        content: 'This is a placeholder summary content.',
-        keyPoints: ['Key point 1', 'Key point 2', 'Key point 3'],
-        wordCount: '500',
-        documentType: 'PDF',
-        estimatedPages: '5',
-        date: new Date().toLocaleDateString()
+    
+    try {
+      const response = await fetch('/api/summarize/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileUrl: uploadedFile.url,
+          fileName: uploadedFile.name,
+        }),
       });
-    }, 2000);
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process PDF');
+      }
+      
+      setSummary(data.summary);
+      toast({
+        title: 'Summary generated',
+        description: 'Your PDF has been successfully summarized.',
+        variant: 'success',
+      });
+    } catch (error) {
+      toast({
+        title: 'Processing failed',
+        description: error.message || 'Something went wrong during processing.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetForm = () => {
@@ -40,11 +106,8 @@ const SummarizePage = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUploadedFile({
-        name: file.name,
-        size: file.size
-      });
-      setUploadProgress(100);
+      setIsUploading(true);
+      startUpload([file]);
     }
   };
 
@@ -134,6 +197,7 @@ const SummarizePage = () => {
                 type="submit" 
                 disabled={!uploadedFile || isLoading || isUploading}
                 className="w-full bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="default"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">

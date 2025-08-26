@@ -100,8 +100,8 @@ export async function getSummaryById(summaryId) {
   try {
     const result = await session.run(
       `
-      MATCH (s:Summary {id: $summaryId})
-      RETURN s
+      MATCH (s:Summary {id: $summaryId})<-[:CREATED]-(u:User)
+      RETURN s, u.id as userId
       `,
       { summaryId }
     );
@@ -110,27 +110,46 @@ export async function getSummaryById(summaryId) {
       return null;
     }
     
-    return result.records[0].get('s').properties;
+    const record = result.records[0];
+    const summary = record.get('s').properties;
+    summary.userId = record.get('userId');
+    
+    return summary;
   } finally {
     await session.close();
   }
 }
 
-export async function deleteSummary(summaryId, userId) {
+export async function deleteSummary(summaryId, userId = null) {
   const driver = getDriver();
   const session = driver.session();
   
   try {
-    const result = await session.run(
-      `
-      MATCH (u:User {id: $userId})-[:CREATED]->(s:Summary {id: $summaryId})
-      DETACH DELETE s
-      RETURN count(s) as deleted
-      `,
-      { summaryId, userId }
-    );
-    
-    return result.records[0].get('deleted').toNumber() > 0;
+    // If userId is provided, ensure the user owns the summary
+    if (userId) {
+      const result = await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:CREATED]->(s:Summary {id: $summaryId})
+        DETACH DELETE s
+        RETURN count(s) as deleted
+        `,
+        { summaryId, userId }
+      );
+      
+      return result.records[0].get('deleted').toNumber() > 0;
+    } else {
+      // Delete any summary with the given ID (admin operation)
+      const result = await session.run(
+        `
+        MATCH (s:Summary {id: $summaryId})
+        DETACH DELETE s
+        RETURN count(s) as deleted
+        `,
+        { summaryId }
+      );
+      
+      return result.records[0].get('deleted').toNumber() > 0;
+    }
   } finally {
     await session.close();
   }
