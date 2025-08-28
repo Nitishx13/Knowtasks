@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Button } from '../../components/ui/Button';
-import { useToast } from '../../hooks/use-toast';
+import DashboardLayout from '../../../components/layout/DashboardLayout';
+import { Button } from '../../../components/ui/Button';
+import { useToast } from '../../../hooks/use-toast';
 
 const LibraryPage = () => {
   const [summaries, setSummaries] = useState([]);
