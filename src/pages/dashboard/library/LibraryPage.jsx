@@ -78,10 +78,10 @@ const LibraryPage = () => {
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No summaries yet</h3>
-          <p className="text-gray-500 mb-4">Upload and summarize your first PDF to get started</p>
-          <Button onClick={() => window.location.href = '/dashboard/summarize'}>
-            Go to Summarizer
-          </Button>
+                        <p className="text-gray-500 mb-4">Upload your first document to get started</p>
+              <Button onClick={() => window.location.href = '/dashboard/library'}>
+                Upload Document
+              </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

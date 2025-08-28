@@ -74,15 +74,7 @@ const DataPage = () => {
     }
   };
 
-  const handleGenerateSummary = async (fileId, fileUrl, fileName) => {
-    try {
-      // Redirect to the summarize page with the file information
-      window.location.href = `/dashboard/summarize?fileId=${fileId}&fileUrl=${encodeURIComponent(fileUrl)}&fileName=${encodeURIComponent(fileName)}`;
-    } catch (err) {
-      console.error('Error redirecting to summarize:', err);
-      alert('Failed to open summarize page. Please try again.');
-    }
-  };
+
 
   const handleSelectFile = (fileId) => {
     setSelectedFiles(prev => 
@@ -418,14 +410,7 @@ const DataPage = () => {
                           >
                             Download
                           </Button>
-                          <Button
-                            onClick={() => handleGenerateSummary(file.id, file.fileUrl, file.fileName)}
-                            variant="outline"
-                            size="sm"
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            Summary
-                          </Button>
+                          
                           <Button
                             onClick={() => handleDeleteFile(file.id)}
                             variant="outline"

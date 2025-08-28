@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
-import { summarizeService } from '../../services/api';
+
 
 const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState({
     metrics: {
       minutesSaved: 0,
-      wordsSummarized: 0,
+
       monthlyUsage: '0%'
     },
     statistics: {
@@ -31,7 +31,7 @@ const DashboardPage = () => {
           setDashboardData({
             metrics: {
               minutesSaved: 120,
-              wordsSummarized: 15000,
+
               monthlyUsage: '45%'
             },
             statistics: {
@@ -88,14 +88,14 @@ const DashboardPage = () => {
 
         <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Words Summarized</h3>
+            <h3 className="text-lg font-semibold text-white">Documents Processed</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{metrics.wordsSummarized}</p>
+          <p className="text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
           <div className="flex items-center text-gray-300 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -124,7 +124,7 @@ const DashboardPage = () => {
 
         <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Total Summaries</h3>
+            <h3 className="text-lg font-semibold text-white">Total Documents</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -145,17 +145,7 @@ const DashboardPage = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Summarize PDF</h3>
-              <p className="text-sm text-gray-400">Upload and analyze documents</p>
-            </div>
-          </Link>
+
 
           <Link href="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
@@ -169,29 +159,9 @@ const DashboardPage = () => {
             </div>
           </Link>
 
-          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Summarize Video</h3>
-              <p className="text-sm text-gray-400">Extract key points from videos</p>
-            </div>
-          </Link>
 
-          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Live Lectures</h3>
-              <p className="text-sm text-gray-400">Real-time lecture notes</p>
-            </div>
-          </Link>
+
+
         </div>
       </div>
 
@@ -266,7 +236,7 @@ const DashboardPage = () => {
       {/* Recent Summaries Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-white">Recent Summaries</h2>
+          <h2 className="text-xl font-semibold text-white">Recent Documents</h2>
           <Link href="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View All →</Link>
         </div>
         
@@ -327,10 +297,10 @@ const DashboardPage = () => {
                   <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h4 className="text-lg font-medium mb-2 text-white">No summaries yet</h4>
-              <p className="text-gray-400 mb-6">Get started by creating your first summary.</p>
-              <Link href="/dashboard/summarize" className="bg-black hover:bg-gray-800 text-white border border-white/30 hover:border-white px-4 py-2 rounded-md font-medium transition-colors inline-block">
-                + New Summary
+              <h4 className="text-lg font-medium mb-2 text-white">No documents yet</h4>
+              <p className="text-gray-400 mb-6">Get started by uploading your first document.</p>
+              <Link href="/dashboard/library" className="bg-black hover:bg-gray-800 text-white border border-white/30 hover:border-white px-4 py-2 rounded-md font-medium transition-colors inline-block">
+                + Upload Document
               </Link>
             </div>
           </div>

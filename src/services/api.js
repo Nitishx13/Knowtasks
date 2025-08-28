@@ -10,34 +10,7 @@ const getAuthHeaders = async () => {
   };
 };
 
-// Summarization API calls
-export const summarizeService = {
-  // Upload and summarize PDF
-  uploadAndSummarize: async (fileUrl, fileName) => {
-    const response = await fetch(`${API_BASE_URL}/summarize/upload`, {
-      method: 'POST',
-      headers: await getAuthHeaders(),
-      body: JSON.stringify({ fileUrl, fileName }),
-    });
-    return response.json();
-  },
 
-  // Get all summaries for the current user
-  getSummaries: async () => {
-    const response = await fetch(`${API_BASE_URL}/summarize/list`, {
-      headers: await getAuthHeaders(),
-    });
-    return response.json();
-  },
-
-  // Get a specific summary by ID
-  getSummaryById: async (summaryId) => {
-    const response = await fetch(`${API_BASE_URL}/summarize/${summaryId}`, {
-      headers: await getAuthHeaders(),
-    });
-    return response.json();
-  },
-};
 
 // User profile service
 export const profileService = {
