@@ -59,6 +59,7 @@ const ResearchPage = () => {
   });
 
   return (
+    <div>
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Research Hub</h1>
         <p className="text-gray-600 text-base md:text-lg">Discover and analyze research materials across various topics</p>

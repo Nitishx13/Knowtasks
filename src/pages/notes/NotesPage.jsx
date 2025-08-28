@@ -100,6 +100,7 @@ const NotesPage = () => {
   };
 
   return (
+    <div>
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">

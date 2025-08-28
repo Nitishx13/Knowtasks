@@ -59,6 +59,7 @@ const LibraryPage = () => {
   }
 
   return (
+    <div>
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Document Library</h1>
         <p className="text-gray-600 text-base md:text-lg">
