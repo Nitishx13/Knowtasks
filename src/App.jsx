@@ -1,42 +1,7 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// Import layouts
-import MainLayout from './components/layout/MainLayout.jsx';
-import DashboardRoutes from './components/layout/DashboardRoutes.jsx';
-
-// Import pages
-import HomePage from './pages/home/HomePage.jsx';
-import LoginPage from './pages/auth/LoginPage.jsx';
-import RegisterPage from './pages/auth/RegisterPage.jsx';
-import NotesPage from './pages/notes/NotesPage.jsx';
-import DashboardPage from './pages/dashboard/DashboardPage.jsx';
-import SettingsPage from './pages/dashboard/SettingsPage.jsx';
-import LibraryPage from './pages/dashboard/LibraryPage.jsx';
-import ResearchPage from './pages/dashboard/ResearchPage.jsx';
-import SummarizePage from './pages/dashboard/SummarizePage.jsx';
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        {/* Public routes with MainLayout */}
-        <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
-        <Route path="/login" element={<MainLayout><LoginPage /></MainLayout>} />
-        <Route path="/register" element={<MainLayout><RegisterPage /></MainLayout>} />
-        
-        {/* Protected routes with DashboardLayout */}
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/dashboard" element={<DashboardRoutes />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="library" element={<LibraryPage />} />
-          <Route path="research" element={<ResearchPage />} />
-          <Route path="summarize" element={<SummarizePage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </Router>
-  )
+// This component is no longer needed for routing since Next.js handles it
+// The actual pages are defined in src/pages/ directory
+export default function App() {
+  return null;
 }
-
-export default App

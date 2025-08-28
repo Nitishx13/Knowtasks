@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { useUploadThing } from '../../lib/uploadthing-config';
 import { useToast } from '../../hooks/use-toast';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -13,41 +12,91 @@ const SummarizePage = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
-  
-  const { startUpload, isUploading: uploadThingIsUploading } = useUploadThing('pdfUploader', {
-    onClientUploadComplete: (res) => {
-      setIsUploading(false);
-      setUploadProgress(100);
-      if (res && res.length > 0) {
-        setUploadedFile({
-          name: res[0].name,
-          size: res[0].size,
-          url: res[0].url
-        });
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Custom file upload handler
+  const handleFileUpload = async (file) => {
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadProgress(10);
+
+    try {
+      // Convert file to base64 for local upload
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          setUploadProgress(50);
+
+          // Upload the file to our server (local storage)
+          const response = await fetch('/api/upload-file', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              file: reader.result.split(',')[1], // Remove data:application/pdf;base64, prefix
+              fileName: file.name
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to upload file');
+          }
+
+          const data = await response.json();
+
+          // Convert relative URL to absolute URL for the summarization API
+          const absoluteFileUrl = `${window.location.origin}${data.file.fileUrl}`;
+
+          setUploadedFile({
+            name: data.file.fileName,
+            size: data.file.fileSize,
+            url: absoluteFileUrl,
+            source: 'local'
+          });
+
+          setUploadProgress(100);
+
+          toast({
+            title: 'Upload complete',
+            description: 'Your file has been uploaded to local storage successfully.',
+            variant: 'success',
+          });
+        } catch (error) {
+          setUploadProgress(0);
+          toast({
+            title: 'Upload failed',
+            description: error.message || 'Something went wrong during upload.',
+            variant: 'destructive',
+          });
+        } finally {
+          setIsUploading(false);
+        }
+      };
+
+      reader.onerror = () => {
+        setUploadProgress(0);
+        setIsUploading(false);
         toast({
-          title: 'Upload complete',
-          description: 'Your file has been uploaded successfully.',
-          variant: 'success',
+          title: 'Upload failed',
+          description: 'Failed to read file.',
+          variant: 'destructive',
         });
-      }
-    },
-    onUploadError: (error) => {
-      setIsUploading(false);
+      };
+
+      reader.readAsDataURL(file);
+
+    } catch (error) {
       setUploadProgress(0);
+      setIsUploading(false);
       toast({
         title: 'Upload failed',
         description: error.message || 'Something went wrong during upload.',
         variant: 'destructive',
       });
-    },
-    onUploadBegin: () => {
-      setIsUploading(true);
-      setUploadProgress(10);
-    },
-    onUploadProgress: (progress) => {
-      setUploadProgress(progress);
-    },
-  });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,7 +112,8 @@ const SummarizePage = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/summarize/upload', {
+      // First, save the file metadata to our Neon database
+      const uploadResponse = await fetch('/api/upload-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +121,20 @@ const SummarizePage = () => {
         body: JSON.stringify({
           fileUrl: uploadedFile.url,
           fileName: uploadedFile.name,
+          fileSize: uploadedFile.size,
+          uploadSource: uploadedFile.source || 'local'
         }),
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to save file to database');
+      }
+
+      // Then process the PDF for summarization
+      const response = await fetch('/api/summarize/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileUrl: uploadedFile.url, fileName: uploadedFile.name }),
       });
       
       const data = await response.json();
@@ -83,7 +146,7 @@ const SummarizePage = () => {
       setSummary(data.summary);
       toast({
         title: 'Summary generated',
-        description: 'Your PDF has been successfully summarized.',
+        description: 'Your PDF has been successfully summarized using AI.',
         variant: 'success',
       });
     } catch (error) {
@@ -106,8 +169,7 @@ const SummarizePage = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setIsUploading(true);
-      startUpload([file]);
+      handleFileUpload(file);
     }
   };
 
@@ -197,7 +259,6 @@ const SummarizePage = () => {
                 type="submit" 
                 disabled={!uploadedFile || isLoading || isUploading}
                 className="w-full bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                variant="default"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
@@ -307,6 +368,27 @@ const SummarizePage = () => {
                     <p className="font-medium text-gray-900">{summary.date}</p>
                   </div>
                 </div>
+                
+                {/* Enhanced AI Analysis */}
+                {(summary.writingStyle || summary.complexityLevel) && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h5 className="text-sm font-medium text-gray-700 mb-3">AI Analysis:</h5>
+                    <div className="grid grid-cols-2 gap-4">
+                      {summary.writingStyle && (
+                        <div>
+                          <p className="text-gray-500 text-xs">Writing Style</p>
+                          <p className="font-medium text-gray-900 text-sm">{summary.writingStyle}</p>
+                        </div>
+                      )}
+                      {summary.complexityLevel && (
+                        <div>
+                          <p className="text-gray-500 text-xs">Complexity Level</p>
+                          <p className="font-medium text-gray-900 text-sm capitalize">{summary.complexityLevel}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -326,7 +408,46 @@ const SummarizePage = () => {
                 </svg>
                 Share Summary
               </Button>
-              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+              <Button 
+                variant="outline" 
+                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/library', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        title: summary.title,
+                        content: summary.content,
+                        keyPoints: summary.keyPoints,
+                        fileName: summary.fileName,
+                        fileUrl: summary.fileUrl,
+                        wordCount: summary.wordCount,
+                        documentType: summary.documentType,
+                        estimatedPages: summary.estimatedPages,
+                        writingStyle: summary.writingStyle,
+                        complexityLevel: summary.complexityLevel
+                      })
+                    });
+                    
+                    if (response.ok) {
+                      toast({
+                        title: 'Saved to Library',
+                        description: 'Your summary has been saved to your library.',
+                        variant: 'success',
+                      });
+                    } else {
+                      throw new Error('Failed to save to library');
+                    }
+                  } catch (error) {
+                    toast({
+                      title: 'Save Failed',
+                      description: 'Failed to save summary to library.',
+                      variant: 'destructive',
+                    });
+                  }
+                }}
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>

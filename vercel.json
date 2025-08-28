@@ -5,15 +5,5 @@
   "framework": "nextjs",
   "env": {
     "NODE_ENV": "production"
-  },
-  "buildEnvironment": {
-    "NEO4J_URI": "@neo4j_uri",
-    "NEO4J_USERNAME": "@neo4j_username",
-    "NEO4J_PASSWORD": "@neo4j_password",
-    "UPLOADTHING_SECRET": "@uploadthing_secret",
-    "UPLOADTHING_APP_ID": "@uploadthing_app_id",
-    "OPENAI_API_KEY": "@openai_api_key",
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "@clerk_publishable_key",
-    "CLERK_SECRET_KEY": "@clerk_secret_key"
   }
 }

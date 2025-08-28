@@ -1,5 +1,5 @@
 import { getAuth } from "@clerk/nextjs/server";
-import { getUserSummaries } from "../../../lib/neo4j";
+import { getUserSummaries } from "../../../lib/postgres";
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -13,23 +13,27 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Get user's summaries from database
+    // Get user's summaries from Postgres
     const summaries = await getUserSummaries(userId);
 
-    // Format the response
-    const formattedSummaries = summaries.map(summary => ({
+    // Transform data to match frontend expectations
+    const transformedSummaries = summaries.map(summary => ({
       id: summary.id,
       title: summary.title,
-      fileName: summary.fileName,
-      wordCount: summary.wordCount,
-      documentType: summary.documentType,
-      createdAt: summary.createdAt,
-      updatedAt: summary.updatedAt
+      content: summary.content,
+      keyPoints: summary.key_points || [],
+      fileName: summary.file_name,
+      fileUrl: summary.file_url,
+      wordCount: summary.word_count,
+      documentType: summary.document_type,
+      estimatedPages: summary.estimated_pages,
+      createdAt: summary.created_at,
+      date: summary.created_at
     }));
 
     res.status(200).json({
       success: true,
-      summaries: formattedSummaries
+      summaries: transformedSummaries
     });
 
   } catch (error) {

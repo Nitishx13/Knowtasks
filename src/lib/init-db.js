@@ -1,16 +1,16 @@
-import { initializeDatabase, testConnection, getDriver } from './neo4j';
+import { initializeDatabase, testConnection } from './postgres.js';
 
 export async function initDatabase() {
   try {
-    console.log('Testing Neo4j connection...');
+    console.log('Testing Postgres connection...');
     const isConnected = await testConnection();
     
     if (!isConnected) {
-      console.error('Failed to connect to Neo4j database');
+      console.error('Failed to connect to Postgres database');
       return false;
     }
     
-    console.log('Neo4j connection successful');
+    console.log('Postgres connection successful');
     
     console.log('Initializing database schema...');
     await initializeDatabase();

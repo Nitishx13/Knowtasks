@@ -28,7 +28,7 @@ const DashboardLayout = ({ children }) => {
 
   // If no user, redirect to login
   if (!user) {
-    router.push('/auth/login');
+    router.push('/login');
     return null;
   }
 
@@ -121,10 +121,23 @@ const DashboardLayout = ({ children }) => {
                   ? "bg-gray-100 text-gray-900"
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www/w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {!sidebarCollapsed && <span className="ml-3">Library</span>}
+              </Link>
+            </li>
+            <li>
+              <Link href="/dashboard/data" className={cn(
+                "flex items-center p-3 rounded-lg transition-colors",
+                router.pathname === '/dashboard/data'
+                  ? "bg-gray-100 text-gray-900"
+                  : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+              )}>
+                <svg xmlns="http://www/w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                {!sidebarCollapsed && <span className="ml-3">Data</span>}
               </Link>
             </li>
             <li className="pt-6">
