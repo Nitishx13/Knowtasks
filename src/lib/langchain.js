@@ -3,11 +3,18 @@ const { PDFLoader } = require('@langchain/community/document_loaders/fs/pdf');
 const { RecursiveCharacterTextSplitter } = require('langchain/text_splitter');
 const { PromptTemplate } = require('@langchain/core/prompts');
 
+// Check if OpenAI API key is configured
+if (!process.env.OPENAI_API_KEY) {
+  console.error('OPENAI_API_KEY is not configured in environment variables');
+}
+
 // Initialize OpenAI model
 const model = new ChatOpenAI({
   openAIApiKey: process.env.OPENAI_API_KEY,
   modelName: 'gpt-3.5-turbo',
   temperature: 0.3,
+  maxRetries: 3,
+  timeout: 60000, // 60 seconds timeout
 });
 
 // Extract text from PDF file
@@ -28,6 +35,10 @@ async function extractTextFromPDF(filePath) {
 // Generate AI summary using OpenAI
 async function generateSummary(text, fileName) {
   try {
+    // Check if API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key is not configured');
+    }
     const prompt = PromptTemplate.fromTemplate(`
       You are an expert document analyst. Please analyze the following document and provide a comprehensive summary.
       

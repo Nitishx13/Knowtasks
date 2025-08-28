@@ -13,6 +13,15 @@ const nextConfig = {
       '@styles': path.resolve(__dirname, './src/styles'),
       '@utils': path.resolve(__dirname, './src/utils'),
     };
+    
+    // Handle Node.js modules in client-side code
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+      os: false,
+    };
+    
     return config;
   },
   reactStrictMode: true,
@@ -28,6 +37,10 @@ const nextConfig = {
         destination: '/api/:path*',
       },
     ];
+  },
+  // Increase timeout for API routes
+  serverRuntimeConfig: {
+    maxDuration: 60,
   },
 };
 

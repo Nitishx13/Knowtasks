@@ -1,5 +1,5 @@
 const { sql } = require('@vercel/postgres');
-const { extractTextFromPDF, generateSummary, analyzeDocumentStructure } = require('../../../lib/langchain');
+const { extractTextFromPDF, generateSummary, analyzeDocumentStructure } = require('../../../src/lib/langchain');
 const path = require('path');
 const fs = require('fs');
 
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     `;
 
     // Convert file URL to local path
-    const filePath = path.join(process.cwd(), 'public', fileUrl.replace('/uploads/', 'uploads/'));
+    const filePath = path.join(process.cwd(), 'uploads', fileUrl.replace('/uploads/', ''));
     
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'File not found on server' });
