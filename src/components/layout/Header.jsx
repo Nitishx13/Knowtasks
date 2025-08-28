@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button } from '@components/ui/Button';
-import { Sheet, SheetContent, SheetTrigger } from '@components/ui/sheet';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 const Header = () => {
   const router = useRouter();
@@ -60,76 +59,29 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button className="bg-orange-500 text-white hover:bg-orange-600 font-bold px-6 py-2 rounded-xl shadow-md group">
-                  <span className="flex items-center">
-                    Summarize something
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="top" className="w-full border-b-2 border-b-primary/20 rounded-b-2xl">
-                <div className="flex flex-col items-center justify-center py-6 md:py-8 space-y-3 md:space-y-4 px-4 md:px-0">
-                  <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-700 inline-block text-transparent bg-clip-text">Summarize Content</h2>
-                  <p className="text-muted-foreground text-center text-sm md:text-base max-w-md">Paste your text below and we'll create a concise summary for you.</p>
-                  <textarea 
-                    className="w-full max-w-2xl h-32 md:h-40 p-3 md:p-4 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                    placeholder="Paste your content here..."
-                  ></textarea>
-                  <Link href="/dashboard/summarize" className="w-full max-w-xs md:max-w-md">
-                    <Button className="w-full bg-orange-500 text-white hover:bg-orange-600 font-bold px-6 md:px-8 py-3 rounded-xl shadow-md">
-                      Generate Summary
-                    </Button>
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-
+            <Link href="/dashboard">
+              <Button className="bg-orange-500 text-white hover:bg-orange-600 font-bold px-6 py-2 rounded-xl shadow-md group">
+                <span className="flex items-center">
+                  Go to Dashboard
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile menu */}
           <div className="md:hidden flex items-center">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-accent relative group overflow-hidden rounded-full border border-gray-200">
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-b from-orange-500/20 to-orange-500/5 rounded-full"></div>
-                  <Menu className="h-5 w-5 relative z-10 text-orange-500" />
-                  <span className="sr-only">Summarize</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="bottom" className="h-[70vh] border-t-2 border-t-primary/20 rounded-t-2xl">
-                {/* Decorative header */}
-                <div className="w-full h-1 bg-gradient-to-r from-orange-500 to-orange-400 mb-4"></div>
-                
-                <div className="flex items-center justify-between mb-4 mt-2">
-                  <h2 className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-700 inline-block text-transparent bg-clip-text">Summarize Content</h2>
-                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-orange-100 hover:text-orange-500 transition-colors">
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                
-                <div className="flex flex-col space-y-3 md:space-y-4 px-2 md:px-4 mt-2">
-                  <p className="text-muted-foreground text-sm md:text-base">Paste your text below and we'll create a concise summary for you.</p>
-                  <textarea 
-                    className="w-full h-28 md:h-32 p-3 md:p-4 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                    placeholder="Paste your content here..."
-                  ></textarea>
-                  <Link href="/dashboard/summarize" className="w-full">
-                    <Button className="w-full bg-orange-500 text-white hover:bg-orange-600 font-bold py-3 rounded-xl shadow-md group">
-                      <span className="flex items-center justify-center text-sm md:text-base">
-                        Generate Summary
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </span>
-                    </Button>
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <Link href="/dashboard">
+              <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-accent relative group overflow-hidden rounded-full border border-gray-200">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-b from-orange-500/20 to-orange-500/5 rounded-full"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 relative z-10 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="sr-only">Dashboard</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

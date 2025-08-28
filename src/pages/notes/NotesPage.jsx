@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import DashboardLayout from '../../components/layout/DashboardLayout';
 import { notesService } from '../../services/api';
 
 const NotesPage = () => {
@@ -101,7 +100,6 @@ const NotesPage = () => {
   };
 
   return (
-    <DashboardLayout>
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
@@ -184,7 +182,7 @@ const NotesPage = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

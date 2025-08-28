@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
-import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -87,7 +86,7 @@ const LibraryPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <div>
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Library</h1>
         <p className="text-gray-600 text-base md:text-lg">Manage and organize your saved content</p>
@@ -177,7 +176,7 @@ const LibraryPage = () => {
           <p className="text-gray-600">Try adjusting your search or filters</p>
         </div>
       )}
-    </DashboardLayout>
+    </div>
   );
 };
 

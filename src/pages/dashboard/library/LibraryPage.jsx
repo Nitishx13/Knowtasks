@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DashboardLayout from '../../../components/layout/DashboardLayout';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../hooks/use-toast';
 
@@ -53,16 +52,13 @@ const LibraryPage = () => {
 
   if (loading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
     );
   }
 
   return (
-    <DashboardLayout>
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Document Library</h1>
         <p className="text-gray-600 text-base md:text-lg">
@@ -271,7 +267,7 @@ const LibraryPage = () => {
           </div>
         </div>
       )}
-    </DashboardLayout>
+    </div>
   );
 };
 
