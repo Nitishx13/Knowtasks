@@ -14,7 +14,7 @@ export default authMiddleware({
   afterAuth(auth, req, evt) {
     // Redirect signed-in users away from login/register
     const url = new URL(req.nextUrl.origin + req.nextUrl.pathname);
-    if (auth.userId && (isLoginPage(req) || isRegisterPage(req))) {
+    if (auth.userId && (url.pathname.startsWith('/login') || url.pathname.startsWith('/register'))) {
       url.pathname = '/dashboard';
       return Response.redirect(url);
     }
