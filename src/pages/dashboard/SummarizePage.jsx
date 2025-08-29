@@ -7,6 +7,9 @@ const SummarizePage = () => {
   const [error, setError] = useState(null);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'text'
+  const [textInput, setTextInput] = useState('');
+  const [isProcessingText, setIsProcessingText] = useState(false);
 
   // Fetch existing summaries on component mount
   useEffect(() => {
@@ -79,6 +82,53 @@ const SummarizePage = () => {
     }
   };
 
+  // New function to handle text processing
+  const handleProcessText = async () => {
+    if (!textInput.trim()) {
+      setError('Please enter some text to process.');
+      return;
+    }
+
+    setIsProcessingText(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: textInput }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Text processing successful:', data);
+        setResult({
+          fileName: 'Text Input',
+          fileSize: textInput.length,
+          fileType: 'text',
+          content: textInput,
+          summary: data.summary,
+          wordCount: Math.ceil(data.summary.split(' ').length),
+          date: new Date().toISOString()
+        });
+        
+        // Refresh summaries list
+        await fetchSummaries();
+      } else {
+        const errorData = await response.json();
+        console.error('Text processing failed:', errorData);
+        setError(errorData.error || 'Text processing failed');
+      }
+    } catch (error) {
+      console.error('Text processing error:', error);
+      setError(error.message || 'Text processing failed');
+    } finally {
+      setIsProcessingText(false);
+    }
+  };
+
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -92,61 +142,99 @@ const SummarizePage = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 text-gray-900">Smart Summarization Tool</h1>
         <p className="text-gray-600 text-lg">
-          Upload PDFs and documents to generate intelligent summaries
+          Upload PDFs and documents or paste text to generate intelligent summaries
         </p>
       </div>
 
-      {/* File Upload Section */}
+      {/* Tab Navigation */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Upload Document</h2>
-        
-        <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept=".pdf,.txt,.doc,.docx"
-              className="hidden"
-              id="file-upload"
-            />
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <div className="space-y-2">
-                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium text-blue-600 hover:text-blue-500">
-                    Click to upload
-                  </span>{' '}
-                  or drag and drop
-                </div>
-                <p className="text-xs text-gray-500">PDF, TXT, DOC, DOCX up to 50MB</p>
-              </div>
-            </label>
-          </div>
-          
-          {file && (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span className="text-sm font-medium text-gray-900">{file.name}</span>
-                </div>
-                <span className="text-xs text-gray-500">{formatFileSize(file.size)}</span>
-              </div>
-            </div>
-          )}
-          
+        <div className="flex border-b border-gray-200 mb-6">
           <button
-            onClick={handleUpload}
-            disabled={!file || isUploading}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            className={`px-4 py-2 font-medium text-sm ${activeTab === 'upload' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('upload')}
           >
-            {isUploading ? 'Processing...' : 'Upload & Summarize'}
+            Upload File
+          </button>
+          <button
+            className={`px-4 py-2 font-medium text-sm ${activeTab === 'text' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('text')}
+          >
+            Paste Text
           </button>
         </div>
+
+        {/* File Upload Section */}
+        {activeTab === 'upload' && (
+          <div className="space-y-4">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <input
+                type="file"
+                onChange={handleFileChange}
+                accept=".pdf,.txt,.doc,.docx"
+                className="hidden"
+                id="file-upload"
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <div className="space-y-2">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium text-blue-600 hover:text-blue-500">
+                      Click to upload
+                    </span>{' '}
+                    or drag and drop
+                  </div>
+                  <p className="text-xs text-gray-500">PDF, TXT, DOC, DOCX up to 50MB</p>
+                </div>
+              </label>
+            </div>
+            
+            {file && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{formatFileSize(file.size)}</span>
+                </div>
+              </div>
+            )}
+            
+            <button
+              onClick={handleUpload}
+              disabled={!file || isUploading}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            >
+              {isUploading ? 'Processing...' : 'Upload & Summarize'}
+            </button>
+          </div>
+        )}
+
+        {/* Text Input Section */}
+        {activeTab === 'text' && (
+          <div className="space-y-4">
+            <div className="border border-gray-300 rounded-lg">
+              <textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Paste or type your text here..."
+                className="w-full h-64 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <button
+              onClick={handleProcessText}
+              disabled={!textInput.trim() || isProcessingText}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            >
+              {isProcessingText ? 'Processing...' : 'Process Text'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Error Display */}
@@ -159,11 +247,11 @@ const SummarizePage = () => {
       {/* Result Display */}
       {result && (
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Upload Result</h2>
+          <h2 className="text-xl font-semibold mb-4">Summary Result</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-blue-600 font-medium">File:</span> {result.fileName}
+                <span className="text-blue-600 font-medium">Source:</span> {result.fileName}
               </div>
               <div>
                 <span className="text-blue-600 font-medium">Words:</span> {result.wordCount}
@@ -230,7 +318,7 @@ const SummarizePage = () => {
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No summaries yet</h3>
             <p className="mt-1 text-sm text-gray-500">
-              Upload a document above to generate your first summary.
+              Upload a document or paste text above to generate your first summary.
             </p>
           </div>
         )}
