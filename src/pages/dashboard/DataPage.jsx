@@ -11,7 +11,6 @@ const DataPage = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
-  const [viewingFile, setViewingFile] = useState(null);
 
   useEffect(() => {
     fetchFiles();
@@ -20,7 +19,6 @@ const DataPage = () => {
     return () => {
       setSelectedFiles([]);
       setSelectAll(false);
-      setViewingFile(null);
     };
   }, []);
 
@@ -144,22 +142,6 @@ const DataPage = () => {
     document.body.removeChild(link);
   };
 
-  const handleViewFile = async (fileId) => {
-    try {
-      const response = await fetch(`/api/summarize/view?id=${fileId}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setViewingFile(data.summary);
-      } else {
-        alert('Failed to view file: ' + data.error);
-      }
-    } catch (err) {
-      console.error('Error viewing file:', err);
-      alert('Failed to view file. Please try again.');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -187,75 +169,6 @@ const DataPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* File Viewing Modal */}
-      {viewingFile && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">{viewingFile.fileName}</h2>
-                <button 
-                  onClick={() => setViewingFile(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 overflow-y-auto flex-grow">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-blue-600 font-medium">Document Type:</span> {viewingFile.documentType}
-                  </div>
-                  <div>
-                    <span className="text-blue-600 font-medium">Word Count:</span> {viewingFile.wordCount}
-                  </div>
-                  <div>
-                    <span className="text-blue-600 font-medium">Created:</span> {new Date(viewingFile.createdAt).toLocaleString()}
-                  </div>
-                  <div>
-                    <span className="text-blue-600 font-medium">Pages:</span> {viewingFile.estimatedPages}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Summary</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-700 whitespace-pre-wrap">{viewingFile.content}</p>
-                  </div>
-                </div>
-                
-                {viewingFile.keyPoints && viewingFile.keyPoints.length > 0 && (
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-2">Key Points</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                      {viewingFile.keyPoints.map((point, index) => (
-                        <li key={index} className="text-gray-700">{point}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="p-6 border-t bg-gray-50">
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => setViewingFile(null)}
-                  variant="outline"
-                  className="mr-2"
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -489,15 +402,6 @@ const DataPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={() => handleViewFile(file.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            View
-                          </Button>
-                          
                           <Button
                             onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
                             variant="outline"
