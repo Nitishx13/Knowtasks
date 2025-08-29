@@ -1,5 +1,5 @@
 // Next.js API route for summarization
-import { createSummary } from '../../../lib/postgres';
+import { createSummary, createUser } from '../../../lib/postgres';
 
 export default async function handler(req, res) {
   // CORS headers
@@ -33,57 +33,73 @@ export default async function handler(req, res) {
     // For demo purposes, we'll just return a simple summary
     const summary = generateMockSummary(text, type);
     
-    // Return the summary response first before attempting database operations
-    // This ensures the user gets a response even if database operations fail
+    // We'll now process the database operations before responding
+    // to include the summary ID in the response
+    let summaryId = null;
+    
+    // Process database operations
+    
+    try {
+       // Get user ID from request headers or use a default ID for demo purposes
+       // In production, this should come from authentication
+       const userId = req.headers['user-id'] || 'user_demo';
+       
+       // First, ensure the user exists in the database
+       try {
+         // Create a demo user if needed - this is just for demonstration
+         // In production, you would use proper authentication
+         await createUser(userId, {
+           name: 'Demo User',
+           email: 'demo@example.com'
+         });
+       } catch (userError) {
+         console.log('Note: User already exists or could not be created:', userError.message);
+         // Continue anyway - the user might already exist
+       }
+       
+       // Extract metadata from request or use defaults
+       const { metadata = {} } = req.body;
+       const wordCount = metadata.wordCount || text.split(/\s+/).length;
+       const estimatedPages = metadata.estimatedPages || Math.ceil(wordCount / 250);
+       const documentType = metadata.documentType || 'Text Input';
+       
+       // Store the summary in the database
+       const summaryData = {
+         title: 'Text Summary',
+         content: summary,
+         keyPoints: ['Key point 1', 'Key point 2', 'Key point 3'],
+         fileName: 'Pasted Text',
+         fileUrl: '', // No file URL for pasted text
+         wordCount: wordCount,
+         documentType: documentType,
+         estimatedPages: estimatedPages
+       };
+       
+       // Save to database and get the ID
+       let summaryId;
+       try {
+         const result = await createSummary(userId, summaryData);
+         summaryId = result.id;
+         console.log('Text summary stored in database with ID:', summaryId);
+       } catch (dbError) {
+         console.error('Database error while saving summary:', dbError);
+       }
+       
+       console.log('Text summary stored in database for user:', userId);
+    } catch (dbError) {
+      // Log database errors but don't fail the request
+      console.error('Error preparing database operation:', dbError);
+    }
+    
+    // Now return the response with the summary ID if available
     res.status(200).json({
       success: true,
       summary,
       originalLength: text.length,
       summaryLength: summary.length,
-      type
+      type,
+      id: summaryId // Include the summary ID for frontend reference
     });
-    
-    try {
-       // For demo purposes, we'll skip database storage since it requires a valid user
-       // In a real application, you would ensure the user exists in the database first
-       // or create a demo/anonymous user for testing
-       
-       // The error we're seeing is because the 'anonymous' user doesn't exist in the users table
-       // and the summaries table has a foreign key constraint requiring a valid user_id
-       
-       // For now, we'll just log that we're skipping database storage
-       console.log('Skipping database storage for demo purposes');
-       
-       // If you want to enable database storage, you would need to:
-       // 1. Create a user record for 'anonymous' or
-       // 2. Get a valid user ID from authentication
-       
-       /* Commented out to prevent foreign key constraint errors
-       const userId = req.headers['user-id'] || 'anonymous';
-       
-       // Store the summary in the database
-       const wordCount = text.split(' ').length;
-       const summaryData = {
-         title: 'Text Summary',
-         content: summary,
-         keyPoints: ['Key point 1', 'Key point 2', 'Key point 3'],
-         fileName: 'Text Input',
-         fileUrl: '',
-         wordCount: wordCount,
-         documentType: 'text',
-         estimatedPages: Math.ceil(wordCount / 250) // Rough estimate of pages
-       };
-       
-       // Save to database - but don't wait for it to complete before responding
-       // This is a "fire and forget" approach to prevent blocking the response
-       createSummary(userId, summaryData).catch(dbError => {
-         console.error('Database error while saving summary:', dbError);
-       });
-       */
-    } catch (dbError) {
-      // Log database errors but don't fail the request
-      console.error('Error preparing database operation:', dbError);
-    }
   } catch (error) {
     console.error('Summarization error:', error);
     return res.status(500).json({ error: 'Internal server error' });

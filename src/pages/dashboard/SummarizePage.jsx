@@ -82,7 +82,7 @@ const SummarizePage = () => {
     }
   };
 
-  // New function to handle text processing
+  // Function to handle text processing and store in database
   const handleProcessText = async () => {
     if (!textInput.trim()) {
       setError('Please enter some text to process.');
@@ -93,28 +93,43 @@ const SummarizePage = () => {
     setError(null);
     
     try {
+      // Calculate estimated word count and pages for metadata
+      const wordCount = textInput.trim().split(/\s+/).length;
+      const estimatedPages = Math.ceil(wordCount / 500); // Rough estimate: ~500 words per page
+      
       const response = await fetch('/api/summarize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: textInput }),
+        body: JSON.stringify({ 
+          text: textInput,
+          metadata: {
+            wordCount,
+            estimatedPages,
+            documentType: 'Text Input'
+          }
+        }),
       });
       
       if (response.ok) {
         const data = await response.json();
         console.log('Text processing successful:', data);
+        
+        // Update the result state with the returned data
         setResult({
           fileName: 'Text Input',
           fileSize: textInput.length,
           fileType: 'text',
           content: textInput,
           summary: data.summary,
-          wordCount: Math.ceil(data.summary.split(' ').length),
-          date: new Date().toISOString()
+          wordCount: wordCount,
+          estimatedPages: estimatedPages,
+          date: new Date().toISOString(),
+          id: data.id // Store the summary ID for potential viewing later
         });
         
-        // Refresh summaries list
+        // Refresh summaries list to show the newly added summary
         await fetchSummaries();
       } else {
         const errorData = await response.json();
