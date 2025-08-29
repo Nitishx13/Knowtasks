@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 
 const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState({
     metrics: {
       minutesSaved: 0,
-
       monthlyUsage: '0%'
     },
     statistics: {
@@ -20,33 +20,68 @@ const DashboardPage = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
   
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // In a real app, we would fetch this data from the backend
-        // For this demo, we'll use mock data after a short delay
-        setTimeout(() => {
+        
+        // Fetch user-specific text files
+        if (user?.id) {
+          const response = await fetch(`/api/text/list?userId=${user.id}`);
+          if (response.ok) {
+            const data = await response.json();
+            const files = data.files || [];
+            
+            // Calculate statistics based on user's files
+            const numOfSummaries = files.length;
+            const totalWords = files.reduce((sum, file) => sum + (file.wordCount || 0), 0);
+            const avgWordsPerFile = numOfSummaries > 0 ? Math.round(totalWords / numOfSummaries) : 0;
+            
+            // Estimate time saved (assuming 200 words per minute reading speed)
+            const minutesSaved = Math.round(totalWords / 200);
+            const totalHoursSaved = (minutesSaved / 60).toFixed(1);
+            
+            // Format recent summaries
+            const recentSummaries = files.slice(0, 3).map(file => ({
+              id: file.id,
+              title: file.title,
+              date: file.formattedDate,
+              type: 'Text',
+              words: file.wordCount
+            }));
+            
+            setDashboardData({
+              metrics: {
+                minutesSaved,
+                monthlyUsage: `${Math.min(100, numOfSummaries * 5)}%`
+              },
+              statistics: {
+                numOfSummaries,
+                totalHoursSaved,
+                avgTimeSaved: `${Math.round(minutesSaved / numOfSummaries) || 0} min`
+              },
+              recentSummaries
+            });
+          }
+        } else {
+          // Fallback to mock data if no user ID
           setDashboardData({
             metrics: {
-              minutesSaved: 120,
-
-              monthlyUsage: '45%'
+              minutesSaved: 0,
+              monthlyUsage: '0%'
             },
             statistics: {
-              numOfSummaries: 12,
-              totalHoursSaved: 8,
-              avgTimeSaved: '15 min'
+              numOfSummaries: 0,
+              totalHoursSaved: 0,
+              avgTimeSaved: '0 min'
             },
-            recentSummaries: [
-              { id: 1, title: 'Machine Learning Basics', date: 'Today', type: 'PDF', words: 2500 },
-              { id: 2, title: 'Introduction to React', date: 'Yesterday', type: 'Video', words: 1800 },
-              { id: 3, title: 'Advanced CSS Techniques', date: '2 days ago', type: 'Lecture', words: 3200 }
-            ]
+            recentSummaries: []
           });
-          setLoading(false);
-        }, 1000);
+        }
+        
+        setLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data');

@@ -1,6 +1,7 @@
-import { initializeDatabase, testConnection } from './postgres.js';
+require('dotenv').config();
+const { initializeDatabase, testConnection } = require('./postgres');
 
-export async function initDatabase() {
+async function initDatabase() {
   try {
     console.log('Testing Postgres connection...');
     const isConnected = await testConnection();
@@ -41,3 +42,5 @@ if (typeof window === 'undefined') {
       process.exit(1);
     });
 }
+
+module.exports = { initDatabase };

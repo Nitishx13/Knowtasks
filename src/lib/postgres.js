@@ -200,6 +200,24 @@ async function initializeDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_documents_upload_date ON documents(upload_date)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_summaries_user_id ON summaries(user_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_summaries_created_at ON summaries(created_at)`;
+    
+    // Create text_files table with proper foreign key constraint
+    await sql`
+      CREATE TABLE IF NOT EXISTS text_files (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(500) NOT NULL,
+        content TEXT NOT NULL,
+        summary TEXT,
+        word_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        status VARCHAR(50) DEFAULT 'processed'
+      )
+    `;
+    
+    await sql`CREATE INDEX IF NOT EXISTS idx_text_files_user_id ON text_files(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_text_files_created_at ON text_files(created_at)`;
 
     console.log('Database schema initialized successfully');
   } catch (error) {

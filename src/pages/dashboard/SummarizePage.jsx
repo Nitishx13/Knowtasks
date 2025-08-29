@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SummarizePage = () => {
   const [file, setFile] = useState(null);
@@ -10,11 +11,43 @@ const SummarizePage = () => {
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'text'
   const [textInput, setTextInput] = useState('');
   const [isProcessingText, setIsProcessingText] = useState(false);
+  const { user } = useAuth();
 
-  // Fetch existing summaries on component mount
+  // Fetch existing summaries and text files on component mount
   useEffect(() => {
     fetchSummaries();
+    fetchTextFiles();
   }, []);
+  
+  // Function to fetch text files
+  const fetchTextFiles = async () => {
+    setLoading(true);
+    try {
+      // Include user ID in the request to get user-specific files
+      const userId = user?.id;
+      const response = await fetch(`/api/text/list${userId ? `?userId=${userId}` : ''}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Combine text files with summaries
+        const textFiles = data.files.map(file => ({
+          id: file.id,
+          fileName: file.title,
+          summary: file.summary,
+          wordCount: file.wordCount,
+          formattedSize: `${Math.ceil(file.content.length / 1024)} KB`,
+          formattedDate: file.formattedDate,
+          fileType: 'text'
+        }));
+        
+        // Add text files to summaries
+        setSummaries(prevSummaries => [...prevSummaries, ...textFiles]);
+      }
+    } catch (error) {
+      console.error('Error fetching text files:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchSummaries = async () => {
     setLoading(true);
@@ -93,7 +126,8 @@ const SummarizePage = () => {
     setError(null);
     
     try {
-      const response = await fetch('/api/summarize', {
+      // First, get the summary from the summarize API
+      const summaryResponse = await fetch('/api/summarize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,26 +135,50 @@ const SummarizePage = () => {
         body: JSON.stringify({ text: textInput }),
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Text processing successful:', data);
-        setResult({
-          fileName: 'Text Input',
-          fileSize: textInput.length,
-          fileType: 'text',
-          content: textInput,
-          summary: data.summary,
-          wordCount: Math.ceil(data.summary.split(' ').length),
-          date: new Date().toISOString()
-        });
-        
-        // Refresh summaries list
-        await fetchSummaries();
-      } else {
-        const errorData = await response.json();
-        console.error('Text processing failed:', errorData);
-        setError(errorData.error || 'Text processing failed');
+      if (!summaryResponse.ok) {
+        const errorData = await summaryResponse.json();
+        throw new Error(errorData.error || 'Text processing failed');
       }
+      
+      const summaryData = await summaryResponse.json();
+      console.log('Text processing successful:', summaryData);
+      
+      // Then, save the text file with the summary and user ID
+      const userId = user?.id;
+      const saveResponse = await fetch(`/api/text/save${userId ? `?userId=${userId}` : ''}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: textInput,
+          title: 'Text Input',
+          summary: summaryData.summary
+        }),
+      });
+      
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        console.error('Text file saving failed:', errorData);
+        throw new Error(errorData.error || 'Failed to save text file');
+      }
+      
+      const savedData = await saveResponse.json();
+      console.log('Text file saved successfully:', savedData);
+      
+      setResult({
+        fileName: savedData.title,
+        fileSize: textInput.length,
+        fileType: 'text',
+        content: textInput,
+        summary: summaryData.summary,
+        wordCount: Math.ceil(summaryData.summary.split(' ').length),
+        date: new Date().toISOString(),
+        fileId: savedData.fileId
+      });
+      
+      // Refresh summaries list
+      await fetchSummaries();
     } catch (error) {
       console.error('Text processing error:', error);
       setError(error.message || 'Text processing failed');
@@ -139,11 +197,21 @@ const SummarizePage = () => {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-gray-900">Smart Summarization Tool</h1>
-        <p className="text-gray-600 text-lg">
-          Upload PDFs and documents or paste text to generate intelligent summaries
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900">Smart Summarization Tool</h1>
+          <p className="text-gray-600 text-lg">
+            Upload PDFs and documents or paste text to generate intelligent summaries
+          </p>
+        </div>
+        <div>
+          <a 
+            href="/dashboard/files" 
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          >
+            View All Text Files
+          </a>
+        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -279,9 +347,9 @@ const SummarizePage = () => {
         </div>
       )}
 
-      {/* Previous Summaries */}
+      {/* Previous Summaries and Text Files */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">Previous Summaries</h2>
+        <h2 className="text-xl font-semibold mb-4">Previous Summaries & Text Files</h2>
         
         {loading ? (
           <div className="text-center py-8">
@@ -307,6 +375,14 @@ const SummarizePage = () => {
                       <span className="capitalize">{summary.fileType?.replace('.', '') || 'unknown'}</span>
                     </div>
                   </div>
+                  {summary.fileType === 'text' && (
+                    <a 
+                      href={`/dashboard/files?id=${summary.id}`}
+                      className="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 border border-blue-200 rounded-full hover:border-blue-400"
+                    >
+                      View
+                    </a>
+                  )}
                 </div>
               </div>
             ))}
