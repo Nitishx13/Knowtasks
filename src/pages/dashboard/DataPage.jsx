@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
+import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders } from '../../utils/auth';
 
 const DataPage = () => {
   const [files, setFiles] = useState([]);
@@ -11,6 +13,9 @@ const DataPage = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  
+  // Get current user from auth context
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchFiles();
@@ -25,7 +30,19 @@ const DataPage = () => {
   const fetchFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/data/files');
+      
+      // Ensure user is authenticated
+      if (!user || !user.id) {
+        setError('Authentication required');
+        setLoading(false);
+        return;
+      }
+      
+      // Get auth headers and pass user ID to API to fetch only this user's files
+      const headers = await getAuthHeaders(user.id);
+      const response = await fetch(`/api/data/files?userId=${user.id}`, {
+        headers
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -51,12 +68,20 @@ const DataPage = () => {
   const handleDeleteFile = async (fileId) => {
     if (window.confirm('Are you sure you want to delete this file?')) {
       try {
+        // Ensure user is authenticated
+        if (!user || !user.id) {
+          setError('Authentication required');
+          return;
+        }
+        
+        const headers = await getAuthHeaders(user.id);
         const response = await fetch('/api/data/files/delete', {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
+            ...headers,
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ fileId }),
+          body: JSON.stringify({ fileIds: selectedFiles }),
         });
 
         const data = await response.json();
@@ -102,14 +127,22 @@ const DataPage = () => {
 
     if (window.confirm(`Are you sure you want to delete ${selectedFiles.length} files?`)) {
       try {
+        // Ensure user is authenticated
+        if (!user || !user.id) {
+          setError('Authentication required');
+          return;
+        }
+        
         setBulkDeleting(true);
         
         // Delete files one by one
         for (const fileId of selectedFiles) {
+          const headers = await getAuthHeaders(user.id);
           const response = await fetch('/api/data/files/delete', {
             method: 'DELETE',
             headers: {
-              'Content-Type': 'application/json',
+              ...headers,
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({ fileId }),
           });
@@ -133,13 +166,37 @@ const DataPage = () => {
     }
   };
 
-  const handleDownloadFile = (fileUrl, fileName) => {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadFile = async (fileUrl, fileName, fileId) => {
+    try {
+      // Ensure user is authenticated
+      if (!user || !user.id) {
+        setError('Authentication required');
+        return;
+      }
+      
+      // Verify file belongs to user before downloading
+      const headers = await getAuthHeaders(user.id);
+      const response = await fetch(`/api/data/files/verify?fileId=${fileId}&userId=${user.id}`, {
+        headers
+      });
+      const data = await response.json();
+      
+      if (!data.success) {
+        alert('You do not have permission to download this file');
+        return;
+      }
+      
+      // Create a temporary anchor element
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Error downloading file:', err);
+      alert('Failed to download file');
+    }
   };
 
   if (loading) {
@@ -405,7 +462,7 @@ const DataPage = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
                             <Button
-                              onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
+                              onClick={() => handleDownloadFile(file.fileUrl, file.fileName, file.id)}
                               variant="outline"
                               size="sm"
                               className="text-blue-600 hover:text-blue-900 text-xs md:text-sm px-2 md:px-3 py-1"
@@ -499,7 +556,7 @@ const DataPage = () => {
                       
                       <div className="mt-3 flex justify-end space-x-2">
                         <button
-                          onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
+                          onClick={() => handleDownloadFile(file.fileUrl, file.fileName, file.id)}
                           className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded border border-blue-200 hover:bg-blue-100"
                         >
                           Download

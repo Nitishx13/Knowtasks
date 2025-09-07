@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders } from '../../utils/auth';
 
 const SummarizePage = () => {
   const [file, setFile] = useState(null);
@@ -25,7 +26,10 @@ const SummarizePage = () => {
     try {
       // Include user ID in the request to get user-specific files
       const userId = user?.id;
-      const response = await fetch(`/api/text/list${userId ? `?userId=${userId}` : ''}`);
+      const headers = await getAuthHeaders(userId);
+      const response = await fetch(`/api/text/list${userId ? `?userId=${userId}` : ''}`, {
+        headers
+      });
       if (response.ok) {
         const data = await response.json();
         // Combine text files with summaries
@@ -52,7 +56,11 @@ const SummarizePage = () => {
   const fetchSummaries = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/summarize/list');
+      const userId = user?.id;
+      const headers = await getAuthHeaders(userId);
+      const response = await fetch('/api/summarize/list', {
+        headers
+      });
       if (response.ok) {
         const data = await response.json();
         setSummaries(data.summaries || []);
@@ -88,8 +96,14 @@ const SummarizePage = () => {
 
       console.log('Uploading file:', file.name, 'Size:', file.size, 'Type:', file.type);
       
+      const userId = user?.id;
+      const headers = await getAuthHeaders(userId);
+      // Remove Content-Type header as it will be set automatically for FormData
+      delete headers['Content-Type'];
+      
       const response = await fetch('/api/summarize/upload', {
         method: 'POST',
+        headers,
         body: formData,
       });
 
@@ -140,11 +154,12 @@ const SummarizePage = () => {
     
     try {
       // First, get the summary from the summarize API
+      const userId = user?.id;
+      const headers = await getAuthHeaders(userId);
+      
       const summaryResponse = await fetch('/api/summarize', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ text: textInput }),
       });
       
@@ -157,12 +172,9 @@ const SummarizePage = () => {
       console.log('Text processing successful:', summaryData);
       
       // Then, save the text file with the summary and user ID
-      const userId = user?.id;
       const saveResponse = await fetch(`/api/text/save${userId ? `?userId=${userId}` : ''}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ 
           text: textInput,
           title: 'Text Input',

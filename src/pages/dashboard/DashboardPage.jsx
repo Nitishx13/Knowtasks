@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders } from '../../utils/auth';
 
 
 const DashboardPage = () => {
@@ -29,7 +30,10 @@ const DashboardPage = () => {
         
         // Fetch user-specific text files
         if (user?.id) {
-          const response = await fetch(`/api/text/list?userId=${user.id}`);
+          const headers = await getAuthHeaders(user.id);
+          const response = await fetch(`/api/text/list?userId=${user.id}`, {
+            headers
+          });
           if (response.ok) {
             const data = await response.json();
             const files = data.files || [];

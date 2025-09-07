@@ -1,10 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders } from '../../utils/auth';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { user } = useAuth();
 
+  // Function to fetch library items from API
+  const fetchLibraryItems = async () => {
+    setLoading(true);
+    try {
+      // In a real implementation, we would fetch data from the API
+      // const userId = user?.id;
+      // if (!userId) return;
+      // 
+      // const headers = await getAuthHeaders(userId);
+      // const response = await fetch(`/api/library/items?userId=${userId}`, {
+      //   headers
+      // });
+      // 
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   setLibraryItems(data.items || []);
+      // }
+      
+      // For now, we'll continue using mock data
+      // Simulate API delay
+      setTimeout(() => {
+        setLoading(false);
+      }, 500);
+    } catch (error) {
+      console.error('Error fetching library items:', error);
+      setLoading(false);
+    }
+  };
+  
+  // Call fetchLibraryItems when component mounts or user changes
+  useEffect(() => {
+    fetchLibraryItems();
+  }, [user]);
+  
   // Mock data for library items
   const libraryItems = [
     {

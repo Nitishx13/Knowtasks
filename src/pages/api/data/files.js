@@ -1,6 +1,7 @@
 const { sql } = require('@vercel/postgres');
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -8,8 +9,19 @@ export default async function handler(req, res) {
   try {
     // Test database connection
     await sql`SELECT NOW()`;
+    
+    // Get user ID from request headers or query parameters
+    const userId = req.headers['user-id'] || req.query.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Authentication required', 
+        message: 'User ID is required to fetch files' 
+      });
+    }
 
-    // Fetch all uploaded files
+    // Fetch only files belonging to the current user
     const result = await sql`
       SELECT 
         id,
@@ -21,6 +33,7 @@ export default async function handler(req, res) {
         upload_date,
         status
       FROM uploaded_files 
+      WHERE user_id = ${userId}
       ORDER BY upload_date DESC
     `;
 
@@ -67,3 +80,6 @@ function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+// Apply auth middleware to protect this route
+export default authMiddleware(handler);

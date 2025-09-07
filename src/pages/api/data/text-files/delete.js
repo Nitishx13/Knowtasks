@@ -1,6 +1,4 @@
 const { sql } = require('@vercel/postgres');
-const fs = require('fs');
-const path = require('path');
 import { authMiddleware } from '../../../../middleware/authMiddleware';
 
 async function handler(req, res) {
@@ -16,7 +14,7 @@ async function handler(req, res) {
       return res.status(401).json({ 
         success: false, 
         error: 'Authentication required', 
-        message: 'User ID is required to delete files' 
+        message: 'User ID is required to delete text files' 
       });
     }
     
@@ -31,8 +29,8 @@ async function handler(req, res) {
 
     // First, verify all files belong to the user
     const fileResult = await sql`
-      SELECT id, file_url, file_name 
-      FROM uploaded_files 
+      SELECT id 
+      FROM text_files 
       WHERE id = ANY(${filesToDelete}) AND user_id = ${userId}
     `;
 
@@ -46,46 +44,22 @@ async function handler(req, res) {
     
     // Check if all requested files were found
     if (fileResult.rows.length !== filesToDelete.length) {
-      console.warn(`User ${userId} attempted to delete files they don't own`);
+      console.warn(`User ${userId} attempted to delete text files they don't own`);
     }
 
     // Delete the files from the database
     await sql`
-      DELETE FROM uploaded_files 
+      DELETE FROM text_files 
       WHERE id = ANY(${fileResult.rows.map(row => row.id)}) AND user_id = ${userId}
     `;
     
-    // Process each file for physical deletion
-    for (const file of fileResult.rows) {
-      // Try to delete the physical file (optional - don't fail if file doesn't exist)
-      try {
-        if (file.file_url.startsWith('http')) {
-          // If it's a full URL, extract the path
-          const url = new URL(file.file_url);
-          const filePath = path.join(process.cwd(), 'uploads', url.pathname.replace('/uploads/', ''));
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        } else {
-          // If it's a relative path
-          const filePath = path.join(process.cwd(), 'uploads', file.file_url.replace('/uploads/', ''));
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        }
-      } catch (fileError) {
-        console.warn('Could not delete physical file:', fileError);
-        // Don't fail the request if file deletion fails
-      }
-    }
-
     res.status(200).json({
       success: true,
-      message: 'File deleted successfully'
+      message: 'Text file(s) deleted successfully'
     });
 
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error('Error deleting text file:', error);
     res.status(500).json({ 
       error: error.message,
       details: 'Check server logs for more information'

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders } from '../../utils/auth';
 
 const FilesPage = () => {
   const [files, setFiles] = useState([]);
@@ -28,7 +29,10 @@ const FilesPage = () => {
     try {
       // Include user ID in the request to get user-specific files
       const userId = user?.id;
-      const response = await fetch(`/api/text/list${userId ? `?userId=${userId}` : ''}`);
+      const headers = await getAuthHeaders(userId);
+      const response = await fetch(`/api/text/list${userId ? `?userId=${userId}` : ''}`, {
+        headers
+      });
       if (response.ok) {
         const data = await response.json();
         setFiles(data.files || []);
@@ -47,7 +51,10 @@ const FilesPage = () => {
     try {
       // Include user ID in the request to ensure user can only view their own files
       const userId = user?.id;
-      const response = await fetch(`/api/text/view?id=${id}${userId ? `&userId=${userId}` : ''}`);
+      const headers = await getAuthHeaders(userId);
+      const response = await fetch(`/api/text/view?id=${id}${userId ? `&userId=${userId}` : ''}`, {
+        headers
+      });
       if (response.ok) {
         const data = await response.json();
         setSelectedFile(data.file);

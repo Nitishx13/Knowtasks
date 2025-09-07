@@ -3,10 +3,11 @@
 const API_BASE_URL = '/api';
 
 // Helper function to get auth headers
-const getAuthHeaders = async () => {
+const getAuthHeaders = async (userId) => {
   // Clerk handles authentication headers automatically for API routes
   return {
     'Content-Type': 'application/json',
+    'user-id': userId || '',
   };
 };
 
@@ -15,20 +16,20 @@ const getAuthHeaders = async () => {
 // User profile service
 export const profileService = {
   // Update user profile
-  updateProfile: async (profileData) => {
+  updateProfile: async (profileData, userId) => {
     const response = await fetch(`${API_BASE_URL}/profile`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
       body: JSON.stringify(profileData),
     });
     return response.json();
   },
 
   // Update notification preferences
-  updateNotifications: async (notificationPreferences) => {
+  updateNotifications: async (notificationPreferences, userId) => {
     const response = await fetch(`${API_BASE_URL}/profile/notifications`, {
       method: 'PUT',
-      headers: await getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
       body: JSON.stringify(notificationPreferences),
     });
     return response.json();
@@ -37,35 +38,35 @@ export const profileService = {
 
 // Notes API calls
 export const notesService = {
-  getNotes: async () => {
+  getNotes: async (userId) => {
     const response = await fetch(`${API_BASE_URL}/notes`, {
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
     });
     return response.json();
   },
 
-  createNote: async (noteData) => {
+  createNote: async (noteData, userId) => {
     const response = await fetch(`${API_BASE_URL}/notes`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
       body: JSON.stringify(noteData),
     });
     return response.json();
   },
 
-  updateNote: async (id, noteData) => {
+  updateNote: async (id, noteData, userId) => {
     const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
       method: 'PUT',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
       body: JSON.stringify(noteData),
     });
     return response.json();
   },
 
-  deleteNote: async (id) => {
+  deleteNote: async (id, userId) => {
     const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
       method: 'DELETE',
-      headers: getAuthHeaders(),
+      headers: await getAuthHeaders(userId),
     });
     return response.json();
   },

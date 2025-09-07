@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { notesService } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
@@ -9,13 +10,19 @@ const NotesPage = () => {
 
   const [activeNote, setActiveNote] = useState(null);
   const [newNote, setNewNote] = useState({ title: '', content: '' });
+  
+  const { user } = useAuth();
 
   // Fetch notes on component mount
   useEffect(() => {
     const fetchNotes = async () => {
       try {
         setLoading(true);
-        const response = await notesService.getNotes();
+        if (!user?.id) {
+          setError('Authentication required');
+          return;
+        }
+        const response = await notesService.getNotes(user.id);
         setNotes(response.notes);
         setError(null);
       } catch (err) {
@@ -26,8 +33,10 @@ const NotesPage = () => {
       }
     };
 
-    fetchNotes();
-  }, []);
+    if (user) {
+      fetchNotes();
+    }
+  }, [user]);
 
   const handleNoteClick = (note) => {
     setActiveNote(note);
@@ -44,9 +53,10 @@ const NotesPage = () => {
 
   const handleCreateNote = async () => {
     if (newNote.title.trim() === '' || newNote.content.trim() === '') return;
+    if (!user?.id) return;
     
     try {
-      const response = await notesService.createNote(newNote.title, newNote.content);
+      const response = await notesService.createNote(newNote, user.id);
       setNotes([response.note, ...notes]);
       setNewNote({ title: '', content: '' });
       setActiveNote(null);
@@ -59,12 +69,13 @@ const NotesPage = () => {
   const handleUpdateNote = async () => {
     if (!activeNote) return;
     if (newNote.title.trim() === '' || newNote.content.trim() === '') return;
+    if (!user?.id) return;
 
     try {
       const response = await notesService.updateNote(
         activeNote.id, 
-        newNote.title, 
-        newNote.content
+        newNote,
+        user.id
       );
       
       const updatedNotes = notes.map(note => {
@@ -84,8 +95,10 @@ const NotesPage = () => {
   };
 
   const handleDeleteNote = async (id) => {
+    if (!user?.id) return;
+    
     try {
-      await notesService.deleteNote(id);
+      await notesService.deleteNote(id, user.id);
       const updatedNotes = notes.filter(note => note.id !== id);
       setNotes(updatedNotes);
       

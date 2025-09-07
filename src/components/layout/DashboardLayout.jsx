@@ -161,6 +161,19 @@ const DashboardLayout = ({ children }) => {
                 {!sidebarCollapsed && <span className="ml-3">Summarize</span>}
               </Link>
             </li>
+            <li>
+              <Link href="/dashboard/upload" className={cn(
+                "flex items-center p-3 rounded-lg transition-colors",
+                router.pathname === '/dashboard/upload'
+                  ? "bg-gray-100 text-gray-900"
+                  : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                {!sidebarCollapsed && <span className="ml-3">Upload</span>}
+              </Link>
+            </li>
             <li className="pt-6">
               <Link href="/dashboard/settings" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
