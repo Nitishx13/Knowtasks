@@ -22,19 +22,30 @@ async function handler(req, res) {
     await sql`SELECT NOW()`;
 
     // Fetch only text files belonging to the current user
-    const result = await sql`
-      SELECT 
-        id,
-        title,
-        content,
-        type,
-        user_id,
-        created_at,
-        updated_at
-      FROM text_files 
-      WHERE user_id = ${userId}
-      ORDER BY created_at DESC
-    `;
+    // Check if the type column exists in the table
+    let result;
+    try {
+      result = await sql`
+        SELECT 
+          id,
+          title,
+          content,
+          user_id,
+          created_at,
+          updated_at
+        FROM text_files 
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+      `;
+    } catch (dbError) {
+      // If there's an error with the query, try a simpler query
+      console.error('Error with initial query:', dbError.message);
+      result = await sql`
+        SELECT * FROM text_files 
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+      `;
+    }
 
     const files = result.rows.map(file => ({
       id: file.id,
