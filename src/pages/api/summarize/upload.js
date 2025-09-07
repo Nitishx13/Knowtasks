@@ -45,20 +45,31 @@ export default async function handler(req, res) {
     }
 
     try {
-      const { filePath, fileName, fileSize, fileExtension } = fileInfo;
-      console.log('Processing file:', { filePath, fileName, fileSize, fileExtension });
+      const { filePath, fileName, fileSize, fileExtension, buffer, fileType } = fileInfo;
+      console.log('Processing file:', { filePath, fileName, fileSize, fileExtension, hasBuffer: !!buffer, fileType });
 
-      if (!filePath || !fileName) {
+      if ((!filePath && !buffer) || !fileName) {
         return res.status(400).json({ error: 'Invalid file data received' });
       }
 
       let content = '';
       let summary = '';
+      let dataBuffer;
+
+      // Check if we have in-memory buffer (Vercel production) or file path (local dev)
+      if (buffer) {
+        console.log('Using in-memory buffer for file processing');
+        dataBuffer = buffer;
+      } else if (filePath) {
+        console.log('Reading file from disk:', filePath);
+        dataBuffer = fs.readFileSync(filePath);
+      } else {
+        return res.status(400).json({ error: 'No file data available' });
+      }
 
       // Process different file types
       if (fileExtension === '.pdf') {
         try {
-          const dataBuffer = fs.readFileSync(filePath);
           const pdfData = await pdf(dataBuffer);
           content = pdfData.text || 'PDF content extracted but appears empty';
           
@@ -72,7 +83,8 @@ export default async function handler(req, res) {
         }
       } else if (fileExtension === '.txt') {
         try {
-          content = fs.readFileSync(filePath, 'utf8');
+          // For text files, convert buffer to string
+          content = dataBuffer.toString('utf8');
           summary = await generateAdvancedSummary(content);
           console.log('TXT processed successfully, content length:', content.length);
         } catch (readError) {
@@ -85,7 +97,8 @@ export default async function handler(req, res) {
         summary = 'Unable to generate summary for Word documents at this time.';
       } else {
         try {
-          content = fs.readFileSync(filePath, 'utf8');
+          // For other files, try to convert buffer to string
+          content = dataBuffer.toString('utf8');
           summary = await generateAdvancedSummary(content);
         } catch (readError) {
           content = `File "${fileName}" uploaded successfully. Content extraction not available for this file type.`;
