@@ -7,16 +7,19 @@ async function handler(req, res) {
   }
 
   try {
-    // Get user ID from request (added by middleware), headers, or query parameters
-    const userId = req.userId || req.headers['user-id'] || req.query.userId;
-    
-    if (!userId) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication required', 
-        message: 'User ID is required to fetch text files' 
-      });
-    }
+    // Get user ID from request (added by auth middleware)
+  const userId = req.userId || req.headers['user-id'];
+  
+  console.log('Text Files API - User ID from request:', userId);
+  
+  if (!userId) {
+    console.error('Text Files API - No user ID found in request');
+    return res.status(401).json({ 
+      success: false, 
+      error: 'Authentication required',
+      message: 'User ID is required to fetch text files'
+    });
+  }
 
     // Test database connection
     await sql`SELECT NOW()`;

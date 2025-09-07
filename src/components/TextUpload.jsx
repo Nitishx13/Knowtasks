@@ -42,14 +42,16 @@ const TextUpload = ({ onUploadSuccess }) => {
       // Get auth headers
       const headers = await getAuthHeaders(user.id);
       
+      console.log('Saving text with user ID:', user.id);
+      
       // Save the text file with user ID
       const response = await fetch('/api/data/text-files/save', {
         method: 'POST',
         headers,
         body: JSON.stringify({ 
           text: textInput,
-          title: title,
-          userId: user.id
+          title: title
+          // userId is already in headers, no need to duplicate
         }),
       });
       

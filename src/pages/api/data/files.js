@@ -10,14 +10,17 @@ async function handler(req, res) {
     // Test database connection
     await sql`SELECT NOW()`;
     
-    // Get user ID from request headers or query parameters
-    const userId = req.headers['user-id'] || req.query.userId;
+    // Get user ID from request (added by auth middleware)
+    const userId = req.userId || req.headers['user-id'];
+    
+    console.log('Files API - User ID from request:', userId);
     
     if (!userId) {
+      console.error('Files API - No user ID found in request');
       return res.status(401).json({ 
         success: false, 
-        error: 'Authentication required', 
-        message: 'User ID is required to fetch files' 
+        error: 'Authentication required',
+        message: 'User ID is required to fetch files'
       });
     }
 

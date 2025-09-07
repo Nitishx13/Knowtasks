@@ -9,7 +9,10 @@ async function handler(req, res) {
   // Get user ID from request (added by auth middleware)
   const userId = req.userId || req.headers['user-id'];
   
+  console.log('Text Save API - User ID from request:', userId);
+  
   if (!userId) {
+    console.error('Text Save API - No user ID found in request');
     return res.status(401).json({ 
       success: false, 
       error: 'Authentication required',

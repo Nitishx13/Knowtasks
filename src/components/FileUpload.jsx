@@ -51,10 +51,18 @@ const FileUpload = ({ onUploadSuccess }) => {
       // Get auth headers
       const headers = await getAuthHeaders(user.id);
       
+      // Add user ID directly to FormData as fallback
+      formData.append('userId', user.id);
+      
+      console.log('Uploading file with user ID:', user.id);
+      
+      // Remove Content-Type from headers as it's set automatically with FormData
+      const { 'Content-Type': contentType, ...authHeaders } = headers;
+      
       const response = await fetch('/api/data/upload', {
         method: 'POST',
         body: formData,
-        headers
+        headers: authHeaders
       });
 
       clearInterval(progressInterval);

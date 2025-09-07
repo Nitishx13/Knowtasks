@@ -34,26 +34,39 @@ const UserDashboard = () => {
   useEffect(() => {
     if (user && user.id) {
       fetchUserData();
+    } else {
+      console.error('User data not available for dashboard');
+      setError('User authentication required. Please log in.');
+      setLoading(false);
     }
   }, [user]);
 
   const fetchUserData = async () => {
     setLoading(true);
     try {
+      if (!user || !user.id) {
+        throw new Error('User ID not available');
+      }
+      
+      console.log('Fetching data for user:', user.id);
+      
       // Get auth headers
       const headers = await getAuthHeaders(user.id);
+      console.log('Auth headers generated:', Object.keys(headers).join(', '));
       
       // Fetch user's uploaded files
-      const filesResponse = await fetch(`/api/data/files?userId=${user.id}`, {
+      const filesResponse = await fetch(`/api/data/files`, {
         headers
       });
       const filesData = await filesResponse.json();
+      console.log('Files data fetched:', filesData.success ? 'success' : 'failed');
       
       // Fetch user's text files
-      const textResponse = await fetch(`/api/data/text-files?userId=${user.id}`, {
+      const textResponse = await fetch(`/api/data/text-files`, {
         headers
       });
       const textData = await textResponse.json();
+      console.log('Text files data fetched:', textData.success ? 'success' : 'failed');
       
       if (filesData.success && textData.success) {
         setUploads(filesData.files || []);
