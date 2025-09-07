@@ -20,6 +20,21 @@ npm install
 npm run dev
 ```
 
+### Authentication Fallback for Development
+
+This project includes an authentication fallback mechanism for development purposes. When enabled, it allows you to access protected routes without requiring actual authentication.
+
+To enable the authentication fallback:
+
+1. Create a `.env.local` file in the root directory (if it doesn't exist)
+2. Add the following environment variable:
+   ```
+   NEXT_PUBLIC_USE_TEST_AUTH=true
+   ```
+3. Restart the development server
+
+With this setting enabled, you can access the dashboard and API routes without authentication, which is useful for development and testing.
+
 ## Building for Production
 
 ```bash
@@ -37,6 +52,19 @@ This project is configured for deployment on Vercel:
 1. Push your code to GitHub
 2. Connect your GitHub repository to Vercel
 3. Vercel will automatically detect Next.js and deploy your application
+
+### Authentication Fallback for Production
+
+If you need to enable the authentication fallback in production (for testing or demo purposes), you can add the environment variable to your Vercel deployment:
+
+1. Go to your project settings in Vercel
+2. Navigate to the Environment Variables section
+3. Add a new environment variable:
+   - Name: `NEXT_PUBLIC_USE_TEST_AUTH`
+   - Value: `true`
+4. Deploy or redeploy your application
+
+**Note:** The authentication fallback is already configured in the `vercel.json` file for this project, so it should work automatically after deployment.
 
 ### Setting up Neo4j on Vercel
 
