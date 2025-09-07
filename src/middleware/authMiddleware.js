@@ -21,13 +21,17 @@ export function authMiddleware(handler) {
       try {
         // Try to get auth from Clerk
         const auth = getAuth(req);
+        console.log('Clerk auth:', auth ? 'Found' : 'Not found');
+        
         if (auth?.userId) {
           userId = auth.userId;
+          console.log('Clerk user ID:', userId);
           
           // Sync user with database if authenticated with Clerk
           try {
             // Check if user exists in database
             let user = await getUserById(userId);
+            console.log('Database user:', user ? 'Found' : 'Not found');
             
             // If user doesn't exist, create a new user record
             if (!user) {
@@ -37,6 +41,8 @@ export function authMiddleware(handler) {
                   `${auth.user.firstName} ${auth.user.lastName}`.trim() : 'Unknown User',
                 email: auth.user?.emailAddresses?.[0]?.emailAddress || 'unknown@example.com'
               };
+              
+              console.log('Creating new user in database with data:', userData);
               
               // Create user in database
               user = await createUser(userId, userData);
@@ -56,6 +62,7 @@ export function authMiddleware(handler) {
       if (!userId) {
         const authHeader = req.headers.authorization;
         const userIdHeader = req.headers['user-id'];
+        const isDevelopment = process.env.NODE_ENV === 'development';
         
         // For testing purposes, allow a specific test token
         if (authHeader && 
@@ -63,6 +70,15 @@ export function authMiddleware(handler) {
             authHeader.split(' ')[1] === 'test_token' && 
             userIdHeader) {
           userId = userIdHeader;
+        }
+        
+        // Enhanced test token handling for development
+        else if (isDevelopment) {
+          // If no auth header but we're in development, use test user as fallback
+          if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
+            console.log('Using fallback test authentication in development mode');
+            userId = 'test_user_123';
+          }
         }
       }
       

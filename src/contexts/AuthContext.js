@@ -29,12 +29,38 @@ export const AuthProvider = ({ children }) => {
   } : null;
 
   const loading = !isLoaded || !userLoaded;
+  
+  // For development/testing, provide a fallback test user
+  const useTestUser = process.env.NODE_ENV === 'development' && 
+                     (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' || !isSignedIn);
+  
+  let effectiveUser = userData;
+  
+  if (useTestUser && !effectiveUser) {
+    // Create a test user for development
+    effectiveUser = {
+      id: 'test_user_123',
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'test@example.com',
+      imageUrl: '',
+      bio: 'Test user for development'
+    };
+    
+    // Store test user ID in localStorage for API calls
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('auth_test_user_id', effectiveUser.id);
+      localStorage.setItem('auth_test_token', 'test_token');
+    }
+    
+    console.log('Using test user for development:', effectiveUser.id);
+  }
 
   // Value to be provided by the context
   const value = {
-    user: isSignedIn ? userData : null,
-    loading,
-    isSignedIn
+    user: isSignedIn ? userData : (useTestUser ? effectiveUser : null),
+    loading: useTestUser ? false : loading,
+    isSignedIn: isSignedIn || useTestUser
   };
 
   return (

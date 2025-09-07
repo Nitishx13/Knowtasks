@@ -19,6 +19,12 @@ const MOCK_CLERK_USERS = [
     firstName: 'Demo',
     lastName: 'Account',
     emailAddresses: [{ emailAddress: 'demo@example.com' }]
+  },
+  {
+    id: 'test_user_123',
+    firstName: 'Test',
+    lastName: 'Account',
+    emailAddresses: [{ emailAddress: 'test123@example.com' }]
   }
 ];
 
