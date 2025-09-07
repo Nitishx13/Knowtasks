@@ -168,11 +168,11 @@ const DataPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Data Management</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Data Management</h1>
           <p className="text-gray-600 mt-2">View and manage all uploaded files</p>
         </div>
         <div className="flex items-center gap-3">
@@ -186,29 +186,29 @@ const DataPage = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Files</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <CardTitle className="text-xs md:text-sm font-medium">Total Files</CardTitle>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{files.length}</div>
-            <p className="text-xs text-muted-foreground">Uploaded files</p>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6 pt-1 md:pt-2">
+            <div className="text-xl md:text-2xl font-bold">{files.length}</div>
+            <p className="text-[10px] md:text-xs text-muted-foreground">Uploaded files</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Size</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Total Size</CardTitle>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl md:text-2xl font-bold">
               {formatTotalSize(files.reduce((sum, file) => sum + (file.fileSize || 0), 0))}
             </div>
             <p className="text-xs text-muted-foreground">Combined size</p>
@@ -217,13 +217,13 @@ const DataPage = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">PDF Files</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">PDF Files</CardTitle>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl md:text-2xl font-bold">
               {files.filter(file => file.fileName.toLowerCase().endsWith('.pdf')).length}
             </div>
             <p className="text-xs text-muted-foreground">PDF documents</p>
@@ -232,13 +232,13 @@ const DataPage = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Files</CardTitle>
+            <CardTitle className="text-xs md:text-sm font-medium">Active Files</CardTitle>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl md:text-2xl font-bold">
               {files.filter(file => file.status === 'uploaded').length}
             </div>
             <p className="text-xs text-muted-foreground">Ready for processing</p>
@@ -253,9 +253,9 @@ const DataPage = () => {
           <CardDescription>Find specific files quickly</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <div className="flex-1">
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="search" className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                 Search Files
               </label>
               <input
@@ -268,7 +268,7 @@ const DataPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="status" className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
                 Status Filter
               </label>
               <select
@@ -291,7 +291,7 @@ const DataPage = () => {
       {/* Files Table */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
             <div>
               <CardTitle>Uploaded Files</CardTitle>
               <CardDescription>
@@ -300,7 +300,7 @@ const DataPage = () => {
             </div>
             {selectedFiles.length > 0 && (
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">
+                <span className="text-xs md:text-sm text-gray-600">
                   {selectedFiles.length} file(s) selected
                 </span>
                 <Button
@@ -325,70 +325,154 @@ const DataPage = () => {
         </CardHeader>
         <CardContent>
           {filteredFiles.length === 0 ? (
-            <div className="text-center py-12">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="text-center py-8 md:py-12">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-3 md:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="text-gray-500 text-lg">No files found</p>
+              <p className="text-gray-500 text-base md:text-lg">No files found</p>
               <p className="text-gray-400">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <input
-                        type="checkbox"
-                        checked={selectAll}
-                        onChange={handleSelectAll}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredFiles.map((file) => (
-                    <tr key={file.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+            <>
+              {/* Desktop Table View - Hidden on Mobile */}
+              <div className="hidden md:block overflow-x-auto -mx-4 md:mx-0">
+                <table className="w-full min-w-[800px]">
+                  <thead className="bg-gray-50 text-[10px] md:text-xs">
+                    <tr>
+                      <th className="px-3 md:px-6 py-2 md:py-3 text-left text-[10px] md:text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <input
                           type="checkbox"
-                          checked={selectedFiles.includes(file.id)}
-                          onChange={() => handleSelectFile(file.id)}
+                          checked={selectAll}
+                          onChange={handleSelectAll}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200 text-xs md:text-sm">
+                    {filteredFiles.map((file) => (
+                      <tr key={file.id} className="hover:bg-gray-50">
+                        <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={selectedFiles.includes(file.id)}
+                            onChange={() => handleSelectFile(file.id)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-8 w-8 md:h-10 md:w-10">
+                              <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-6 md:w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-xs md:text-sm font-medium text-gray-900">{file.fileName}</div>
+                              <div className="text-[10px] md:text-xs text-gray-500">ID: {file.id}</div>
                             </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{file.fileName}</div>
-                            <div className="text-sm text-gray-500">ID: {file.id}</div>
+                        </td>
+                        <td className="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap text-xs md:text-sm text-gray-900">
+                          {file.formattedSize}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-medium bg-green-100 text-green-800">
+                            {file.uploadSource}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-medium ${
+                            file.status === 'uploaded' ? 'bg-green-100 text-green-800' :
+                            file.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                            file.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {file.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {file.formattedDate}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
+                              variant="outline"
+                              size="sm"
+                              className="text-blue-600 hover:text-blue-900 text-xs md:text-sm px-2 md:px-3 py-1"
+                            >
+                              Download
+                            </Button>
+                            
+                            <Button
+                              onClick={() => handleDeleteFile(file.id)}
+                              variant="outline"
+                              size="sm"
+                              className="text-red-600 hover:text-red-900 text-xs md:text-sm px-2 md:px-3 py-1"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Mobile Card View - Visible only on Mobile */}
+              <div className="md:hidden space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
+                    />
+                    <span className="text-xs font-medium text-gray-500">Select All</span>
+                  </div>
+                  {selectedFiles.length > 0 && (
+                    <button
+                      onClick={handleBulkDelete}
+                      className="px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded border border-red-200 hover:bg-red-100"
+                    >
+                      Delete Selected
+                    </button>
+                  )}
+                </div>
+                
+                {filteredFiles.map((file) => (
+                  <div key={file.id} className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedFiles.includes(file.id)}
+                            onChange={() => handleSelectFile(file.id)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1"
+                          />
+                          <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900">{file.fileName}</h3>
+                            <p className="text-xs text-gray-500 mt-1">ID: {file.id}</p>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {file.formattedSize}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {file.uploadSource}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           file.status === 'uploaded' ? 'bg-green-100 text-green-800' :
                           file.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
                           file.status === 'completed' ? 'bg-blue-100 text-blue-800' :
@@ -396,36 +480,42 @@ const DataPage = () => {
                         }`}>
                           {file.status}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {file.formattedDate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
-                            variant="outline"
-                            size="sm"
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            Download
-                          </Button>
-                          
-                          <Button
-                            onClick={() => handleDeleteFile(file.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
-                          </Button>
+                      </div>
+                      
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-500">Size:</span>
+                          <span className="ml-1 text-gray-900">{file.formattedSize}</span>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <div>
+                          <span className="text-gray-500">Source:</span>
+                          <span className="ml-1 text-gray-900">{file.uploadSource}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-gray-500">Uploaded:</span>
+                          <span className="ml-1 text-gray-900">{file.formattedDate}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleDownloadFile(file.fileUrl, file.fileName)}
+                          className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded border border-blue-200 hover:bg-blue-100"
+                        >
+                          Download
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFile(file.id)}
+                          className="px-3 py-1 bg-red-50 text-red-600 text-xs font-medium rounded border border-red-200 hover:bg-red-100"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

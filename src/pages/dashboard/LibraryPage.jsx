@@ -93,7 +93,7 @@ const LibraryPage = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
+      <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm mb-6 md:mb-8">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <input
@@ -101,28 +101,28 @@ const LibraryPage = () => {
               placeholder="Search your library..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
             <Button 
               onClick={() => setActiveTab('all')}
               variant={activeTab === 'all' ? 'default' : 'outline'}
-              className={activeTab === 'all' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'all' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
               All
             </Button>
             <Button 
               onClick={() => setActiveTab('summary')}
               variant={activeTab === 'summary' ? 'default' : 'outline'}
-              className={activeTab === 'summary' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'summary' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
               Summaries
             </Button>
             <Button 
               onClick={() => setActiveTab('research')}
               variant={activeTab === 'research' ? 'default' : 'outline'}
-              className={activeTab === 'research' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'research' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
               Research
             </Button>
@@ -133,32 +133,32 @@ const LibraryPage = () => {
       {/* Library Items */}
       <div className="space-y-4">
         {filteredItems.map((item) => (
-          <div key={item.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+          <div key={item.id} className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0">
+              <div className="flex items-start md:items-center space-x-3 md:space-x-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   {getTypeIcon(item.type)}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                  <div className="flex items-center space-x-4 mt-1">
-                    <span className="text-sm text-gray-500">{item.category}</span>
-                    <span className="text-sm text-gray-500">{item.size}</span>
-                    <span className="text-sm text-gray-500">{item.date}</span>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900">{item.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-1">
+                    <span className="text-xs md:text-sm text-gray-500">{item.category}</span>
+                    <span className="text-xs md:text-sm text-gray-500">{item.size}</span>
+                    <span className="text-xs md:text-sm text-gray-500">{item.date}</span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(item.status)}`}>
                       {item.status}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
+              <div className="flex items-center gap-2 self-end md:self-auto">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
                   View
                 </Button>
-                <Button variant="outline" size="sm" className="text-gray-700 border-gray-300 hover:bg-gray-50">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
                   Share
                 </Button>
-                <Button variant="outline" size="sm" className="text-red-600 border-red-300 hover:bg-red-50">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-red-600 border-red-300 hover:bg-red-50">
                   Delete
                 </Button>
               </div>
@@ -168,12 +168,12 @@ const LibraryPage = () => {
       </div>
 
       {filteredItems.length === 0 && (
-        <div className="text-center py-12">
-          <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="text-center py-8 md:py-12">
+          <svg className="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-3 md:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
-          <p className="text-gray-600">Try adjusting your search or filters</p>
+          <h3 className="text-base md:text-lg font-medium text-gray-900 mb-1 md:mb-2">No items found</h3>
+          <p className="text-sm md:text-base text-gray-600">Try adjusting your search or filters</p>
         </div>
       )}
     </div>

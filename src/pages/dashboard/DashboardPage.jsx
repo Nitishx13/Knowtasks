@@ -96,23 +96,23 @@ const DashboardPage = () => {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-white">Hey there 👋</h1>
-        <p className="text-gray-400 text-lg">Welcome back to your dashboard</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-white">Hey there 👋</h1>
+        <p className="text-gray-400 text-base md:text-lg">Welcome back to your dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         {/* Metrics Cards - First Row */}
-        <div className="bg-black rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Minutes Saved</h3>
+        <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
+          <div className="flex items-center justify-between mb-2 md:mb-4">
+            <h3 className="text-sm md:text-lg font-semibold text-white">Minutes Saved</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{metrics.minutesSaved}</p>
+          <p className="text-xl md:text-3xl font-bold text-white mb-1">{metrics.minutesSaved}</p>
           <div className="flex items-center text-gray-300 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -121,16 +121,16 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Documents Processed</h3>
+            <h3 className="text-sm md:text-lg font-semibold text-white">Docs Processed</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
+          <p className="text-xl md:text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
           <div className="flex items-center text-gray-300 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -141,14 +141,14 @@ const DashboardPage = () => {
 
         <div className="bg-black rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Monthly Usage</h3>
+            <h3 className="text-sm md:text-lg font-semibold text-white">Monthly Usage</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{metrics.monthlyUsage}</p>
+          <p className="text-xl md:text-3xl font-bold text-white mb-1">{metrics.monthlyUsage}</p>
           <div className="flex items-center text-gray-300 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -159,14 +159,14 @@ const DashboardPage = () => {
 
         <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Total Documents</h3>
+            <h3 className="text-sm md:text-lg font-semibold text-white">Total Docs</h3>
             <div className="p-2 bg-white/20 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
+          <p className="text-xl md:text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
           <div className="flex items-center text-gray-300 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -177,32 +177,32 @@ const DashboardPage = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="mb-6 md:mb-8">
+        <h2 className="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 
 
-          <Link href="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-5 flex items-center transition-all duration-300">
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <Link href="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Research</h3>
-              <p className="text-sm text-gray-400">Deep dive into topics</p>
+              <h3 className="font-semibold text-white text-sm md:text-base">Research</h3>
+              <p className="text-xs md:text-sm text-gray-400">Deep dive into topics</p>
             </div>
           </Link>
 
-          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Summarize</h3>
-              <p className="text-sm text-blue-200">AI-powered summaries</p>
+              <h3 className="font-semibold text-white text-sm md:text-base">Summarize</h3>
+              <p className="text-xs md:text-sm text-blue-200">AI-powered summaries</p>
             </div>
           </Link>
 
@@ -213,12 +213,12 @@ const DashboardPage = () => {
       </div>
 
       {/* Usage Statistics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         <div className="lg:col-span-2">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 h-full">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-white">Usage Statistics</h3>
-              <div className="flex space-x-2">
+          <div className="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 h-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 space-y-2 md:space-y-0">
+              <h3 className="text-lg md:text-xl font-semibold text-white">Usage Statistics</h3>
+              <div className="flex space-x-1 md:space-x-2">
                 <button className="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-md hover:bg-gray-700">Week</button>
                 <button className="px-3 py-1 bg-white text-black text-sm rounded-md">Month</button>
                 <button className="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-md hover:bg-gray-700">Year</button>
@@ -226,7 +226,7 @@ const DashboardPage = () => {
             </div>
             
             {/* Placeholder for chart - in a real app, you'd use a charting library */}
-            <div className="h-64 bg-black/30 rounded-lg flex items-center justify-center border border-gray-700">
+            <div className="h-40 md:h-64 bg-black/30 rounded-lg flex items-center justify-center border border-gray-700">
               <div className="text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -235,7 +235,7 @@ const DashboardPage = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
               <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
                 <p className="text-sm text-gray-400">Total Hours Saved</p>
                 <p className="text-2xl font-bold text-white">{statistics.totalHoursSaved}</p>
@@ -253,10 +253,10 @@ const DashboardPage = () => {
         </div>
         
         <div>
-          <div className="bg-black rounded-xl shadow-lg p-6 border border-gray-700 h-full">
-            <h3 className="text-xl font-semibold text-white mb-6">Premium Status</h3>
-            <div className="bg-gradient-to-br from-white/10 to-gray-800/30 p-6 rounded-lg border border-gray-700 mb-6">
-              <div className="flex justify-between items-center mb-4">
+          <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 h-full">
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">Premium Status</h3>
+            <div className="bg-gradient-to-br from-white/10 to-gray-800/30 p-4 md:p-6 rounded-lg border border-gray-700 mb-4 md:mb-6">
+              <div className="flex justify-between items-center mb-3 md:mb-4">
                 <h4 className="text-lg font-medium text-white">Pro Plan</h4>
                 <span className="px-2 py-1 bg-white/20 text-white text-xs rounded-full">Active</span>
               </div>
@@ -281,16 +281,16 @@ const DashboardPage = () => {
         </div>
 
       {/* Recent Summaries Section */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-white">Recent Documents</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-white">Recent Documents</h2>
           <Link href="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View All →</Link>
         </div>
         
         {recentSummaries.length > 0 ? (
           <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-4 md:mx-0">
+              <table className="w-full min-w-[640px]">
                 <thead>
                   <tr className="bg-gray-700/50">
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Title</th>
@@ -337,7 +337,7 @@ const DashboardPage = () => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+          <div className="flex flex-col items-center justify-center py-8 md:py-12 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
             <div className="text-center">
               <div className="inline-block p-4 rounded-full bg-gray-700 mb-4">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -355,7 +355,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Footer with AI message */}
-      <div className="text-center text-sm text-gray-500 py-4 border-t border-gray-800 mt-8">
+      <div className="text-center text-xs md:text-sm text-gray-500 py-3 md:py-4 border-t border-gray-800 mt-6 md:mt-8">
         <p>🤖 Powered by Knowtasks</p>
       </div>
     </>

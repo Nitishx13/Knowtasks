@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUser, SignOutButton } from '@clerk/nextjs';
@@ -9,6 +9,24 @@ const DashboardLayout = ({ children }) => {
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Check if the screen is mobile size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const isActive = (path) => {
     return router.pathname === path ? 'bg-primary/10 text-primary' : 'hover:bg-accent text-muted-foreground hover:text-foreground';
@@ -34,8 +52,10 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white shadow-lg fixed h-full border-r border-gray-200 transition-all duration-300 ease-in-out z-20`}>
+      {/* Sidebar - Hidden on mobile unless toggled */}
+      <div className={`${isMobile ? (mobileMenuOpen ? 'translate-x-0' : '-translate-x-full') : sidebarCollapsed ? 'w-16' : 'w-64'} 
+        ${isMobile ? 'fixed inset-y-0 left-0 w-64 z-50' : 'fixed h-full border-r border-gray-200'} 
+        bg-white shadow-lg transition-all duration-300 ease-in-out z-20`}>
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="relative w-8 h-8 flex items-center justify-center overflow-hidden rounded-lg border border-gray-300 shadow-sm">
@@ -160,9 +180,20 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 ${sidebarCollapsed ? 'ml-16' : 'ml-64'} transition-all duration-300 ease-in-out`}>
+      <div className={`flex-1 ${isMobile ? 'ml-0' : (sidebarCollapsed ? 'ml-16' : 'ml-64')} transition-all duration-300 ease-in-out`}>
         {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10">
+          {/* Mobile menu toggle */}
+          {isMobile && (
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="mr-2 p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 border border-gray-200 shadow-sm active:scale-95 transition-all duration-150"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          )}
           <div className="flex items-center">
             <h2 className="text-xl font-semibold text-gray-900">Dashboard</h2>
           </div>
@@ -199,10 +230,65 @@ const DashboardLayout = ({ children }) => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6 bg-gray-50 min-h-screen">
+        <main className="p-6 bg-gray-50 min-h-screen pb-20 md:pb-6">
           {children}
         </main>
+        
+        {/* Mobile Bottom Navigation */}
+        {isMobile && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 shadow-lg">
+            <div className="flex justify-around items-center h-16 px-2">
+              <Link href="/dashboard" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname === '/dashboard' ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Home</span>
+              </Link>
+              
+              <Link href="/dashboard/research" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname === '/dashboard/research' ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Research</span>
+              </Link>
+              
+              <Link href="/dashboard/summarize" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname === '/dashboard/summarize' ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Summarize</span>
+              </Link>
+              
+              <Link href="/dashboard/library" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname === '/dashboard/library' ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Library</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
+      
+      {/* Mobile sidebar overlay */}
+      {isMobile && mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-60 z-40 backdrop-blur-sm"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 };
