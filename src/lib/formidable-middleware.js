@@ -3,21 +3,39 @@
  * This helps ensure consistent file upload handling across environments
  */
 
-import formidable from 'formidable';
+// Import formidable correctly for v3.5.4
+import { formidable } from 'formidable';
 import fs from 'fs';
 import path from 'path';
 
 // Ensure uploads directory exists
 const ensureUploadsDir = () => {
   const uploadsDir = path.join(process.cwd(), 'uploads');
+  console.log('Checking uploads directory:', uploadsDir);
+  
   if (!fs.existsSync(uploadsDir)) {
     try {
       fs.mkdirSync(uploadsDir, { recursive: true });
       console.log('Created uploads directory:', uploadsDir);
     } catch (err) {
       console.error('Failed to create uploads directory:', err);
+      throw new Error(`Failed to create uploads directory: ${err.message}`);
+    }
+  } else {
+    console.log('Uploads directory already exists');
+    
+    // Verify directory is writable
+    try {
+      const testFile = path.join(uploadsDir, '.write-test');
+      fs.writeFileSync(testFile, 'test');
+      fs.unlinkSync(testFile);
+      console.log('Uploads directory is writable');
+    } catch (err) {
+      console.error('Uploads directory is not writable:', err);
+      throw new Error(`Uploads directory is not writable: ${err.message}`);
     }
   }
+  
   return uploadsDir;
 };
 
@@ -28,16 +46,29 @@ const ensureUploadsDir = () => {
  * @returns {Promise<{fields: Object, files: Object}>} - Parsed fields and files
  */
 export const parseFormData = (req, options = {}) => {
-  ensureUploadsDir();
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('Current working directory:', process.cwd());
   
-  return new Promise((resolve, reject) => {
-    const form = new formidable.IncomingForm({
-      uploadDir: path.join(process.cwd(), 'uploads'),
-      keepExtensions: true,
-      maxFileSize: 50 * 1024 * 1024, // 50MB
-      multiples: false,
-      ...options
-    });
+  try {
+    const uploadsDir = ensureUploadsDir();
+    
+    return new Promise((resolve, reject) => {
+      console.log('Initializing formidable with options:', {
+        uploadDir: uploadsDir,
+        keepExtensions: true,
+        maxFileSize: '50MB',
+        multiples: false,
+        ...options
+      });
+      
+      // Fix formidable constructor usage for v3.5.4
+      const form = formidable({
+        uploadDir: uploadsDir,
+        keepExtensions: true,
+        maxFileSize: 50 * 1024 * 1024, // 50MB
+        multiples: false,
+        ...options
+      });
     
     form.parse(req, (err, fields, files) => {
       if (err) {
@@ -53,6 +84,14 @@ export const parseFormData = (req, options = {}) => {
       resolve({ fields, files });
     });
   });
+  } catch (error) {
+    console.error('Error in parseFormData:', error);
+    return Promise.reject({
+      error: 'Failed to initialize form parser',
+      details: error.message,
+      code: 'FORM_INIT_ERROR'
+    });
+  }
 };
 
 /**

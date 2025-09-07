@@ -105,13 +105,19 @@ const SummarizePage = () => {
       } else {
         const errorData = await response.json();
         console.error('Upload failed:', errorData);
+        
+        // Create a detailed error message with all available information
         let errorMessage = errorData.error || 'Upload failed';
         
-        // Add more detailed error information if available
         if (errorData.details) {
           errorMessage += `: ${errorData.details}`;
         }
         
+        if (errorData.code) {
+          errorMessage += ` (Code: ${errorData.code})`;
+        }
+        
+        console.log('Setting error message:', errorMessage);
         setError(errorMessage);
       }
     } catch (error) {

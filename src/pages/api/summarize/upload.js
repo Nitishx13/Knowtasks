@@ -19,12 +19,19 @@ export default async function handler(req, res) {
     // Use our middleware to parse the form data
     let fields, files;
     try {
+      console.log('Starting form data parsing...');
       const result = await parseFormData(req);
       fields = result.fields;
       files = result.files;
+      console.log('Form data parsed successfully');
     } catch (parseError) {
       console.error('Form parsing error:', parseError);
-      return res.status(500).json(parseError);
+      // Return more detailed error information
+      return res.status(500).json({
+        error: 'Failed to parse form data',
+        details: parseError.message || 'Unknown parsing error',
+        code: parseError.code || 'PARSE_ERROR'
+      });
     }
 
     // Log the files object structure to help debug
