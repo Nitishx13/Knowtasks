@@ -47,12 +47,12 @@ const UserDashboard = () => {
             setUserName('User');
           }
           
-          // For development, ensure test auth is set up
-          if (process.env.NODE_ENV === 'development' && user.id === 'test_user_123') {
+          // Ensure test auth is set up (works in both development and production)
+          if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && user.id === 'test_user_123') {
             if (typeof window !== 'undefined') {
               localStorage.setItem('auth_test_user_id', user.id);
               localStorage.setItem('auth_test_token', 'test_token');
-              console.log('Test authentication configured for development');
+              console.log('Test authentication configured');
             }
           }
           

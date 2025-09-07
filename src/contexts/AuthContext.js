@@ -30,9 +30,8 @@ export const AuthProvider = ({ children }) => {
 
   const loading = !isLoaded || !userLoaded;
   
-  // For development/testing, provide a fallback test user
-  const useTestUser = process.env.NODE_ENV === 'development' && 
-                     (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' || !isSignedIn);
+  // For testing, provide a fallback test user (works in both development and production)
+  const useTestUser = process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && !isSignedIn;
   
   let effectiveUser = userData;
   

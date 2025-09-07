@@ -8,9 +8,9 @@
  */
 export const getAuthToken = async () => {
   try {
-    // For development/testing, use a test token if in development mode
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
-      console.log('Using test authentication token in development mode');
+    // For testing, use a test token if test auth is enabled (works in both development and production)
+    if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
+      console.log('Using test authentication token');
       return 'test_token';
     }
     
@@ -26,8 +26,8 @@ export const getAuthToken = async () => {
         }
       }
       
-      // Fallback to localStorage for development/testing
-      if (process.env.NODE_ENV === 'development') {
+      // Fallback to localStorage for testing (works in both development and production)
+      if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
         const testToken = localStorage.getItem('auth_test_token');
         if (testToken) {
           console.log('Using fallback test token from localStorage');
