@@ -1,0 +1,19 @@
+// Main Sass file
+
+// Base styles
+@import 'base';
+
+// Components
+@import 'components/dashboard';
+@import 'components/digital-skills';
+@import 'components/notes';
+@import 'components/buttons';
+@import 'components/cards';
+
+// Pages
+@import 'pages/dashboard';
+@import 'pages/digital-skills';
+@import 'pages/revision-plan';
+
+// Utilities
+@import 'utilities';

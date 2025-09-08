@@ -1,0 +1,504 @@
+// Button components styles
+@use '../variables' as *;
+
+// Base button styles
+.btn {
+  display: inline-block;
+  font-weight: $font-weight-medium;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: $spacer * 0.5 $spacer;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: $border-radius;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  
+  &:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.25);
+  }
+  
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+  
+  svg {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+    
+    &:first-child:not(:last-child) {
+      margin-right: $spacer * 0.5;
+    }
+    
+    &:last-child:not(:first-child) {
+      margin-left: $spacer * 0.5;
+    }
+  }
+}
+
+// Button sizes
+.btn-sm {
+  padding: $spacer * 0.25 $spacer * 0.5;
+  font-size: 0.75rem;
+  border-radius: $border-radius-sm;
+}
+
+.btn-lg {
+  padding: $spacer * 0.75 $spacer * 1.5;
+  font-size: 1rem;
+  border-radius: $border-radius-lg;
+}
+
+// Button variants
+.btn-primary {
+  background-color: $primary;
+  border-color: $primary;
+  color: white;
+  
+  &:hover {
+    background-color: darken($primary, 7.5%);
+    border-color: darken($primary, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.5);
+  }
+}
+
+.btn-secondary {
+  background-color: $secondary;
+  border-color: $secondary;
+  color: white;
+  
+  &:hover {
+    background-color: darken($secondary, 7.5%);
+    border-color: darken($secondary, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($secondary, 0.5);
+  }
+}
+
+.btn-success {
+  background-color: $success;
+  border-color: $success;
+  color: white;
+  
+  &:hover {
+    background-color: darken($success, 7.5%);
+    border-color: darken($success, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($success, 0.5);
+  }
+}
+
+.btn-info {
+  background-color: $info;
+  border-color: $info;
+  color: white;
+  
+  &:hover {
+    background-color: darken($info, 7.5%);
+    border-color: darken($info, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($info, 0.5);
+  }
+}
+
+.btn-warning {
+  background-color: $warning;
+  border-color: $warning;
+  color: white;
+  
+  &:hover {
+    background-color: darken($warning, 7.5%);
+    border-color: darken($warning, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($warning, 0.5);
+  }
+}
+
+.btn-danger {
+  background-color: $danger;
+  border-color: $danger;
+  color: white;
+  
+  &:hover {
+    background-color: darken($danger, 7.5%);
+    border-color: darken($danger, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($danger, 0.5);
+  }
+}
+
+.btn-light {
+  background-color: $light;
+  border-color: $light;
+  color: $dark;
+  
+  &:hover {
+    background-color: darken($light, 7.5%);
+    border-color: darken($light, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($light, 0.5);
+  }
+}
+
+.btn-dark {
+  background-color: $dark;
+  border-color: $dark;
+  color: white;
+  
+  &:hover {
+    background-color: darken($dark, 7.5%);
+    border-color: darken($dark, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($dark, 0.5);
+  }
+}
+
+// Outline buttons
+.btn-outline-primary {
+  background-color: transparent;
+  border-color: $primary;
+  color: $primary;
+  
+  &:hover {
+    background-color: $primary;
+    color: white;
+  }
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  border-color: $secondary;
+  color: $secondary;
+  
+  &:hover {
+    background-color: $secondary;
+    color: white;
+  }
+}
+
+.btn-outline-success {
+  background-color: transparent;
+  border-color: $success;
+  color: $success;
+  
+  &:hover {
+    background-color: $success;
+    color: white;
+  }
+}
+
+.btn-outline-info {
+  background-color: transparent;
+  border-color: $info;
+  color: $info;
+  
+  &:hover {
+    background-color: $info;
+    color: white;
+  }
+}
+
+.btn-outline-warning {
+  background-color: transparent;
+  border-color: $warning;
+  color: $warning;
+  
+  &:hover {
+    background-color: $warning;
+    color: white;
+  }
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  border-color: $danger;
+  color: $danger;
+  
+  &:hover {
+    background-color: $danger;
+    color: white;
+  }
+}
+
+.btn-outline-light {
+  background-color: transparent;
+  border-color: $light;
+  color: $light;
+  
+  &:hover {
+    background-color: $light;
+    color: $dark;
+  }
+}
+
+.btn-outline-dark {
+  background-color: transparent;
+  border-color: $dark;
+  color: $dark;
+  
+  &:hover {
+    background-color: $dark;
+    color: white;
+  }
+}
+
+// Educational context buttons
+.btn-iit {
+  background-color: $iit-color;
+  border-color: $iit-color;
+  color: white;
+  
+  &:hover {
+    background-color: darken($iit-color, 7.5%);
+    border-color: darken($iit-color, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($iit-color, 0.5);
+  }
+}
+
+.btn-neet {
+  background-color: $neet-color;
+  border-color: $neet-color;
+  color: white;
+  
+  &:hover {
+    background-color: darken($neet-color, 7.5%);
+    border-color: darken($neet-color, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($neet-color, 0.5);
+  }
+}
+
+.btn-digital {
+  background-color: $digital-color;
+  border-color: $digital-color;
+  color: white;
+  
+  &:hover {
+    background-color: darken($digital-color, 7.5%);
+    border-color: darken($digital-color, 10%);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($digital-color, 0.5);
+  }
+}
+
+.btn-outline-iit {
+  background-color: transparent;
+  border-color: $iit-color;
+  color: $iit-color;
+  
+  &:hover {
+    background-color: $iit-color;
+    color: white;
+  }
+}
+
+.btn-outline-neet {
+  background-color: transparent;
+  border-color: $neet-color;
+  color: $neet-color;
+  
+  &:hover {
+    background-color: $neet-color;
+    color: white;
+  }
+}
+
+.btn-outline-digital {
+  background-color: transparent;
+  border-color: $digital-color;
+  color: $digital-color;
+  
+  &:hover {
+    background-color: $digital-color;
+    color: white;
+  }
+}
+
+// Gradient buttons
+.btn-gradient-primary {
+  background: $primary-gradient;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, darken($primary, 5%), darken($secondary, 5%));
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.btn-gradient-iit {
+  background: $iit-gradient;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, darken($iit-color, 5%), darken($iit-color, 20%));
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.btn-gradient-neet {
+  background: $neet-gradient;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, darken($neet-color, 5%), darken($neet-color, 20%));
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.btn-gradient-digital {
+  background: $digital-gradient;
+  border: none;
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, darken($digital-color, 5%), darken($digital-color, 20%));
+    transform: translateY(-1px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// CTA buttons
+.cta-button {
+  display: inline-block;
+  padding: $spacer * 0.75 $spacer * 1.5;
+  font-weight: $font-weight-bold;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  border-radius: $border-radius;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-lg;
+    
+    &::before {
+      transform: translateX(0);
+    }
+  }
+  
+  &.cta-primary {
+    background: $primary-gradient;
+    color: white;
+  }
+  
+  &.cta-iit {
+    background: $iit-gradient;
+    color: white;
+  }
+  
+  &.cta-neet {
+    background: $neet-gradient;
+    color: white;
+  }
+  
+  &.cta-digital {
+    background: $digital-gradient;
+    color: white;
+  }
+  
+  svg {
+    margin-left: $spacer * 0.5;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+// Floating action button
+.fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: $primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-lg;
+  position: fixed;
+  right: $spacer * 2;
+  bottom: $spacer * 2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: $z-index-fixed;
+  
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-xl;
+  }
+  
+  &.fab-iit {
+    background-color: $iit-color;
+  }
+  
+  &.fab-neet {
+    background-color: $neet-color;
+  }
+  
+  &.fab-digital {
+    background-color: $digital-color;
+  }
+}

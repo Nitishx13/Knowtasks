@@ -48,39 +48,57 @@ const LibraryPage = () => {
   const libraryItems = [
     {
       id: 1,
-      title: 'Machine Learning Fundamentals',
-      type: 'summary',
-      category: 'AI',
+      title: 'Physics Equations',
+      type: 'formula',
+      category: 'Physics',
       date: '2023-11-15',
-      size: '2.5K words',
+      size: '25 formulas',
       status: 'completed'
     },
     {
       id: 2,
-      title: 'React Development Guide',
-      type: 'research',
-      category: 'Programming',
+      title: 'Organic Chemistry Reactions',
+      type: 'formula',
+      category: 'Chemistry',
       date: '2023-11-10',
-      size: '1.8K words',
+      size: '18 formulas',
       status: 'in-progress'
     },
     {
       id: 3,
-      title: 'Climate Change Analysis',
-      type: 'summary',
-      category: 'Science',
+      title: 'Calculus Fundamentals',
+      type: 'flashcard',
+      category: 'Mathematics',
       date: '2023-11-08',
-      size: '3.2K words',
+      size: '32 cards',
       status: 'completed'
     },
     {
       id: 4,
-      title: 'Business Strategy Framework',
-      type: 'research',
-      category: 'Business',
+      title: 'Computer Science Concepts',
+      type: 'flashcard',
+      category: 'CS',
       date: '2023-11-05',
-      size: '2.1K words',
+      size: '21 cards',
       status: 'completed'
+    },
+    {
+      id: 5,
+      title: 'Physics 2022 Exam',
+      type: 'pyq',
+      category: 'Physics',
+      date: '2023-11-03',
+      size: '15 questions',
+      status: 'completed'
+    },
+    {
+      id: 6,
+      title: 'Mathematics 2021 Midterm',
+      type: 'pyq',
+      category: 'Mathematics',
+      date: '2023-11-01',
+      size: '10 questions',
+      status: 'in-progress'
     }
   ];
 
@@ -103,16 +121,22 @@ const LibraryPage = () => {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'summary':
+      case 'formula':
         return (
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.871 4A17.926 17.926 0 003 12c0 2.874.673 5.59 1.871 8m14.13 0a17.926 17.926 0 001.87-8c0-2.874-.673-5.59-1.87-8M9 9h1.246a1 1 0 01.961.725l1.586 5.55a1 1 0 00.961.725H15m1-7h-.08a2 2 0 00-1.519.698L9.6 15.302A2 2 0 018.08 16H8" />
           </svg>
         );
-      case 'research':
+      case 'flashcard':
+        return (
+          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        );
+      case 'pyq':
         return (
           <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
       default:
@@ -127,8 +151,8 @@ const LibraryPage = () => {
   return (
     <div>
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Library</h1>
-        <p className="text-gray-600 text-base md:text-lg">Manage and organize your saved content</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Knowledge Hub</h1>
+        <p className="text-gray-600 text-base md:text-lg">Access your Formula Bank, Flashcards, and Previous Year Questions</p>
       </div>
 
       {/* Search and Filters */}
@@ -152,18 +176,25 @@ const LibraryPage = () => {
               All
             </Button>
             <Button 
-              onClick={() => setActiveTab('summary')}
-              variant={activeTab === 'summary' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'summary' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
+              onClick={() => setActiveTab('formula')}
+              variant={activeTab === 'formula' ? 'default' : 'outline'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'formula' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
-              Summaries
+              Formula Bank
             </Button>
             <Button 
-              onClick={() => setActiveTab('research')}
-              variant={activeTab === 'research' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'research' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
+              onClick={() => setActiveTab('flashcard')}
+              variant={activeTab === 'flashcard' ? 'default' : 'outline'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'flashcard' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
-              Research
+              Flashcards
+            </Button>
+            <Button 
+              onClick={() => setActiveTab('pyq')}
+              variant={activeTab === 'pyq' ? 'default' : 'outline'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'pyq' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
+            >
+              PYQ
             </Button>
           </div>
         </div>

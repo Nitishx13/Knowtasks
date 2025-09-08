@@ -98,7 +98,7 @@ const DashboardLayout = ({ children }) => {
             <li>
               <Link href="/dashboard" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
-                router.pathname === '/dashboard'
+                router.pathname === '/dashboard' || router.pathname === '/dashboard/'
                   ? "bg-gray-100 text-gray-900" 
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
@@ -108,44 +108,45 @@ const DashboardLayout = ({ children }) => {
                 {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
               </Link>
             </li>
+            {/* Research page replaced with Revision & Daily Plan */}
             <li>
-              <Link href="/dashboard/research" className={cn(
+              <Link href="/dashboard/revision-plan" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
-                router.pathname === '/dashboard/research'
+                router.pathname.startsWith('/dashboard/revision-plan')
                   ? "bg-gray-100 text-gray-900"
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                {!sidebarCollapsed && <span className="ml-3">Research</span>}
+                {!sidebarCollapsed && <span className="ml-3">Revision & Daily Plan</span>}
               </Link>
             </li>
-
+            
             <li>
               <Link href="/dashboard/library" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
-                router.pathname === '/dashboard/library'
+                router.pathname.startsWith('/dashboard/library')
                   ? "bg-gray-100 text-gray-900"
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
-                <svg xmlns="http://www/w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {!sidebarCollapsed && <span className="ml-3">Library</span>}
+                {!sidebarCollapsed && <span className="ml-3">Knowledge Hub</span>}
               </Link>
             </li>
             <li>
               <Link href="/dashboard/data" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
-                router.pathname === '/dashboard/data'
+                router.pathname.startsWith('/dashboard/data')
                   ? "bg-gray-100 text-gray-900"
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
                 <svg xmlns="http://www/w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                {!sidebarCollapsed && <span className="ml-3">Data</span>}
+                {!sidebarCollapsed && <span className="ml-3">My Notes</span>}
               </Link>
             </li>
             <li>
@@ -158,22 +159,23 @@ const DashboardLayout = ({ children }) => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                {!sidebarCollapsed && <span className="ml-3">Summarize</span>}
+                {!sidebarCollapsed && <span className="ml-3">Upload File</span>}
               </Link>
             </li>
             <li>
-              <Link href="/dashboard/upload" className={cn(
+              <Link href="/dashboard/digital-skills" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
-                router.pathname === '/dashboard/upload'
+                router.pathname === '/dashboard/digital-skills'
                   ? "bg-gray-100 text-gray-900"
                   : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                {!sidebarCollapsed && <span className="ml-3">Upload</span>}
+                {!sidebarCollapsed && <span className="ml-3">Digital Skills</span>}
               </Link>
             </li>
+            {/* Upload page hidden */}
             <li className="pt-6">
               <Link href="/dashboard/settings" className={cn(
                 "flex items-center p-3 rounded-lg transition-colors",
@@ -253,7 +255,7 @@ const DashboardLayout = ({ children }) => {
             <div className="flex justify-around items-center h-16 px-2">
               <Link href="/dashboard" className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                router.pathname === '/dashboard' ? "text-blue-600" : "text-gray-500"
+                router.pathname === '/dashboard' || router.pathname === '/dashboard/' ? "text-blue-600" : "text-gray-500"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -261,46 +263,154 @@ const DashboardLayout = ({ children }) => {
                 <span className="text-xs mt-1 font-medium">Home</span>
               </Link>
               
-              <Link href="/dashboard/research" className={cn(
+              <Link href="/dashboard/revision-plan" className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                router.pathname === '/dashboard/research' ? "text-blue-600" : "text-gray-500"
+                router.pathname.startsWith('/dashboard/revision-plan') ? "text-blue-600" : "text-gray-500"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                <span className="text-xs mt-1 font-medium">Research</span>
+                <span className="text-xs mt-1 font-medium">Revision</span>
+              </Link>
+              
+              <Link href="/dashboard/digital-skills" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname.startsWith('/dashboard/digital-skills') ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Skills</span>
               </Link>
               
               <Link href="/dashboard/summarize" className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                router.pathname === '/dashboard/summarize' ? "text-blue-600" : "text-gray-500"
+                router.pathname.startsWith('/dashboard/summarize') ? "text-blue-600" : "text-gray-500"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span className="text-xs mt-1 font-medium">Summarize</span>
+                <span className="text-xs mt-1 font-medium">Upload</span>
               </Link>
               
               <Link href="/dashboard/library" className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                router.pathname === '/dashboard/library' ? "text-blue-600" : "text-gray-500"
+                router.pathname.startsWith('/dashboard/library') ? "text-blue-600" : "text-gray-500"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-xs mt-1 font-medium">Library</span>
+                <span className="text-xs mt-1 font-medium">Hub</span>
               </Link>
             </div>
           </div>
         )}
       </div>
       
-      {/* Mobile sidebar overlay */}
+      {/* Mobile sidebar overlay and menu */}
       {isMobile && mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-60 z-40 backdrop-blur-sm"
-          onClick={() => setMobileMenuOpen(false)}
-        />
+        <>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-60 z-40 backdrop-blur-sm"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-xl overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">Menu</h2>
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <nav className="mt-4 px-3">
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/dashboard" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname === '/dashboard' || router.pathname === '/dashboard/'
+                      ? "bg-gray-100 text-gray-900" 
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span className="ml-3">Dashboard</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/revision-plan" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname.startsWith('/dashboard/revision-plan')
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <span className="ml-3">Revision & Daily Plan</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/library" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname.startsWith('/dashboard/library')
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="ml-3">Knowledge Hub</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/digital-skills" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname.startsWith('/dashboard/digital-skills')
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span className="ml-3">Digital Skills</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dashboard/summarize" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname.startsWith('/dashboard/summarize')
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span className="ml-3">Upload File</span>
+                  </Link>
+                </li>
+                <li className="pt-6">
+                  <Link href="/dashboard/settings" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname.startsWith('/dashboard/settings')
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="ml-3">Settings</span>
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </>
       )}
     </div>
   );

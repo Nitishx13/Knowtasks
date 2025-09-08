@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import '../App.css';
+import '../styles/main.scss';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from '../components/ui/toaster';
 import { AuthProvider } from '../contexts/AuthContext';

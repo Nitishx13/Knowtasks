@@ -105,6 +105,57 @@ const DashboardPage = () => {
         <p className="text-gray-400 text-base md:text-lg">Welcome back to your dashboard</p>
       </div>
 
+      {/* Educational Context Banners */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 md:mb-8">
+        {/* IIT Banner */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-lg font-bold text-white mb-2">IIT Preparation</h3>
+            <p className="text-sm text-blue-100 mb-3">Access study materials and practice tests for JEE preparation</p>
+            <Link href="/dashboard/revision-plan?type=iit" className="inline-block bg-white text-blue-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-50 transition-all">
+              Start Learning
+            </Link>
+          </div>
+          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* NEET Banner */}
+        <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-lg font-bold text-white mb-2">NEET Preparation</h3>
+            <p className="text-sm text-green-100 mb-3">Access biology, physics, and chemistry resources for medical exams</p>
+            <Link href="/dashboard/revision-plan?type=neet" className="inline-block bg-white text-green-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-green-50 transition-all">
+              Start Learning
+            </Link>
+          </div>
+          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+              <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Digital Skills Banner */}
+        <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-lg font-bold text-white mb-2">Digital Skills</h3>
+            <p className="text-sm text-purple-100 mb-3">Learn programming, design, and other digital skills for your future</p>
+            <Link href="/dashboard/digital-skills" className="inline-block bg-white text-purple-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-purple-50 transition-all">
+              Explore Skills
+            </Link>
+          </div>
+          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+              <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         {/* Metrics Cards - First Row */}
         <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
@@ -186,15 +237,15 @@ const DashboardPage = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 
 
-          <Link href="/dashboard/research" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/revision-plan" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Research</h3>
-              <p className="text-xs md:text-sm text-gray-400">Deep dive into topics</p>
+              <h3 className="font-semibold text-white text-sm md:text-base">Revision & Daily Plan</h3>
+              <p className="text-xs md:text-sm text-gray-400">Organize your study schedule</p>
             </div>
           </Link>
 
@@ -210,7 +261,17 @@ const DashboardPage = () => {
             </div>
           </Link>
 
-
+          <Link href="/dashboard/digital-skills" className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+            <div className="p-3 bg-white/10 rounded-lg mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white text-sm md:text-base">Digital Skills</h3>
+              <p className="text-xs md:text-sm text-purple-200">Learn new digital skills</p>
+            </div>
+          </Link>
 
 
         </div>
@@ -288,7 +349,7 @@ const DashboardPage = () => {
       <div className="mb-6 md:mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg md:text-xl font-semibold text-white">Recent Documents</h2>
-          <Link href="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View All →</Link>
+          <Link href="/dashboard/library" className="text-white hover:text-gray-300 text-sm font-medium">View Knowledge Hub →</Link>
         </div>
         
         {recentSummaries.length > 0 ? (
@@ -331,7 +392,7 @@ const DashboardPage = () => {
                         {summary.date}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link href="/dashboard/library" className="text-white hover:text-gray-300 mr-3">View</Link>
+                        <Link href="/dashboard/library" className="text-white hover:text-gray-300 mr-3">View in Hub</Link>
                         <button className="text-gray-400 hover:text-gray-300">Share</button>
                       </td>
                     </tr>
@@ -351,7 +412,7 @@ const DashboardPage = () => {
               <h4 className="text-lg font-medium mb-2 text-white">No documents yet</h4>
               <p className="text-gray-400 mb-6">Get started by uploading your first document.</p>
               <Link href="/dashboard/library" className="bg-black hover:bg-gray-800 text-white border border-white/30 hover:border-white px-4 py-2 rounded-md font-medium transition-colors inline-block">
-                + Upload Document
+                + Add to Knowledge Hub
               </Link>
             </div>
           </div>
