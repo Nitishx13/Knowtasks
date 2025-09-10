@@ -1,17 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { cn } from '../../lib/utils';
 
 const HomePage = () => {
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 300], [0, 100]);
+  const y2 = useTransform(scrollY, [0, 300], [0, -100]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <div>
 
-      {/* Hero Section */}
-      <section className="py-16 md:py-24 lg:py-32 bg-black text-white relative overflow-hidden">
-        {/* Minimalist background effect */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[#111] -z-10"></div>
+      {/* Enhanced Hero Section */}
+      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white relative overflow-hidden">
+        {/* Dynamic background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+        <motion.div 
+          className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"
+          style={{ y: y1 }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+          style={{ y: y2 }}
+        />
+        
+        {/* Interactive cursor effect */}
+        <div 
+          className="absolute w-96 h-96 bg-gradient-radial from-white/10 to-transparent rounded-full blur-2xl pointer-events-none transition-all duration-300"
+          style={{
+            left: mousePosition.x - 192,
+            top: mousePosition.y - 192,
+          }}
+        />
         
         <div className="container max-w-5xl px-4 sm:px-6 relative z-10">
           <div className="text-center">
@@ -19,103 +50,333 @@ const HomePage = () => {
               <p className="text-sm font-semibold tracking-widest">KNOWTASKS</p>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-8 text-white leading-tight tracking-tight">
-              AI-Generated<br className="hidden sm:block"/>
-              <span className="border-b-4 border-white pb-1">Smart Notes</span>
-            </h1>
+            <motion.h1 
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 text-white leading-tight tracking-tight"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Transform Knowledge into
+              <br className="hidden sm:block"/>
+              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
+                Smart Notes
+              </span>
+            </motion.h1>
             
-            <p className="text-gray-300 mb-6 text-lg md:text-xl max-w-2xl mx-auto font-medium">Transform any document into comprehensive, intelligent notes with our AI technology. Get organized summaries, key points, and study materials instantly.</p>
+            <motion.p 
+              className="text-gray-300 mb-8 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              Harness the power of AI to instantly convert any document, textbook, or research paper into organized, intelligent notes. Save hours of reading time while improving comprehension and retention.
+            </motion.p>
             
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <span className="px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20">IIT-JEE</span>
-              <span className="px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20">NEET</span>
-              <span className="px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20">Digital Skills</span>
-              <span className="px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20">Classes 9-12</span>
-              <span className="px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20">Graduation</span>
-            </div>
+            <motion.div 
+              className="flex flex-wrap justify-center gap-3 mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              {['IIT-JEE', 'NEET', 'Digital Skills', 'Classes 9-12', 'Graduation'].map((tag, index) => (
+                <motion.span 
+                  key={tag}
+                  className="px-4 py-2 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 cursor-pointer"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+                >
+                  {tag}
+                </motion.span>
+              ))}
+            </motion.div>
             
-            <div className="flex flex-col sm:flex-row justify-center gap-6 mb-8">
-              <Button asChild size="lg" className="px-10 py-6 text-base md:text-lg font-bold rounded-md hover:translate-y-[-2px] transition-all duration-300 shadow-md bg-white text-black">
-                <Link href="/dashboard">
-                  <span className="flex items-center justify-center gap-2">
-                    CREATE SMART NOTES
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </span>
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="px-10 py-6 text-base md:text-lg font-bold rounded-md border-2 border-white text-white bg-black/50 hover:text-white hover:bg-white/10">
-                <Link href="#how-it-works">
-                  <span className="flex items-center justify-center gap-2">
-                    SEE HOW IT WORKS
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </span>
-                </Link>
-              </Button>
-            </div>
+            <motion.div 
+              className="flex flex-col sm:flex-row justify-center gap-6 mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.0 }}
+            >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button asChild size="lg" className="px-12 py-6 text-base md:text-lg font-bold rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
+                  <Link href="/dashboard">
+                    <span className="flex items-center justify-center gap-3">
+                      🚀 START CREATING NOTES
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </span>
+                  </Link>
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button asChild variant="outline" size="lg" className="px-12 py-6 text-base md:text-lg font-bold rounded-xl border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+                  <Link href="#features">
+                    <span className="flex items-center justify-center gap-3">
+                      ✨ EXPLORE FEATURES
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    </span>
+                  </Link>
+                </Button>
+              </motion.div>
+            </motion.div>
             
-            <p className="text-sm font-medium text-gray-400 mb-16">✓ No credit card required &nbsp;&nbsp; ✓ 14-day free trial &nbsp;&nbsp; ✓ Cancel anytime</p>
+            <motion.div 
+              className="flex items-center justify-center gap-8 text-sm font-medium text-gray-400 mb-16"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 1.2 }}
+            >
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Free to start
+              </span>
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                No credit card
+              </span>
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Instant setup
+              </span>
+            </motion.div>
             
-            {/* Demo card with animation */}
-            <div className="relative max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl border border-white/20 bg-[#111]">
-              <div className="absolute top-0 left-0 w-full h-10 bg-white flex items-center px-4">
+            {/* Enhanced Demo Section */}
+            <motion.div 
+              className="relative max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/20 bg-gradient-to-br from-gray-900 to-black backdrop-blur-sm"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1.4 }}
+            >
+              <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-gray-800 to-gray-700 flex items-center px-6 border-b border-white/10">
                 <div className="flex space-x-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-black opacity-50"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-black opacity-50"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-black opacity-50"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
                 <div className="flex-1 flex justify-center">
-                  <div className="px-3 py-0.5 rounded-sm bg-black/10 text-xs text-black flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <div className="px-4 py-1 rounded-md bg-black/20 text-xs text-white flex items-center font-mono">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    KNOWTASKS
+                    knowtasks.ai
                   </div>
                 </div>
               </div>
               
-              <div className="pt-14 pb-6 px-6">
-                <div className="flex gap-6 flex-col md:flex-row">
-                  <div className="flex-1 border border-white/10 rounded-md p-4 bg-[#1a1a1a]">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-white text-sm uppercase tracking-wide">Document</h3>
-                      <span className="text-xs px-2 py-0.5 bg-white text-black rounded-sm">INPUT</span>
+              <div className="pt-16 pb-8 px-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <motion.div 
+                    className="space-y-4"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 1.6 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-white text-lg">📄 Document Input</h3>
+                      <span className="text-xs px-3 py-1 bg-blue-500 text-white rounded-full font-medium">UPLOAD</span>
                     </div>
-                    <div className="border border-white/10 rounded-md p-4 flex flex-col items-center justify-center text-center bg-[#222]">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p className="text-sm text-gray-400 mb-3 font-medium">Upload your textbook or article</p>
-                      <Button variant="outline" size="sm" className="text-xs border-white text-white hover:bg-white hover:text-black transition-colors font-bold px-4 py-1">SELECT FILE</Button>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 border border-white/10 rounded-md p-4 bg-[#1a1a1a]">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-white text-sm uppercase tracking-wide">Smart Notes</h3>
-                      <span className="text-xs px-2 py-0.5 bg-white text-black rounded-sm">OUTPUT</span>
-                    </div>
-                    <div className="space-y-2.5 bg-[#222] p-4 rounded-md border border-white/10">
-                      <div className="h-3 bg-white/20 rounded-sm w-full"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-5/6"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-full"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-4/6"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-full"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-5/6"></div>
-                      <div className="h-3 bg-white/20 rounded-sm w-3/6"></div>
-                      <div className="flex justify-end mt-4">
-                        <Button size="sm" className="text-xs bg-white text-black hover:bg-gray-200 font-bold px-4 py-1">EXPORT PDF</Button>
+                    <div className="border-2 border-dashed border-white/20 rounded-xl p-6 bg-white/5 backdrop-blur-sm hover:border-blue-400/50 transition-all duration-300">
+                      <div className="text-center">
+                        <motion.div 
+                          className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+                          animate={{ rotate: [0, 5, -5, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        </motion.div>
+                        <p className="text-white font-medium mb-2">Drop your PDF, DOCX, or TXT file</p>
+                        <p className="text-gray-400 text-sm mb-4">Or paste text directly</p>
+                        <div className="inline-flex items-center px-4 py-2 bg-white/10 rounded-lg text-white text-sm font-medium border border-white/20">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586a4 4 0 00-5.656-5.656l-6.586 6.586a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          Select File
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="space-y-4"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 1.8 }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-white text-lg">🧠 AI-Generated Notes</h3>
+                      <span className="text-xs px-3 py-1 bg-green-500 text-white rounded-full font-medium">READY</span>
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                      <div className="space-y-3">
+                        {[
+                          { width: 'w-full', delay: 2.0 },
+                          { width: 'w-5/6', delay: 2.2 },
+                          { width: 'w-full', delay: 2.4 },
+                          { width: 'w-4/6', delay: 2.6 },
+                          { width: 'w-5/6', delay: 2.8 },
+                          { width: 'w-3/4', delay: 3.0 }
+                        ].map((line, index) => (
+                          <motion.div 
+                            key={index}
+                            className={`h-3 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-sm ${line.width}`}
+                            initial={{ opacity: 0, scaleX: 0 }}
+                            animate={{ opacity: 1, scaleX: 1 }}
+                            transition={{ duration: 0.5, delay: line.delay }}
+                          />
+                        ))}
+                        <div className="flex justify-between items-center mt-6 pt-4 border-t border-white/10">
+                          <div className="flex items-center gap-2 text-gray-400 text-sm">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            Generated in 3.2s
+                          </div>
+                          <motion.button 
+                            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all duration-300"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            📥 Export PDF
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 md:py-28 lg:py-32 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-40"></div>
+        
+        <div className="container max-w-7xl px-4 sm:px-6 mx-auto relative z-10">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-indigo-100 to-cyan-100 rounded-full backdrop-blur-md border border-indigo-200">
+              <p className="text-sm font-bold tracking-wider text-indigo-800">🚀 POWERFUL FEATURES</p>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+              Everything you need for
+              <br />
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                Smart Learning
+              </span>
+            </h2>
+            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+              Discover the advanced AI capabilities that make Knowtasks the ultimate study companion for students worldwide.
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: "🧠",
+                title: "AI-Powered Summarization",
+                description: "Advanced algorithms analyze your documents and extract key concepts, creating comprehensive summaries that capture the essence of any material.",
+                color: "from-blue-500 to-cyan-500",
+                delay: 0.2
+              },
+              {
+                icon: "⚡",
+                title: "Lightning Fast Processing",
+                description: "Upload documents up to 50MB and get intelligent notes in seconds. Our optimized AI processes even complex academic papers instantly.",
+                color: "from-purple-500 to-pink-500",
+                delay: 0.4
+              },
+              {
+                icon: "📚",
+                title: "Multi-Format Support",
+                description: "Works with PDFs, Word documents, text files, and more. Paste text directly or upload files - we handle all popular formats seamlessly.",
+                color: "from-green-500 to-teal-500",
+                delay: 0.6
+              },
+              {
+                icon: "🎯",
+                title: "Subject-Specific Optimization",
+                description: "Tailored for IIT-JEE, NEET, digital skills, and academic subjects. Our AI understands context and generates relevant study materials.",
+                color: "from-orange-500 to-red-500",
+                delay: 0.8
+              },
+              {
+                icon: "🔍",
+                title: "Smart Search & Organization",
+                description: "Find any note instantly with powerful search. Organize by subject, date, or custom tags. Your knowledge, perfectly structured.",
+                color: "from-indigo-500 to-purple-500",
+                delay: 1.0
+              },
+              {
+                icon: "📊",
+                title: "Progress Tracking",
+                description: "Monitor your learning journey with detailed analytics. Track reading time, note creation, and study patterns to optimize your workflow.",
+                color: "from-cyan-500 to-blue-500",
+                delay: 1.2
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                className="group relative bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: feature.delay }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+                
+                <div className="relative z-10">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    {feature.icon}
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-800 transition-colors">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors">
+                    {feature.description}
+                  </p>
+                  
+                  <div className={`mt-6 w-12 h-1 bg-gradient-to-r ${feature.color} rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          
+          <motion.div 
+            className="text-center mt-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <Link href="/dashboard" className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-indigo-200/30 transition-all duration-300 hover:-translate-y-1 text-lg">
+              🎉 Try All Features Free
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

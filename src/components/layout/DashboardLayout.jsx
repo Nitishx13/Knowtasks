@@ -11,29 +11,67 @@ const DashboardLayout = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const [authChecked, setAuthChecked] = useState(false);
+
   // Check if the screen is mobile size
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     // Initial check
     checkMobile();
-    
+
     // Add event listener for window resize
     window.addEventListener('resize', checkMobile);
-    
+
     // Cleanup
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
+  // Check authentication based on route
+  useEffect(() => {
+    const checkAuth = () => {
+      const currentPath = router.pathname;
+
+      // For SuperAdmin routes
+      if (currentPath.startsWith('/admin/')) {
+        const isAuthenticated = localStorage.getItem('superadmin_authenticated');
+        if (!isAuthenticated) {
+          router.push('/admin/login');
+          return;
+        }
+      }
+
+      // For Mentor routes
+      if (currentPath.startsWith('/mentor/')) {
+        const isAuthenticated = localStorage.getItem('mentor_authenticated');
+        if (!isAuthenticated) {
+          router.push('/mentor/login');
+          return;
+        }
+      }
+
+      // For regular user routes, check Clerk authentication
+      if (currentPath.startsWith('/dashboard') && !currentPath.includes('/admin/') && !currentPath.includes('/mentor/')) {
+        if (isLoaded && !user) {
+          router.push('/login');
+          return;
+        }
+      }
+
+      setAuthChecked(true);
+    };
+
+    checkAuth();
+  }, [router.pathname, isLoaded, user, router]);
+
   const isActive = (path) => {
     return router.pathname === path ? 'bg-primary/10 text-primary' : 'hover:bg-accent text-muted-foreground hover:text-foreground';
   };
 
-  // Show loading state while Clerk loads
-  if (!isLoaded) {
+  // Show loading state while authentication is being checked
+  if (!authChecked || (!isLoaded && router.pathname.startsWith('/dashboard') && !router.pathname.includes('/admin/') && !router.pathname.includes('/mentor/'))) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -42,12 +80,6 @@ const DashboardLayout = ({ children }) => {
         </div>
       </div>
     );
-  }
-
-  // If no user, redirect to login
-  if (!user) {
-    router.push('/login');
-    return null;
   }
 
   return (
@@ -222,23 +254,78 @@ const DashboardLayout = ({ children }) => {
               </Button>
             </div>
             <div className="flex items-center space-x-3">
-              <SignOutButton>
+              {/* Sign Out Button - Different logic for different auth types */}
+              {router.pathname.startsWith('/admin/') ? (
                 <Button 
                   variant="outline" 
                   className="text-sm font-medium px-4 py-2 mr-2 flex items-center shadow-sm hover:shadow-md transition-all border-gray-300 text-gray-700 hover:bg-gray-50"
+                  onClick={() => {
+                    localStorage.removeItem('superadmin_authenticated');
+                    localStorage.removeItem('superadmin_email');
+                    localStorage.removeItem('superadmin_login_time');
+                    router.push('/admin/login');
+                  }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                   Sign Out
                 </Button>
-              </SignOutButton>
+              ) : router.pathname.startsWith('/mentor/') ? (
+                <Button 
+                  variant="outline" 
+                  className="text-sm font-medium px-4 py-2 mr-2 flex items-center shadow-sm hover:shadow-md transition-all border-gray-300 text-gray-700 hover:bg-gray-50"
+                  onClick={() => {
+                    localStorage.removeItem('mentor_authenticated');
+                    localStorage.removeItem('mentor_email');
+                    localStorage.removeItem('mentor_login_time');
+                    router.push('/mentor/login');
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign Out
+                </Button>
+              ) : (
+                <SignOutButton>
+                  <Button 
+                    variant="outline" 
+                    className="text-sm font-medium px-4 py-2 mr-2 flex items-center shadow-sm hover:shadow-md transition-all border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </Button>
+                </SignOutButton>
+              )}
+              
+              {/* User Profile - Different display for different auth types */}
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-gray-900">{user.firstName || user.emailAddresses[0]?.emailAddress}</p>
-                <p className="text-xs text-gray-500 font-medium">Premium</p>
+                {router.pathname.startsWith('/admin/') ? (
+                  <>
+                    <p className="text-sm font-medium text-gray-900">SuperAdmin</p>
+                    <p className="text-xs text-gray-500 font-medium">System Administrator</p>
+                  </>
+                ) : router.pathname.startsWith('/mentor/') ? (
+                  <>
+                    <p className="text-sm font-medium text-gray-900">Mentor</p>
+                    <p className="text-xs text-gray-500 font-medium">Educational Guide</p>
+                  </>
+                ) : user ? (
+                  <>
+                    <p className="text-sm font-medium text-gray-900">{user.firstName || user.emailAddresses[0]?.emailAddress}</p>
+                    <p className="text-xs text-gray-500 font-medium">Premium</p>
+                  </>
+                ) : null}
               </div>
+              
+              {/* Avatar */}
               <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
-                {user.firstName ? user.firstName[0].toUpperCase() : user.emailAddresses[0]?.emailAddress[0].toUpperCase()}
+                {router.pathname.startsWith('/admin/') ? 'SA' : 
+                 router.pathname.startsWith('/mentor/') ? 'M' : 
+                 user ? (user.firstName ? user.firstName[0].toUpperCase() : user.emailAddresses[0]?.emailAddress[0].toUpperCase()) : 'U'}
               </div>
             </div>
           </div>
