@@ -80,7 +80,7 @@ const SuperAdminLogin = () => {
 
         {/* Login Form */}
         <div className="bg-gray-900 rounded-2xl p-6 border border-gray-700 shadow-lg">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
