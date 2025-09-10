@@ -3,41 +3,8 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 
 const MentorManagement = () => {
-  const [mentors, setMentors] = useState([
-    { 
-      id: 1, 
-      name: 'Dr. Sarah Wilson', 
-      email: 'sarah.wilson@knowtasks.com', 
-      password: 'Mentor@123', 
-      subject: 'Physics', 
-      status: 'active', 
-      students: 45, 
-      joinDate: '2024-01-10',
-      lastLogin: '2024-01-20'
-    },
-    { 
-      id: 2, 
-      name: 'Prof. Michael Chen', 
-      email: 'michael.chen@knowtasks.com', 
-      password: 'Physics@456', 
-      subject: 'Chemistry', 
-      status: 'active', 
-      students: 38, 
-      joinDate: '2024-01-12',
-      lastLogin: '2024-01-19'
-    },
-    { 
-      id: 3, 
-      name: 'Dr. Emily Davis', 
-      email: 'emily.davis@knowtasks.com', 
-      password: 'Math@789', 
-      subject: 'Mathematics', 
-      status: 'pending', 
-      students: 0, 
-      joinDate: '2024-01-18',
-      lastLogin: 'Never'
-    }
-  ]);
+  const [mentors, setMentors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -51,6 +18,35 @@ const MentorManagement = () => {
     status: 'active'
   });
 
+  // Fetch mentors from database
+  const fetchMentors = async () => {
+    try {
+      const response = await fetch('/api/auth/mentor');
+      if (response.ok) {
+        const data = await response.json();
+        const formattedMentors = data.data.map(mentor => ({
+          id: mentor.id,
+          name: mentor.name,
+          email: mentor.email,
+          subject: mentor.subject,
+          status: mentor.status,
+          students: mentor.students_count || 0,
+          joinDate: new Date(mentor.created_at).toLocaleDateString(),
+          lastLogin: mentor.last_login ? new Date(mentor.last_login).toLocaleDateString() : 'Never'
+        }));
+        setMentors(formattedMentors);
+      }
+    } catch (error) {
+      console.error('Error fetching mentors:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMentors();
+  }, []);
+
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$';
     let password = '';
@@ -60,47 +56,91 @@ const MentorManagement = () => {
     return password;
   };
 
-  const handleAddMentor = () => {
+  const handleAddMentor = async () => {
     if (newMentor.name && newMentor.email && newMentor.subject) {
       const password = newMentor.password || generatePassword();
-      const mentor = {
-        id: mentors.length + 1,
-        ...newMentor,
-        password,
-        students: 0,
-        joinDate: new Date().toISOString().split('T')[0],
-        lastLogin: 'Never'
-      };
       
-      setMentors([...mentors, mentor]);
-      setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
-      setShowAddModal(false);
-      
-      // Store mentor credentials in localStorage
-      const existingMentors = JSON.parse(localStorage.getItem('mentor_credentials') || '[]');
-      existingMentors.push({
-        email: mentor.email,
-        password: mentor.password,
-        name: mentor.name,
-        id: mentor.id
-      });
-      localStorage.setItem('mentor_credentials', JSON.stringify(existingMentors));
+      try {
+        const response = await fetch('/api/auth/mentor', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: newMentor.name,
+            email: newMentor.email,
+            password: password,
+            subject: newMentor.subject,
+            status: newMentor.status
+          })
+        });
+
+        if (response.ok) {
+          setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
+          setShowAddModal(false);
+          fetchMentors(); // Refresh the list
+          alert('Mentor added successfully!');
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.error}`);
+        }
+      } catch (error) {
+        console.error('Error adding mentor:', error);
+        alert('Failed to add mentor. Please try again.');
+      }
     }
   };
 
-  const handleDeleteMentor = (mentorId) => {
-    setMentors(mentors.filter(m => m.id !== mentorId));
-    
-    // Remove from localStorage
-    const existingMentors = JSON.parse(localStorage.getItem('mentor_credentials') || '[]');
-    const updatedMentors = existingMentors.filter(m => m.id !== mentorId);
-    localStorage.setItem('mentor_credentials', JSON.stringify(updatedMentors));
+  const handleDeleteMentor = async (mentorId) => {
+    if (confirm('Are you sure you want to delete this mentor?')) {
+      try {
+        const response = await fetch(`/api/auth/mentor?id=${mentorId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          fetchMentors(); // Refresh the list
+          alert('Mentor deleted successfully!');
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.error}`);
+        }
+      } catch (error) {
+        console.error('Error deleting mentor:', error);
+        alert('Failed to delete mentor. Please try again.');
+      }
+    }
   };
 
-  const handleStatusChange = (mentorId, newStatus) => {
-    setMentors(mentors.map(m => 
-      m.id === mentorId ? { ...m, status: newStatus } : m
-    ));
+  const handleStatusChange = async (mentorId, newStatus) => {
+    const mentor = mentors.find(m => m.id === mentorId);
+    if (!mentor) return;
+
+    try {
+      const response = await fetch('/api/auth/mentor', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: mentor.name,
+          email: mentor.email,
+          password: 'unchanged', // Keep existing password
+          subject: mentor.subject,
+          status: newStatus
+        })
+      });
+
+      if (response.ok) {
+        fetchMentors(); // Refresh the list
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating mentor status:', error);
+      alert('Failed to update mentor status. Please try again.');
+    }
   };
 
   const showPassword = (mentor) => {

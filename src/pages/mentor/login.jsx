@@ -21,33 +21,40 @@ const MentorLogin = () => {
     setError('');
   };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // Get mentor credentials from localStorage
-      const mentorCredentials = JSON.parse(localStorage.getItem('mentor_credentials') || '[]');
-      
-      // Find matching mentor
-      const mentor = mentorCredentials.find(m => 
-        m.email === credentials.email && m.password === credentials.password
-      );
+      // Use database API for authentication
+      const response = await fetch('/api/auth/mentor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
 
-      if (mentor) {
-        // Store mentor session
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Set authentication flag and user data
         localStorage.setItem('mentor_authenticated', 'true');
-        localStorage.setItem('mentor_data', JSON.stringify(mentor));
-        localStorage.setItem('mentor_login_time', new Date().toISOString());
+        localStorage.setItem('mentor_user', JSON.stringify(data.data));
         
         // Redirect to mentor dashboard
         router.push('/mentor/dashboard');
       } else {
-        setError('Invalid email or password. Please check your credentials.');
+        const errorData = await response.json();
+        setError(errorData.error || 'Invalid email or password. Please check your credentials.');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -69,7 +76,7 @@ const MentorLogin = () => {
 
         {/* Login Form */}
         <div className="bg-gray-900 rounded-2xl p-6 border border-gray-700 shadow-lg">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">

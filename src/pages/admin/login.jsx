@@ -25,26 +25,40 @@ const SuperAdminLogin = () => {
     setError(''); // Clear error when user types
   };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // Validate credentials
-      if (credentials.email === SUPERADMIN_EMAIL && credentials.password === SUPERADMIN_PASSWORD) {
-        // Store SuperAdmin session
-        localStorage.setItem('superadmin_authenticated', 'true');
-        localStorage.setItem('superadmin_email', credentials.email);
-        localStorage.setItem('superadmin_login_time', new Date().toISOString());
+      // Use database API for authentication
+      const response = await fetch('/api/auth/superadmin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
         
-        // Redirect to SuperAdmin dashboard
+        // Set authentication flag and user data
+        localStorage.setItem('superadmin_authenticated', 'true');
+        localStorage.setItem('superadmin_user', JSON.stringify(data.data));
+        
+        // Redirect to admin dashboard
         router.push('/admin/dashboard');
       } else {
-        setError('Invalid email or password. Access denied.');
+        const errorData = await response.json();
+        setError(errorData.error || 'Invalid email or password. Please check your credentials.');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
     } finally {
       setLoading(false);
     }

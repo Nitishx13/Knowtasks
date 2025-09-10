@@ -23,6 +23,7 @@ const SuperAdminDashboard = () => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showMentorManagement, setShowMentorManagement] = useState(false);
 
   const { metrics, statistics } = dashboardData;
 
@@ -162,7 +163,7 @@ const SuperAdminDashboard = () => {
       {/* Quick Actions */}
       <div className="mb-6 md:mb-8">
         <h2 className="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
 
           <Link href="/admin/users" className="bg-gradient-to-br from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border border-red-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
@@ -175,6 +176,21 @@ const SuperAdminDashboard = () => {
               <p className="text-xs md:text-sm text-red-200">Manage system users</p>
             </div>
           </Link>
+
+          <button 
+            onClick={() => setShowMentorManagement(!showMentorManagement)}
+            className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300"
+          >
+            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white text-sm md:text-base">Mentor System</h3>
+              <p className="text-xs md:text-sm text-blue-200">Manage mentors</p>
+            </div>
+          </button>
 
           <Link href="/admin/analytics" className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
@@ -286,6 +302,25 @@ const SuperAdminDashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Mentor Management System */}
+      {showMentorManagement && (
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-white">Mentor Login System</h2>
+            <Button
+              onClick={() => setShowMentorManagement(false)}
+              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Close
+            </Button>
+          </div>
+          <MentorManagement />
+        </div>
+      )}
 
       {/* Footer */}
       <div className="text-center py-4 md:py-6 border-t border-gray-700">

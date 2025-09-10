@@ -2,50 +2,70 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
+import { useRouter } from 'next/router';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [libraryItems, setLibraryItems] = useState([]);
+  const [selectedPDF, setSelectedPDF] = useState(null);
+  const [showPDFModal, setShowPDFModal] = useState(false);
   
   const { user } = useAuth();
+  const router = useRouter();
+
+  // Check if user is mentor - only allow uploads in mentor routes
+  const isMentor = router.pathname.includes('/mentor') && localStorage.getItem('mentor_authenticated');
 
   // Function to fetch library items from API
   const fetchLibraryItems = async () => {
     setLoading(true);
     try {
-      // In a real implementation, we would fetch data from the API
-      // const userId = user?.id;
-      // if (!userId) return;
-      // 
-      // const headers = await getAuthHeaders(userId);
-      // const response = await fetch(`/api/library/items?userId=${userId}`, {
-      //   headers
-      // });
-      // 
-      // if (response.ok) {
-      //   const data = await response.json();
-      //   setLibraryItems(data.items || []);
-      // }
+      // Fetch Formula Bank items from database
+      const response = await fetch('/api/formula-bank/list?' + new URLSearchParams({
+        category: activeTab === 'all' ? '' : activeTab,
+        search: searchQuery
+      }));
       
-      // For now, we'll continue using mock data
-      // Simulate API delay
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
+      if (response.ok) {
+        const data = await response.json();
+        const formattedItems = data.data.map(item => ({
+          id: item.id,
+          title: item.title,
+          type: 'formula',
+          category: item.subject,
+          date: new Date(item.created_at).toLocaleDateString(),
+          size: `${Math.round(item.file_size / 1024)} KB`,
+          status: 'completed',
+          description: item.description,
+          fileUrl: item.file_url,
+          fileName: item.file_name,
+          uploadedBy: item.uploaded_by,
+          tags: item.tags || [],
+          created_at: item.created_at
+        }));
+        setLibraryItems(formattedItems);
+      } else {
+        // Fallback to mock data if API fails
+        setLibraryItems(mockLibraryItems);
+      }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching library items:', error);
+      // Fallback to mock data
+      setLibraryItems(mockLibraryItems);
       setLoading(false);
     }
   };
   
-  // Call fetchLibraryItems when component mounts or user changes
+  // Call fetchLibraryItems when component mounts or filters change
   useEffect(() => {
     fetchLibraryItems();
-  }, [user]);
+  }, [activeTab, searchQuery]);
   
-  // Mock data for library items
-  const libraryItems = [
+  // Mock data for library items (fallback)
+  const mockLibraryItems = [
     {
       id: 1,
       title: 'Physics Equations',
@@ -102,11 +122,28 @@ const LibraryPage = () => {
     }
   ];
 
+
   const filteredItems = libraryItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTab = activeTab === 'all' || item.type === activeTab;
     return matchesSearch && matchesTab;
   });
+
+  // Handle PDF viewing
+  const handleViewPDF = (item) => {
+    setSelectedPDF(item);
+    setShowPDFModal(true);
+  };
+
+  // Handle PDF download
+  const handleDownloadPDF = (item) => {
+    const link = document.createElement('a');
+    link.href = item.fileUrl || `/uploads/${item.fileName}`;
+    link.download = item.fileName || item.title;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -222,15 +259,35 @@ const LibraryPage = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 self-end md:self-auto">
-                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
-                  View
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-red-600 border-red-300 hover:bg-red-50">
-                  Delete
-                </Button>
+                {item.type === 'formula' ? (
+                  <>
+                    <Button 
+                      onClick={() => handleViewPDF(item)}
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
+                    >
+                      View
+                    </Button>
+                    <Button 
+                      onClick={() => handleDownloadPDF(item)}
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
+                    >
+                      Download
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
+                      View
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
+                      Share
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -244,6 +301,71 @@ const LibraryPage = () => {
           </svg>
           <h3 className="text-base md:text-lg font-medium text-gray-900 mb-1 md:mb-2">No items found</h3>
           <p className="text-sm md:text-base text-gray-600">Try adjusting your search or filters</p>
+        </div>
+      )}
+
+      {/* PDF Viewer Modal */}
+      {showPDFModal && selectedPDF && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-4xl h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{selectedPDF.title}</h2>
+                <p className="text-sm text-gray-600">{selectedPDF.category}</p>
+              </div>
+              <button
+                onClick={() => setShowPDFModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 p-4">
+              <iframe
+                src={selectedPDF.fileUrl || `/uploads/${selectedPDF.fileName}`}
+                className="w-full h-full border rounded-lg"
+                title={selectedPDF.title}
+                onError={(e) => {
+                  console.error('PDF load error:', e);
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div style={{display: 'none'}} className="flex items-center justify-center h-full text-gray-500">
+                <div className="text-center">
+                  <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                  </svg>
+                  <p>PDF preview not available</p>
+                  <p className="text-sm">Click download to view the file</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t bg-gray-50 flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                <p><strong>Description:</strong> {selectedPDF.description}</p>
+                <p><strong>Uploaded:</strong> {new Date(selectedPDF.created_at || selectedPDF.date).toLocaleDateString()}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleDownloadPDF(selectedPDF)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Download PDF
+                </Button>
+                <Button
+                  onClick={() => setShowPDFModal(false)}
+                  variant="outline"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
