@@ -3,6 +3,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 import { useRouter } from 'next/router';
+import PDFViewer from '../../components/ui/PDFViewer';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -22,34 +23,104 @@ const LibraryPage = () => {
   const fetchLibraryItems = async () => {
     setLoading(true);
     try {
-      // Fetch Formula Bank items from database
-      const response = await fetch('/api/formula-bank/list?' + new URLSearchParams({
-        category: activeTab === 'all' ? '' : activeTab,
-        search: searchQuery
-      }));
-      
-      if (response.ok) {
-        const data = await response.json();
-        const formattedItems = data.data.map(item => ({
-          id: item.id,
-          title: item.title,
-          type: 'formula',
-          category: item.subject,
-          date: new Date(item.created_at).toLocaleDateString(),
-          size: `${Math.round(item.file_size / 1024)} KB`,
-          status: 'completed',
-          description: item.description,
-          fileUrl: item.file_url,
-          fileName: item.file_name,
-          uploadedBy: item.uploaded_by,
-          tags: item.tags || [],
-          created_at: item.created_at
+      const allItems = [];
+
+      // Fetch Formula Bank items
+      try {
+        const formulaResponse = await fetch('/api/formula-bank/list?' + new URLSearchParams({
+          category: activeTab === 'formula' ? '' : '',
+          search: searchQuery
         }));
-        setLibraryItems(formattedItems);
-      } else {
-        // Fallback to mock data if API fails
-        setLibraryItems(mockLibraryItems);
+        
+        if (formulaResponse.ok) {
+          const formulaData = await formulaResponse.json();
+          const formulaItems = formulaData.data.map(item => ({
+            id: `formula-${item.id}`,
+            title: item.title,
+            type: 'formula',
+            category: item.subject,
+            date: new Date(item.created_at).toLocaleDateString(),
+            size: `${Math.round(item.file_size / 1024)} KB`,
+            status: 'completed',
+            description: item.description,
+            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
+            fileName: item.file_name,
+            uploadedBy: item.uploaded_by,
+            tags: item.tags || [],
+            created_at: item.created_at
+          }));
+          allItems.push(...formulaItems);
+        }
+      } catch (error) {
+        console.error('Error fetching formula bank items:', error);
       }
+
+      // Fetch Flashcards
+      try {
+        const flashcardResponse = await fetch('/api/flashcards/list?' + new URLSearchParams({
+          category: activeTab === 'flashcard' ? '' : '',
+          search: searchQuery
+        }));
+        
+        if (flashcardResponse.ok) {
+          const flashcardData = await flashcardResponse.json();
+          const flashcardItems = flashcardData.data.map(item => ({
+            id: `flashcard-${item.id}`,
+            title: item.title,
+            type: 'flashcard',
+            category: item.subject,
+            date: new Date(item.created_at).toLocaleDateString(),
+            size: `${Math.round(item.file_size / 1024)} KB`,
+            status: 'completed',
+            description: item.description,
+            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
+            fileName: item.file_name,
+            uploadedBy: item.uploaded_by,
+            tags: item.tags || [],
+            created_at: item.created_at
+          }));
+          allItems.push(...flashcardItems);
+        }
+      } catch (error) {
+        console.error('Error fetching flashcard items:', error);
+      }
+
+      // Fetch PYQ items
+      try {
+        const pyqResponse = await fetch('/api/pyq/list?' + new URLSearchParams({
+          category: activeTab === 'pyq' ? '' : '',
+          search: searchQuery
+        }));
+        
+        if (pyqResponse.ok) {
+          const pyqData = await pyqResponse.json();
+          const pyqItems = pyqData.data.map(item => ({
+            id: `pyq-${item.id}`,
+            title: item.title,
+            type: 'pyq',
+            category: item.subject,
+            date: new Date(item.created_at).toLocaleDateString(),
+            size: `${Math.round(item.file_size / 1024)} KB`,
+            status: 'completed',
+            description: item.description,
+            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
+            fileName: item.file_name,
+            uploadedBy: item.uploaded_by,
+            year: item.year,
+            examType: item.exam_type,
+            tags: item.tags || [],
+            created_at: item.created_at
+          }));
+          allItems.push(...pyqItems);
+        }
+      } catch (error) {
+        console.error('Error fetching PYQ items:', error);
+      }
+
+      // Sort items by creation date (newest first)
+      allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      setLibraryItems(allItems.length > 0 ? allItems : mockLibraryItems);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching library items:', error);
@@ -138,7 +209,7 @@ const LibraryPage = () => {
   // Handle PDF download
   const handleDownloadPDF = (item) => {
     const link = document.createElement('a');
-    link.href = item.fileUrl || `/uploads/${item.fileName}`;
+    link.href = item.fileUrl || `/uploads/${encodeURIComponent(item.fileName)}`;
     link.download = item.fileName || item.title;
     document.body.appendChild(link);
     link.click();
@@ -250,6 +321,12 @@ const LibraryPage = () => {
                   <h3 className="text-base md:text-lg font-semibold text-gray-900">{item.title}</h3>
                   <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-1">
                     <span className="text-xs md:text-sm text-gray-500">{item.category}</span>
+                    {item.type === 'pyq' && item.year && (
+                      <span className="text-xs md:text-sm text-gray-500">{item.year}</span>
+                    )}
+                    {item.type === 'pyq' && item.examType && (
+                      <span className="text-xs md:text-sm text-gray-500">{item.examType}</span>
+                    )}
                     <span className="text-xs md:text-sm text-gray-500">{item.size}</span>
                     <span className="text-xs md:text-sm text-gray-500">{item.date}</span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(item.status)}`}>
@@ -259,35 +336,22 @@ const LibraryPage = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 self-end md:self-auto">
-                {item.type === 'formula' ? (
-                  <>
-                    <Button 
-                      onClick={() => handleViewPDF(item)}
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      onClick={() => handleDownloadPDF(item)}
-                      variant="outline" 
-                      size="sm" 
-                      className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
-                    >
-                      Download
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
-                      View
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50">
-                      Share
-                    </Button>
-                  </>
-                )}
+                <Button 
+                  onClick={() => handleViewPDF(item)}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
+                >
+                  View
+                </Button>
+                <Button 
+                  onClick={() => handleDownloadPDF(item)}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
+                >
+                  Download
+                </Button>
               </div>
             </div>
           </div>
@@ -324,25 +388,13 @@ const LibraryPage = () => {
             </div>
             
             <div className="flex-1 p-4">
-              <iframe
-                src={selectedPDF.fileUrl || `/uploads/${selectedPDF.fileName}`}
-                className="w-full h-full border rounded-lg"
-                title={selectedPDF.title}
-                onError={(e) => {
-                  console.error('PDF load error:', e);
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
+              <PDFViewer
+                fileUrl={selectedPDF.fileUrl}
+                fileName={selectedPDF.fileName}
+                onError={(error) => {
+                  console.error('PDF load error:', error);
                 }}
               />
-              <div style={{display: 'none'}} className="flex items-center justify-center h-full text-gray-500">
-                <div className="text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                  </svg>
-                  <p>PDF preview not available</p>
-                  <p className="text-sm">Click download to view the file</p>
-                </div>
-              </div>
             </div>
             
             <div className="p-4 border-t bg-gray-50 flex justify-between items-center">

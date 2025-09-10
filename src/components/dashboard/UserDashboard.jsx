@@ -225,184 +225,64 @@ const UserDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back, {userName}!</h1>
-          <p className="text-muted-foreground">Here's an overview of your content and recent activity.</p>
-        </div>
-        <Button onClick={fetchUserData} variant="outline" size="sm">
-          <ClockIcon className="mr-2 h-4 w-4" />
-          Refresh
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Uploads</CardTitle>
-            <FileIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUploads}</div>
-            <p className="text-xs text-muted-foreground">Files you've uploaded</p>
+      {/* Main Actions */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/data'}>
+          <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+            <FileIcon className="h-12 w-12 text-purple-500 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">My Data</h3>
+            <p className="text-sm text-muted-foreground">Manage your personal notes</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.recentUploads}</div>
-            <p className="text-xs text-muted-foreground">Uploads in the last 7 days</p>
+        
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/summarize'}>
+          <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+            <UploadIcon className="h-12 w-12 text-blue-500 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Upload Documents</h3>
+            <p className="text-sm text-muted-foreground">Upload and analyze your study materials</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Text Files</CardTitle>
-            <FileTextIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTextFiles}</div>
-            <p className="text-xs text-muted-foreground">Text documents</p>
+        
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/library'}>
+          <CardContent className="flex flex-col items-center justify-center p-8 text-center">
+            <FileTextIcon className="h-12 w-12 text-green-500 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Knowledge Hub</h3>
+            <p className="text-sm text-muted-foreground">Access your library and resources</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Recent Activity */}
+      {(uploads.length > 0 || textFiles.length > 0) && (
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks you can perform</CardDescription>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest uploads and documents</CardDescription>
           </CardHeader>
-          <CardContent className="flex gap-4">
-            <Button>
-              <UploadIcon className="mr-2 h-4 w-4" />
-              Upload File
-            </Button>
-            <Button variant="outline">
-              <FileTextIcon className="mr-2 h-4 w-4" />
-              Create Text
-            </Button>
+          <CardContent>
+            <div className="space-y-3">
+              {uploads.slice(0, 3).map((file) => (
+                <div key={file.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
+                  <FileIcon className="h-6 w-6 text-blue-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{file.fileName}</p>
+                    <p className="text-xs text-gray-500">{formatDistanceToNow(new Date(file.uploadDate))} ago</p>
+                  </div>
+                </div>
+              ))}
+              {textFiles.slice(0, 2).map((file) => (
+                <div key={file.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded">
+                  <FileTextIcon className="h-6 w-6 text-green-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{file.title}</p>
+                    <p className="text-xs text-gray-500">{formatDistanceToNow(new Date(file.createdAt))} ago</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Content Tabs */}
-      <Tabs defaultValue="uploads" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="uploads">File Uploads ({uploads.length})</TabsTrigger>
-          <TabsTrigger value="text">Text Files ({textFiles.length})</TabsTrigger>
-        </TabsList>
-        
-        {/* Uploads Tab */}
-        <TabsContent value="uploads" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Uploads</CardTitle>
-              <CardDescription>Files you've uploaded to the platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {uploads.length > 0 ? (
-                <div className="space-y-4">
-                  {uploads.map((file) => (
-                    <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <FileIcon className="h-8 w-8 text-blue-500" />
-                        <div>
-                          <p className="font-medium">{file.fileName}</p>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <span>{file.formattedSize}</span>
-                            <span>•</span>
-                            <span>{formatDistanceToNow(new Date(file.uploadDate))} ago</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="ghost" onClick={() => handleViewFile(file.fileUrl, file.fileName)}>
-                          <EyeIcon className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleDeleteFile(file.id, 'upload')}>
-                          <TrashIcon className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                  <FileIcon className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-gray-900">No files uploaded yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Get started by uploading your first file</p>
-                  <div className="mt-6">
-                    <Button>
-                      <UploadIcon className="mr-2 h-4 w-4" />
-                      Upload File
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        {/* Text Files Tab */}
-        <TabsContent value="text" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Text Files</CardTitle>
-              <CardDescription>Text documents you've created</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {textFiles.length > 0 ? (
-                <div className="space-y-4">
-                  {textFiles.map((file) => (
-                    <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <FileTextIcon className="h-8 w-8 text-green-500" />
-                        <div>
-                          <p className="font-medium">{file.title}</p>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <Badge variant="outline">{file.type || 'Text'}</Badge>
-                            <span>•</span>
-                            <span>{formatDistanceToNow(new Date(file.createdAt))} ago</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="ghost">
-                          <EyeIcon className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <PencilIcon className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleDeleteFile(file.id, 'text')}>
-                          <TrashIcon className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                  <FileTextIcon className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-gray-900">No text files created yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Get started by creating your first text document</p>
-                  <div className="mt-6">
-                    <Button>
-                      <FileTextIcon className="mr-2 h-4 w-4" />
-                      Create Text
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      )}
     </div>
   );
 };

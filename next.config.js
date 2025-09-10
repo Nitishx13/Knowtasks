@@ -20,7 +20,14 @@ const nextConfig = {
       fs: false,
       path: false,
       os: false,
+      canvas: false,
     };
+
+    // Handle PDF.js worker
+    config.module.rules.push({
+      test: /\.pdf$/,
+      use: 'file-loader',
+    });
     
     return config;
   },
@@ -29,12 +36,16 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
-  // Configure rewrites for API routes
+  // Configure rewrites for API routes and static files
   async rewrites() {
     return [
       {
         source: '/api/:path*',
         destination: '/api/:path*',
+      },
+      {
+        source: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
       },
     ];
   },

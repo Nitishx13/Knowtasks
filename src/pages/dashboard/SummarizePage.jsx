@@ -224,17 +224,17 @@ const SummarizePage = () => {
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-gray-900">Smart Summarization Tool</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-gray-900">Document Upload & Processing</h1>
           <p className="text-gray-600 text-base md:text-lg">
-            Upload PDFs and documents or paste text to generate intelligent summaries
+            Upload study materials, research papers, and documents for AI-powered summarization and knowledge extraction
           </p>
         </div>
         <div className="w-full md:w-auto">
           <a 
-            href="/dashboard/files" 
+            href="/dashboard/library" 
             className="inline-flex w-full md:w-auto justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
-            View All Text Files
+            View Knowledge Hub
           </a>
         </div>
       </div>
@@ -278,7 +278,7 @@ const SummarizePage = () => {
                     </span>{' '}
                     or drag and drop
                   </div>
-                  <p className="text-xs text-gray-500">PDF, TXT, DOC, DOCX up to 50MB</p>
+                  <p className="text-xs text-gray-500">Study materials: PDF, TXT, DOC, DOCX up to 50MB</p>
                 </div>
               </label>
             </div>
@@ -302,7 +302,7 @@ const SummarizePage = () => {
               disabled={!file || isUploading}
               className="w-full px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium text-sm md:text-base"
             >
-              {isUploading ? 'Processing...' : 'Upload & Summarize'}
+              {isUploading ? 'Processing...' : 'Upload & Analyze'}
             </button>
           </div>
         )}
@@ -314,7 +314,7 @@ const SummarizePage = () => {
               <textarea
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Paste or type your text here..."
+                placeholder="Paste lecture notes, research content, or study material here for AI analysis..."
                 className="w-full h-48 md:h-64 p-3 md:p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               />
             </div>
@@ -324,7 +324,7 @@ const SummarizePage = () => {
               disabled={!textInput.trim() || isProcessingText}
               className="w-full px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium text-sm md:text-base"
             >
-              {isProcessingText ? 'Processing...' : 'Process Text'}
+              {isProcessingText ? 'Analyzing...' : 'Analyze & Summarize'}
             </button>
           </div>
         )}
@@ -374,7 +374,7 @@ const SummarizePage = () => {
 
       {/* Previous Summaries and Text Files */}
       <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
-        <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Previous Summaries & Text Files</h2>
+        <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Your Processed Documents</h2>
         
         {loading ? (
           <div className="text-center py-6 md:py-8">
@@ -419,7 +419,7 @@ const SummarizePage = () => {
             </svg>
             <h3 className="mt-2 text-xs md:text-sm font-medium text-gray-900">No summaries yet</h3>
             <p className="mt-1 text-xs md:text-sm text-gray-500">
-              Upload a document or paste text above to generate your first summary.
+              Upload study materials or paste content above to start building your knowledge base.
             </p>
           </div>
         )}
