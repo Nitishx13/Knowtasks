@@ -105,57 +105,6 @@ const DashboardPage = () => {
         <p className="text-gray-400 text-base md:text-lg">Welcome back to your dashboard</p>
       </div>
 
-      {/* Educational Context Banners */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 md:mb-8">
-        {/* IIT Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">IIT Preparation</h3>
-            <p className="text-sm text-blue-100 mb-3">Access study materials and practice tests for JEE preparation</p>
-            <Link href="/dashboard/revision-plan?type=iit" className="inline-block bg-white text-blue-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-50 transition-all">
-              Start Learning
-            </Link>
-          </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* NEET Banner */}
-        <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">NEET Preparation</h3>
-            <p className="text-sm text-green-100 mb-3">Access biology, physics, and chemistry resources for medical exams</p>
-            <Link href="/dashboard/revision-plan?type=neet" className="inline-block bg-white text-green-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-green-50 transition-all">
-              Start Learning
-            </Link>
-          </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Digital Skills Banner */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">Digital Skills</h3>
-            <p className="text-sm text-purple-100 mb-3">Learn programming, design, and other digital skills for your future</p>
-            <Link href="/dashboard/digital-skills" className="inline-block bg-white text-purple-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-purple-50 transition-all">
-              Explore Skills
-            </Link>
-          </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
-            </svg>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         {/* Metrics Cards - First Row */}
         <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
