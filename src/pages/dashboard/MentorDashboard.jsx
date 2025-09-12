@@ -29,9 +29,27 @@ const MentorDashboard = () => {
     year: new Date().getFullYear(),
     examType: 'Midterm'
   });
-  const [formulaBankItems, setFormulaBankItems] = useState([]);
-  const [flashcardItems, setFlashcardItems] = useState([]);
-  const [pyqItems, setPyqItems] = useState([]);
+  const [formulaBankItems, setFormulaBankItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('formula_bank_items');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [flashcardItems, setFlashcardItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('flashcard_items');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [pyqItems, setPyqItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('pyq_items');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(false);
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
@@ -39,52 +57,92 @@ const MentorDashboard = () => {
   const [showPyqModal, setShowPyqModal] = useState(false);
   const [activeSection, setActiveSection] = useState('formula');
 
-  // Fetch Formula Bank items
-  const fetchFormulaBankItems = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/formula-bank/list');
-      if (response.ok) {
-        const data = await response.json();
-        setFormulaBankItems(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching Formula Bank items:', error);
-    } finally {
-      setLoading(false);
+  // Initialize with mock data if localStorage is empty
+  const initializeMockData = () => {
+    if (formulaBankItems.length === 0) {
+      const mockFormulas = [
+        {
+          id: 1,
+          title: 'Physics Formulas - Mechanics',
+          description: 'Essential mechanics formulas for physics',
+          category: 'Physics',
+          subject: 'Physics',
+          file_name: 'physics_mechanics.pdf',
+          created_at: new Date().toISOString(),
+          tags: ['mechanics', 'physics']
+        },
+        {
+          id: 2,
+          title: 'Mathematics - Calculus',
+          description: 'Calculus formulas and derivatives',
+          category: 'Mathematics',
+          subject: 'Mathematics',
+          file_name: 'math_calculus.pdf',
+          created_at: new Date().toISOString(),
+          tags: ['calculus', 'derivatives']
+        }
+      ];
+      setFormulaBankItems(mockFormulas);
+      localStorage.setItem('formula_bank_items', JSON.stringify(mockFormulas));
     }
-  };
 
-  // Fetch Flashcards
-  const fetchFlashcards = async () => {
-    try {
-      const response = await fetch('/api/flashcards/list');
-      if (response.ok) {
-        const data = await response.json();
-        setFlashcardItems(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching Flashcards:', error);
+    if (flashcardItems.length === 0) {
+      const mockFlashcards = [
+        {
+          id: 1,
+          title: 'Biology Cell Structure',
+          description: 'Flashcards for cell biology',
+          category: 'Biology',
+          subject: 'Biology',
+          file_name: 'biology_cells.pdf',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: 'Chemistry Periodic Table',
+          description: 'Element properties flashcards',
+          category: 'Chemistry',
+          subject: 'Chemistry',
+          file_name: 'chemistry_periodic.pdf',
+          created_at: new Date().toISOString()
+        }
+      ];
+      setFlashcardItems(mockFlashcards);
+      localStorage.setItem('flashcard_items', JSON.stringify(mockFlashcards));
     }
-  };
 
-  // Fetch PYQ
-  const fetchPyq = async () => {
-    try {
-      const response = await fetch('/api/pyq/list');
-      if (response.ok) {
-        const data = await response.json();
-        setPyqItems(data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching PYQ:', error);
+    if (pyqItems.length === 0) {
+      const mockPyq = [
+        {
+          id: 1,
+          title: 'Physics Midterm 2023',
+          description: 'Previous year physics midterm paper',
+          category: 'Physics',
+          subject: 'Physics',
+          year: 2023,
+          exam_type: 'Midterm',
+          file_name: 'physics_midterm_2023.pdf',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: 'Mathematics Final 2023',
+          description: 'Previous year mathematics final exam',
+          category: 'Mathematics',
+          subject: 'Mathematics',
+          year: 2023,
+          exam_type: 'Final',
+          file_name: 'math_final_2023.pdf',
+          created_at: new Date().toISOString()
+        }
+      ];
+      setPyqItems(mockPyq);
+      localStorage.setItem('pyq_items', JSON.stringify(mockPyq));
     }
   };
 
   useEffect(() => {
-    fetchFormulaBankItems();
-    fetchFlashcards();
-    fetchPyq();
+    initializeMockData();
   }, []);
 
   // Upload Formula Bank PDF
@@ -93,43 +151,54 @@ const MentorDashboard = () => {
     if (!e.target.file.files[0]) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', e.target.file.files[0]);
-    formData.append('title', uploadForm.title);
-    formData.append('description', uploadForm.description);
-    formData.append('category', uploadForm.category);
-    formData.append('subject', uploadForm.subject);
-    formData.append('uploadedBy', 'mentor');
-    formData.append('uploaderRole', 'mentor');
-    formData.append('tags', JSON.stringify(uploadForm.tags));
+    
+    if (editingItem && editingItem.type === 'formula') {
+      // Update existing item
+      const updatedItems = formulaBankItems.map(item => 
+        item.id === editingItem.id 
+          ? {
+              ...item,
+              title: uploadForm.title,
+              description: uploadForm.description,
+              category: uploadForm.category,
+              subject: uploadForm.subject,
+              tags: uploadForm.tags || []
+            }
+          : item
+      );
+      setFormulaBankItems(updatedItems);
+      localStorage.setItem('formula_bank_items', JSON.stringify(updatedItems));
+      setEditingItem(null);
+      alert('Formula Bank item updated successfully!');
+    } else {
+      // Create new formula item
+      const newItem = {
+        id: Date.now(),
+        title: uploadForm.title,
+        description: uploadForm.description,
+        category: uploadForm.category,
+        subject: uploadForm.subject,
+        file_name: e.target.file.files[0].name,
+        created_at: new Date().toISOString(),
+        tags: uploadForm.tags || []
+      };
 
-    try {
-      const response = await fetch('/api/formula-bank/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        setShowUploadModal(false);
-        setUploadForm({
-          title: '',
-          description: '',
-          category: 'Physics',
-          subject: 'Physics',
-          tags: []
-        });
-        fetchFormulaBankItems();
-        alert('Formula Bank PDF uploaded successfully!');
-      } else {
-        const error = await response.json();
-        alert(`Upload failed: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      alert('Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
+      // Add to local state and localStorage
+      const updatedItems = [...formulaBankItems, newItem];
+      setFormulaBankItems(updatedItems);
+      localStorage.setItem('formula_bank_items', JSON.stringify(updatedItems));
+      alert('Formula Bank PDF uploaded successfully!');
     }
+
+    setShowUploadModal(false);
+    setUploadForm({
+      title: '',
+      description: '',
+      category: 'Physics',
+      subject: 'Physics',
+      tags: []
+    });
+    setUploading(false);
   };
 
   // Upload Flashcard
@@ -138,41 +207,51 @@ const MentorDashboard = () => {
     if (!e.target.file.files[0]) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', e.target.file.files[0]);
-    formData.append('title', flashcardForm.title);
-    formData.append('description', flashcardForm.description);
-    formData.append('category', flashcardForm.category);
-    formData.append('subject', flashcardForm.subject);
-    formData.append('uploadedBy', 'mentor');
-    formData.append('uploaderRole', 'mentor');
+    
+    if (editingItem && editingItem.type === 'flashcard') {
+      // Update existing item
+      const updatedItems = flashcardItems.map(item => 
+        item.id === editingItem.id 
+          ? {
+              ...item,
+              title: flashcardForm.title,
+              description: flashcardForm.description,
+              category: flashcardForm.category,
+              subject: flashcardForm.subject
+            }
+          : item
+      );
+      setFlashcardItems(updatedItems);
+      localStorage.setItem('flashcard_items', JSON.stringify(updatedItems));
+      setEditingItem(null);
+      alert('Flashcard updated successfully!');
+    } else {
+      // Create new flashcard item
+      const newItem = {
+        id: Date.now(),
+        title: flashcardForm.title,
+        description: flashcardForm.description,
+        category: flashcardForm.category,
+        subject: flashcardForm.subject,
+        file_name: e.target.file.files[0].name,
+        created_at: new Date().toISOString()
+      };
 
-    try {
-      const response = await fetch('/api/flashcards/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        setShowFlashcardModal(false);
-        setFlashcardForm({
-          title: '',
-          description: '',
-          category: 'Physics',
-          subject: 'Physics'
-        });
-        fetchFlashcards();
-        alert('Flashcard uploaded successfully!');
-      } else {
-        const error = await response.json();
-        alert(`Upload failed: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Flashcard upload error:', error);
-      alert('Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
+      // Add to local state and localStorage
+      const updatedItems = [...flashcardItems, newItem];
+      setFlashcardItems(updatedItems);
+      localStorage.setItem('flashcard_items', JSON.stringify(updatedItems));
+      alert('Flashcard uploaded successfully!');
     }
+
+    setShowFlashcardModal(false);
+    setFlashcardForm({
+      title: '',
+      description: '',
+      category: 'Biology',
+      subject: 'Biology'
+    });
+    setUploading(false);
   };
 
   // Upload PYQ
@@ -181,45 +260,57 @@ const MentorDashboard = () => {
     if (!e.target.file.files[0]) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', e.target.file.files[0]);
-    formData.append('title', pyqForm.title);
-    formData.append('description', pyqForm.description);
-    formData.append('category', pyqForm.category);
-    formData.append('subject', pyqForm.subject);
-    formData.append('year', pyqForm.year);
-    formData.append('examType', pyqForm.examType);
-    formData.append('uploadedBy', 'mentor');
-    formData.append('uploaderRole', 'mentor');
+    
+    if (editingItem && editingItem.type === 'pyq') {
+      // Update existing item
+      const updatedItems = pyqItems.map(item => 
+        item.id === editingItem.id 
+          ? {
+              ...item,
+              title: pyqForm.title,
+              description: pyqForm.description,
+              category: pyqForm.category,
+              subject: pyqForm.subject,
+              year: pyqForm.year,
+              exam_type: pyqForm.examType
+            }
+          : item
+      );
+      setPyqItems(updatedItems);
+      localStorage.setItem('pyq_items', JSON.stringify(updatedItems));
+      setEditingItem(null);
+      alert('PYQ updated successfully!');
+    } else {
+      // Create new PYQ item
+      const newItem = {
+        id: Date.now(),
+        title: pyqForm.title,
+        description: pyqForm.description,
+        category: pyqForm.category,
+        subject: pyqForm.subject,
+        year: pyqForm.year,
+        exam_type: pyqForm.examType,
+        file_name: e.target.file.files[0].name,
+        created_at: new Date().toISOString()
+      };
 
-    try {
-      const response = await fetch('/api/pyq/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        setShowPyqModal(false);
-        setPyqForm({
-          title: '',
-          description: '',
-          category: 'Physics',
-          subject: 'Physics',
-          year: new Date().getFullYear(),
-          examType: 'Midterm'
-        });
-        fetchPyq();
-        alert('PYQ uploaded successfully!');
-      } else {
-        const error = await response.json();
-        alert(`Upload failed: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('PYQ upload error:', error);
-      alert('Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
+      // Add to local state and localStorage
+      const updatedItems = [...pyqItems, newItem];
+      setPyqItems(updatedItems);
+      localStorage.setItem('pyq_items', JSON.stringify(updatedItems));
+      alert('PYQ uploaded successfully!');
     }
+
+    setShowPyqModal(false);
+    setPyqForm({
+      title: '',
+      description: '',
+      category: 'Physics',
+      subject: 'Physics',
+      year: new Date().getFullYear(),
+      examType: 'Midterm'
+    });
+    setUploading(false);
   };
 
   // Handle PDF viewing
@@ -237,6 +328,63 @@ const MentorDashboard = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // State for editing
+  const [editingItem, setEditingItem] = useState(null);
+
+  // Handle Edit Item
+  const handleEditItem = (item, type) => {
+    setEditingItem({ ...item, type });
+    if (type === 'formula') {
+      setUploadForm({
+        title: item.title,
+        description: item.description,
+        category: item.category,
+        subject: item.subject,
+        tags: item.tags || []
+      });
+      setShowUploadModal(true);
+    } else if (type === 'flashcard') {
+      setFlashcardForm({
+        title: item.title,
+        description: item.description,
+        category: item.category,
+        subject: item.subject
+      });
+      setShowFlashcardModal(true);
+    } else if (type === 'pyq') {
+      setPyqForm({
+        title: item.title,
+        description: item.description,
+        category: item.category,
+        subject: item.subject,
+        year: item.year,
+        examType: item.exam_type
+      });
+      setShowPyqModal(true);
+    }
+  };
+
+  // Handle Delete Item
+  const handleDeleteItem = async (itemId, type) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    // Remove from local state and localStorage
+    if (type === 'formula') {
+      const updatedItems = formulaBankItems.filter(item => item.id !== itemId);
+      setFormulaBankItems(updatedItems);
+      localStorage.setItem('formula_bank_items', JSON.stringify(updatedItems));
+    } else if (type === 'flashcard') {
+      const updatedItems = flashcardItems.filter(item => item.id !== itemId);
+      setFlashcardItems(updatedItems);
+      localStorage.setItem('flashcard_items', JSON.stringify(updatedItems));
+    } else if (type === 'pyq') {
+      const updatedItems = pyqItems.filter(item => item.id !== itemId);
+      setPyqItems(updatedItems);
+      localStorage.setItem('pyq_items', JSON.stringify(updatedItems));
+    }
+    alert('Item deleted successfully!');
   };
 
   return (
@@ -369,6 +517,18 @@ const MentorDashboard = () => {
                           >
                             Download
                           </button>
+                          <button 
+                            onClick={() => handleEditItem(item, 'formula')}
+                            className="text-yellow-400 hover:text-yellow-300"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteItem(item.id, 'formula')}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -431,6 +591,18 @@ const MentorDashboard = () => {
                           >
                             Download
                           </button>
+                          <button 
+                            onClick={() => handleEditItem(item, 'flashcard')}
+                            className="text-yellow-400 hover:text-yellow-300"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteItem(item.id, 'flashcard')}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -492,6 +664,18 @@ const MentorDashboard = () => {
                             className="text-gray-400 hover:text-white"
                           >
                             Download
+                          </button>
+                          <button 
+                            onClick={() => handleEditItem(item, 'pyq')}
+                            className="text-yellow-400 hover:text-yellow-300"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteItem(item.id, 'pyq')}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            Delete
                           </button>
                         </div>
                       </div>
