@@ -45,7 +45,12 @@ const MentorLogin = () => {
           status: 'active'
         }));
       }
-      router.push('/mentor/dashboard');
+      // Force redirect with window.location for immediate navigation
+      if (typeof window !== 'undefined') {
+        window.location.href = '/mentor/dashboard';
+      } else {
+        router.push('/mentor/dashboard');
+      }
       setLoading(false);
       return;
     }
