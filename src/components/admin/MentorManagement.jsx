@@ -3,7 +3,16 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 
 const MentorManagement = () => {
-  const [mentors, setMentors] = useState([]);
+  const [mentors, setMentors] = useState(() => {
+    // Load mentors from localStorage on initialization
+    if (typeof window !== 'undefined') {
+      const savedMentors = localStorage.getItem('mentors_data');
+      if (savedMentors) {
+        return JSON.parse(savedMentors);
+      }
+    }
+    return [];
+  });
   const [loading, setLoading] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -18,46 +27,51 @@ const MentorManagement = () => {
     status: 'active'
   });
 
-  // Load initial mock mentors
+  // Load initial mock mentors if none exist in localStorage
   const fetchMentors = async () => {
     try {
-      // Set mock mentors data
-      const mockMentors = [
-        {
-          id: 1,
-          name: 'Dr. Sarah Johnson',
-          email: 'sarah.johnson@knowtasks.com',
-          subject: 'Physics',
-          status: 'active',
-          students: 25,
-          joinDate: '12/1/2023',
-          lastLogin: '1/10/2024',
-          password: 'physics123'
-        },
-        {
-          id: 2,
-          name: 'Prof. Michael Chen',
-          email: 'michael.chen@knowtasks.com',
-          subject: 'Mathematics',
-          status: 'active',
-          students: 18,
-          joinDate: '11/15/2023',
-          lastLogin: '1/9/2024',
-          password: 'math456'
-        },
-        {
-          id: 3,
-          name: 'Dr. Emily Rodriguez',
-          email: 'emily.rodriguez@knowtasks.com',
-          subject: 'Chemistry',
-          status: 'pending',
-          students: 12,
-          joinDate: '1/5/2024',
-          lastLogin: 'Never',
-          password: 'chem789'
-        }
-      ];
-      setMentors(mockMentors);
+      // Check if mentors already exist in localStorage
+      const savedMentors = localStorage.getItem('mentors_data');
+      if (!savedMentors) {
+        // Set initial mock mentors data only if none exist
+        const mockMentors = [
+          {
+            id: 1,
+            name: 'Dr. Sarah Johnson',
+            email: 'sarah.johnson@knowtasks.com',
+            subject: 'Physics',
+            status: 'active',
+            students: 25,
+            joinDate: '12/1/2023',
+            lastLogin: '1/10/2024',
+            password: 'physics123'
+          },
+          {
+            id: 2,
+            name: 'Prof. Michael Chen',
+            email: 'michael.chen@knowtasks.com',
+            subject: 'Mathematics',
+            status: 'active',
+            students: 18,
+            joinDate: '11/15/2023',
+            lastLogin: '1/9/2024',
+            password: 'math456'
+          },
+          {
+            id: 3,
+            name: 'Dr. Emily Rodriguez',
+            email: 'emily.rodriguez@knowtasks.com',
+            subject: 'Chemistry',
+            status: 'pending',
+            students: 12,
+            joinDate: '1/5/2024',
+            lastLogin: 'Never',
+            password: 'chem789'
+          }
+        ];
+        setMentors(mockMentors);
+        localStorage.setItem('mentors_data', JSON.stringify(mockMentors));
+      }
     } catch (error) {
       console.error('Error loading mentors:', error);
     } finally {
@@ -95,8 +109,10 @@ const MentorManagement = () => {
         password: password // Store password for display
       };
 
-      // Add to local state
-      setMentors(prev => [...prev, mockMentor]);
+      // Add to local state and save to localStorage
+      const updatedMentors = [...mentors, mockMentor];
+      setMentors(updatedMentors);
+      localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
       
       // Reset form and close modal
       setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
@@ -107,19 +123,23 @@ const MentorManagement = () => {
 
   const handleDeleteMentor = async (mentorId) => {
     if (confirm('Are you sure you want to delete this mentor?')) {
-      // Remove from local state
-      setMentors(prev => prev.filter(mentor => mentor.id !== mentorId));
+      // Remove from local state and save to localStorage
+      const updatedMentors = mentors.filter(mentor => mentor.id !== mentorId);
+      setMentors(updatedMentors);
+      localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
       alert('Mentor deleted successfully!');
     }
   };
 
   const handleStatusChange = async (mentorId, newStatus) => {
-    // Update status in local state
-    setMentors(prev => prev.map(mentor => 
+    // Update status in local state and save to localStorage
+    const updatedMentors = mentors.map(mentor => 
       mentor.id === mentorId 
         ? { ...mentor, status: newStatus }
         : mentor
-    ));
+    );
+    setMentors(updatedMentors);
+    localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
   };
 
   const showPassword = (mentor) => {
