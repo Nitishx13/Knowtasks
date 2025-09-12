@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import FileUpload from '../../components/FileUpload';
 import TextUpload from '../../components/TextUpload';
@@ -11,13 +12,7 @@ const UploadPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user && user.id) {
-      fetchRecentUploads();
-    }
-  }, [user]);
-
-  const fetchRecentUploads = async () => {
+  const fetchRecentUploads = useCallback(async () => {
     try {
       // Get auth headers
       const headers = await getAuthHeaders(user.id);
@@ -54,7 +49,13 @@ const UploadPage = () => {
     } catch (error) {
       console.error('Error fetching recent uploads:', error);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user && user.id) {
+      fetchRecentUploads();
+    }
+  }, [user, fetchRecentUploads]);
 
   const handleUploadSuccess = (file) => {
     setUploadSuccess({
@@ -161,12 +162,12 @@ const UploadPage = () => {
             )}
             
             <div className="mt-4">
-              <a 
+              <Link 
                 href="/dashboard" 
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
                 View all uploads
-              </a>
+              </Link>
             </div>
           </div>
         </div>

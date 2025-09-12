@@ -15,11 +15,7 @@ export const SuperAdminAuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [adminData, setAdminData] = useState(null);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
-
-  const checkAuthStatus = () => {
+  const checkAuthStatus = useCallback(() => {
     try {
       const authenticated = localStorage.getItem('superadmin_authenticated');
       const email = localStorage.getItem('superadmin_email');
@@ -49,7 +45,11 @@ export const SuperAdminAuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const login = (email) => {
     localStorage.setItem('superadmin_authenticated', 'true');

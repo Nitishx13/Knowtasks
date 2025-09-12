@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useRouter } from 'next/router';
 import DashboardLayout from '../../components/layout/DashboardLayout';
@@ -21,7 +21,7 @@ const MentorLibraryPage = () => {
   const router = useRouter();
 
   // Function to fetch library items from API
-  const fetchLibraryItems = async () => {
+  const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
       // Fetch Formula Bank items from database
@@ -48,43 +48,60 @@ const MentorLibraryPage = () => {
         setLibraryItems(formattedItems);
       } else {
         // Fallback to mock data if API fails
+        const mockLibraryItems = [
+          {
+            id: 1,
+            title: 'Physics Equations',
+            type: 'formula',
+            category: 'Physics',
+            date: '2023-11-15',
+            size: '25 formulas',
+            status: 'completed'
+          },
+          {
+            id: 2,
+            title: 'Organic Chemistry Reactions',
+            type: 'formula',
+            category: 'Chemistry',
+            date: '2023-11-10',
+            size: '18 formulas',
+            status: 'in-progress'
+          }
+        ];
         setLibraryItems(mockLibraryItems);
       }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching library items:', error);
       // Fallback to mock data
+      const mockLibraryItems = [
+        {
+          id: 1,
+          title: 'Physics Equations',
+          type: 'formula',
+          category: 'Physics',
+          date: '2023-11-15',
+          size: '25 formulas',
+          status: 'completed'
+        },
+        {
+          id: 2,
+          title: 'Organic Chemistry Reactions',
+          type: 'formula',
+          category: 'Chemistry',
+          date: '2023-11-10',
+          size: '18 formulas',
+          status: 'in-progress'
+        }
+      ];
       setLibraryItems(mockLibraryItems);
       setLoading(false);
     }
-  };
-  
-  // Call fetchLibraryItems when component mounts or filters change
+  }, [activeTab, searchQuery]);
+
   useEffect(() => {
     fetchLibraryItems();
-  }, [activeTab, searchQuery]);
-  
-  // Mock data for library items (fallback)
-  const mockLibraryItems = [
-    {
-      id: 1,
-      title: 'Physics Equations',
-      type: 'formula',
-      category: 'Physics',
-      date: '2023-11-15',
-      size: '25 formulas',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'Organic Chemistry Reactions',
-      type: 'formula',
-      category: 'Chemistry',
-      date: '2023-11-10',
-      size: '18 formulas',
-      status: 'in-progress'
-    }
-  ];
+  }, [fetchLibraryItems]);
 
   // Upload Formula Bank PDF
   const handleUpload = async (e) => {

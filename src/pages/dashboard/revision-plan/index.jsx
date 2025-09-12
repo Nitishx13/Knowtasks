@@ -252,7 +252,7 @@ const RevisionPlanPage = () => {
         {activeTab === 'daily' && (
           <div id="schedule" className="revision-schedule">
             <div className="schedule-header">
-              <h3>Today's Schedule</h3>
+              <h3>Today&rsquo;s Schedule</h3>
               <div className="schedule-actions">
                 <button className="px-3 py-1 bg-gray-200 text-gray-800 rounded-md text-sm hover:bg-gray-300">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

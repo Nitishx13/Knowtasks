@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 
@@ -14,14 +15,8 @@ const SummarizePage = () => {
   const [isProcessingText, setIsProcessingText] = useState(false);
   const { user } = useAuth();
 
-  // Fetch existing summaries and text files on component mount
-  useEffect(() => {
-    fetchSummaries();
-    fetchTextFiles();
-  }, []);
-  
   // Function to fetch text files
-  const fetchTextFiles = async () => {
+  const fetchTextFiles = useCallback(async () => {
     setLoading(true);
     try {
       // Include user ID in the request to get user-specific files
@@ -51,9 +46,9 @@ const SummarizePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const fetchSummaries = async () => {
+  const fetchSummaries = useCallback(async () => {
     setLoading(true);
     try {
       const userId = user?.id;
@@ -70,7 +65,13 @@ const SummarizePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Fetch existing summaries and text files on component mount
+  useEffect(() => {
+    fetchSummaries();
+    fetchTextFiles();
+  }, [fetchSummaries, fetchTextFiles]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -230,12 +231,12 @@ const SummarizePage = () => {
           </p>
         </div>
         <div className="w-full md:w-auto">
-          <a 
+          <Link 
             href="/dashboard/library" 
             className="inline-flex w-full md:w-auto justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             View Knowledge Hub
-          </a>
+          </Link>
         </div>
       </div>
 

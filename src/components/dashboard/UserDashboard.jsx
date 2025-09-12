@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -35,34 +35,33 @@ const UserDashboard = () => {
   useEffect(() => {
     const initDashboard = async () => {
       try {
-        if (user && user.id) {
-          console.log('User authenticated:', user.id);
-          
-          // Set user name if available
-          if (user.firstName || user.lastName) {
-            setUserName(`${user.firstName || ''} ${user.lastName || ''}`.trim());
-          } else if (user.email) {
-            setUserName(user.email.split('@')[0]);
-          } else {
-            setUserName('User');
-          }
-          
-          // Ensure test auth is set up (works in both development and production)
-          if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && user.id === 'test_user_123') {
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('auth_test_user_id', user.id);
-              localStorage.setItem('auth_test_token', 'test_token');
-              console.log('Test authentication configured');
-            }
-          }
-          
-          // Fetch user data
-          await fetchUserData();
-        } else {
-          console.error('User data not available for dashboard');
-          setError('User authentication required. Please log in or refresh the page.');
-          setLoading(false);
+        // Only run on client side and when user is available
+        if (typeof window === 'undefined' || !user || !user.id) {
+          return;
         }
+        
+        console.log('User authenticated:', user.id);
+        
+        // Set user name if available
+        if (user.firstName || user.lastName) {
+          setUserName(`${user.firstName || ''} ${user.lastName || ''}`.trim());
+        } else if (user.email) {
+          setUserName(user.email.split('@')[0]);
+        } else {
+          setUserName('User');
+        }
+        
+        // Ensure test auth is set up (works in both development and production)
+        if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && user.id === 'test_user_123') {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('auth_test_user_id', user.id);
+            localStorage.setItem('auth_test_token', 'test_token');
+            console.log('Test authentication configured');
+          }
+        }
+        
+        // Fetch user data
+        await fetchUserData();
       } catch (err) {
         console.error('Dashboard initialization error:', err);
         setError('Failed to initialize dashboard. Please try again.');
@@ -71,9 +70,9 @@ const UserDashboard = () => {
     };
     
     initDashboard();
-  }, [user]);
+  }, [user, fetchUserData]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -164,7 +163,7 @@ const UserDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, uploads]);
 
   const handleDeleteFile = async (fileId, fileType) => {
     if (!window.confirm('Are you sure you want to delete this file?')) return;

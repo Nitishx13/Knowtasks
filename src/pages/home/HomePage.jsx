@@ -746,7 +746,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">Computer Science Student</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"Knowtasks's seamless experience and intuitive design make it my top pick for creative projects. It's a game changer that continuously boosts my productivity—highly recommended!"</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;Knowtasks&rsquo;s seamless experience and intuitive design make it my top pick for creative projects. It&rsquo;s a game changer that continuously boosts my productivity&mdash;highly recommended!&rdquo;</p>
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
@@ -770,7 +770,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">Graduate Student</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"Love how Knowtasks accelerates my development and that of my teams. The AI-generated notes are comprehensive and save me hours of reading time."</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;Love how Knowtasks accelerates my development and that of my teams. The AI-generated notes are comprehensive and save me hours of reading time.&rdquo;</p>
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
@@ -794,7 +794,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">PhD Candidate</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"Knowtasks, the real AI partner! It's been such a huge help in getting my research tasks done—no stress reading at all. Plus, I've got to say, this is the best note-taking app I've ever used!"</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;Knowtasks, the real AI partner! It&rsquo;s been such a huge help in getting my research tasks done&mdash;no stress reading at all. Plus, I&rsquo;ve got to say, this is the best note-taking app I&rsquo;ve ever used!&rdquo;</p>
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <div className="flex items-center">
                   <div className="flex text-yellow-400">
@@ -845,7 +845,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">Computer Science Student</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"Knowtasks has completely transformed how I study. I can upload complex CS textbook chapters and get clear, concise notes that help me understand difficult concepts."</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;Knowtasks has completely transformed how I study. I can upload complex CS textbook chapters and get clear, concise notes that help me understand difficult concepts.&rdquo;</p>
               <div className="flex text-yellow-400 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -875,7 +875,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">Medical Student</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"As a med student, I have mountains of reading. Knowtasks's smart notes feature extracts key concepts from dense medical texts and organizes them perfectly. The AI-generated summaries save me hours of work."</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;As a med student, I have mountains of reading. Knowtasks&rsquo;s smart notes feature extracts key concepts from dense medical texts and organizes them perfectly. The AI-generated summaries save me hours of work.&rdquo;</p>
               <div className="flex text-yellow-400 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -905,7 +905,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">History Major</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">"I was skeptical about AI for humanities subjects, but Knowtasks's smart notes actually understand context and themes in historical texts. The AI-generated notes capture nuances I might miss myself."</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;I was skeptical about AI for humanities subjects, but Knowtasks&rsquo;s smart notes actually understand context and themes in historical texts. The AI-generated notes capture nuances I might miss myself.&rdquo;</p>
               <div className="flex text-yellow-400 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />

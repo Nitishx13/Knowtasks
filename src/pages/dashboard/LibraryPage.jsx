@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
@@ -17,10 +17,67 @@ const LibraryPage = () => {
   const router = useRouter();
 
   // Check if user is mentor - only allow uploads in mentor routes
-  const isMentor = router.pathname.includes('/mentor') && localStorage.getItem('mentor_authenticated');
+  const isMentor = typeof window !== 'undefined' && router.pathname.includes('/mentor') && localStorage.getItem('mentor_authenticated');
+
+  const mockLibraryItems = [
+    {
+      id: 1,
+      title: 'Physics Equations',
+      type: 'formula',
+      category: 'Physics',
+      date: '2023-11-15',
+      size: '25 formulas',
+      status: 'completed'
+    },
+    {
+      id: 2,
+      title: 'Organic Chemistry Reactions',
+      type: 'formula',
+      category: 'Chemistry',
+      date: '2023-11-10',
+      size: '18 formulas',
+      status: 'in-progress'
+    },
+    {
+      id: 3,
+      title: 'Calculus Fundamentals',
+      type: 'flashcard',
+      category: 'Mathematics',
+      date: '2023-11-08',
+      size: '32 cards',
+      status: 'completed'
+    },
+    {
+      id: 4,
+      title: 'Computer Science Concepts',
+      type: 'flashcard',
+      category: 'CS',
+      date: '2023-11-05',
+      size: '21 cards',
+      status: 'completed'
+    },
+    {
+      id: 5,
+      title: 'Physics 2022 Exam',
+      type: 'pyq',
+      category: 'Physics',
+      date: '2023-11-03',
+      size: '15 questions',
+      status: 'completed'
+    },
+    {
+      id: 6,
+      title: 'Mathematics 2021 Midterm',
+      type: 'pyq',
+      category: 'Mathematics',
+      date: '2023-11-01',
+      size: '10 questions',
+      status: 'in-progress'
+    }
+  ];
 
   // Function to fetch library items from API
-  const fetchLibraryItems = async () => {
+  const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
       const allItems = [];
@@ -128,70 +185,12 @@ const LibraryPage = () => {
       setLibraryItems(mockLibraryItems);
       setLoading(false);
     }
-  };
-  
+  }, [activeTab, searchQuery, mockLibraryItems]);
+
   // Call fetchLibraryItems when component mounts or filters change
   useEffect(() => {
     fetchLibraryItems();
-  }, [activeTab, searchQuery]);
-  
-  // Mock data for library items (fallback)
-  const mockLibraryItems = [
-    {
-      id: 1,
-      title: 'Physics Equations',
-      type: 'formula',
-      category: 'Physics',
-      date: '2023-11-15',
-      size: '25 formulas',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'Organic Chemistry Reactions',
-      type: 'formula',
-      category: 'Chemistry',
-      date: '2023-11-10',
-      size: '18 formulas',
-      status: 'in-progress'
-    },
-    {
-      id: 3,
-      title: 'Calculus Fundamentals',
-      type: 'flashcard',
-      category: 'Mathematics',
-      date: '2023-11-08',
-      size: '32 cards',
-      status: 'completed'
-    },
-    {
-      id: 4,
-      title: 'Computer Science Concepts',
-      type: 'flashcard',
-      category: 'CS',
-      date: '2023-11-05',
-      size: '21 cards',
-      status: 'completed'
-    },
-    {
-      id: 5,
-      title: 'Physics 2022 Exam',
-      type: 'pyq',
-      category: 'Physics',
-      date: '2023-11-03',
-      size: '15 questions',
-      status: 'completed'
-    },
-    {
-      id: 6,
-      title: 'Mathematics 2021 Midterm',
-      type: 'pyq',
-      category: 'Mathematics',
-      date: '2023-11-01',
-      size: '10 questions',
-      status: 'in-progress'
-    }
-  ];
+  }, [fetchLibraryItems]);
 
 
   const filteredItems = libraryItems.filter(item => {

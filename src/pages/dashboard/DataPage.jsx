@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { useAuth } from '../../contexts/AuthContext';
@@ -18,16 +18,18 @@ const DataPage = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    fetchFiles();
+    if (user) {
+      fetchFiles();
+    }
     
     // Cleanup function to reset selection when component unmounts
     return () => {
       setSelectedFiles([]);
       setSelectAll(false);
     };
-  }, []);
+  }, [fetchFiles, user]);
 
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -56,7 +58,7 @@ const DataPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   const filteredFiles = files.filter(file => {
     const matchesSearch = file.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../contexts/AuthContext';
@@ -14,17 +14,7 @@ const FilesPage = () => {
   const { id } = router.query;
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchFiles();
-  }, []);
-
-  useEffect(() => {
-    if (id && files.length > 0) {
-      viewFile(id);
-    }
-  }, [id, files]);
-
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
       // Include user ID in the request to get user-specific files
@@ -45,9 +35,9 @@ const FilesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const viewFile = async (id) => {
+  const viewFile = useCallback(async (id) => {
     try {
       // Include user ID in the request to ensure user can only view their own files
       const userId = user?.id;
@@ -65,7 +55,17 @@ const FilesPage = () => {
       console.error('Error viewing file:', error);
       setError(error.message);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchFiles();
+  }, [fetchFiles]);
+
+  useEffect(() => {
+    if (id && files.length > 0) {
+      viewFile(id);
+    }
+  }, [id, files, viewFile]);
 
   return (
     <div className="p-8 max-w-6xl mx-auto">

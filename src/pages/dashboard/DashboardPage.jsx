@@ -94,7 +94,7 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [user.id]);
   
   const { metrics, statistics, recentSummaries } = dashboardData;
 
@@ -288,7 +288,7 @@ const DashboardPage = () => {
             </div>
             <div className="text-center">
                 <p className="text-sm text-gray-400 mb-2">Need help with your account?</p>
-                <a href="#" className="text-white hover:text-gray-300 text-sm font-medium">Contact Support →</a>
+                <button className="text-white hover:text-gray-300 text-sm font-medium">Contact Support →</button>
               </div>
             </div>
           </div>

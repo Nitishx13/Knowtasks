@@ -172,7 +172,7 @@ const MentorLogin = () => {
               </svg>
               <div>
                 <p className="text-blue-400 text-sm font-medium mb-1">Need Help?</p>
-                <p className="text-blue-300 text-xs">Contact your administrator if you don't have login credentials or need assistance.</p>
+                <p className="text-blue-300 text-xs">Contact your administrator if you don&rsquo;t have login credentials or need assistance.</p>
               </div>
             </div>
           </div>

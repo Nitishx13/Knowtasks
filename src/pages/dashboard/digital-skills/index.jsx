@@ -63,8 +63,8 @@ const DigitalSkillsPage = () => {
           <div className="banner-content">
             <h2>Boost Your Digital Literacy</h2>
             <p>
-              Whether you're in high school, college, or preparing for competitive exams like IIT-JEE or NEET,
-              digital skills will give you a competitive edge in today's technology-driven world.
+              Whether you&rsquo;re in high school, college, or preparing for competitive exams like IIT-JEE or NEET,
+              digital skills will give you a competitive edge in today&rsquo;s technology-driven world.
             </p>
             <Link href="#skills-grid" className="banner-cta">Explore Skills</Link>
           </div>
@@ -231,7 +231,7 @@ const DigitalSkillsPage = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h3>No skills found</h3>
-              <p>We couldn't find any skills matching your filter criteria.</p>
+              <p>We couldn&rsquo;t find any skills matching your filter criteria.</p>
               <button 
                 onClick={() => setActiveFilter('all')} 
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"

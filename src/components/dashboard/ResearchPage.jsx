@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAuthHeaders } from '@/utils/auth';
@@ -10,13 +10,7 @@ const ResearchPage = () => {
   const [researchResults, setResearchResults] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  useEffect(() => {
-    if (user) {
-      fetchResearchData();
-    }
-  }, [user]);
-
-  const fetchResearchData = async () => {
+  const fetchResearchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -36,7 +30,13 @@ const ResearchPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchResearchData();
+    }
+  }, [user, fetchResearchData]);
 
   const filteredResults = () => {
     if (activeFilter === 'all') return researchResults;
