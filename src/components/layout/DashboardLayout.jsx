@@ -143,19 +143,35 @@ const DashboardLayout = ({ children }) => {
             
             {/* Admin-specific navigation */}
             {router.pathname.startsWith('/admin/') && (
-              <li>
-                <Link href="/admin/mentor-applications" className={cn(
-                  "flex items-center p-3 rounded-lg transition-colors",
-                  router.pathname === '/admin/mentor-applications'
-                    ? "bg-gray-100 text-gray-900" 
-                    : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
-                )}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-                  </svg>
-                  {!sidebarCollapsed && <span className="ml-3">Mentor Applications</span>}
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link href="/admin/mentor-applications" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname === '/admin/mentor-applications'
+                      ? "bg-gray-100 text-gray-900" 
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                    </svg>
+                    {!sidebarCollapsed && <span className="ml-3">Mentor Applications</span>}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin/dashboard" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname === '/admin/dashboard'
+                      ? "bg-gray-100 text-gray-900" 
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+                    </svg>
+                    {!sidebarCollapsed && <span className="ml-3">Admin Dashboard</span>}
+                  </Link>
+                </li>
+              </>
             )}
             
             <li>
@@ -169,6 +185,20 @@ const DashboardLayout = ({ children }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {!sidebarCollapsed && <span className="ml-3">Knowledge Hub</span>}
+              </Link>
+            </li>
+            
+            <li>
+              <Link href="/dashboard/qz-folder" className={cn(
+                "flex items-center p-3 rounded-lg transition-colors",
+                router.pathname === '/dashboard/qz-folder'
+                  ? "bg-gray-100 text-gray-900"
+                  : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {!sidebarCollapsed && <span className="ml-3">QZ Folder</span>}
               </Link>
             </li>
             <li>
@@ -412,19 +442,35 @@ const DashboardLayout = ({ children }) => {
                 
                 {/* Admin-specific navigation for mobile */}
                 {router.pathname.startsWith('/admin/') && (
-                  <li>
-                    <Link href="/admin/mentor-applications" className={cn(
-                      "flex items-center p-3 rounded-lg transition-colors",
-                      router.pathname === '/admin/mentor-applications'
-                        ? "bg-gray-100 text-gray-900" 
-                        : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
-                    )}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-                      </svg>
-                      <span className="ml-3">Mentor Applications</span>
-                    </Link>
-                  </li>
+                  <>
+                    <li>
+                      <Link href="/admin/mentor-applications" className={cn(
+                        "flex items-center p-3 rounded-lg transition-colors",
+                        router.pathname === '/admin/mentor-applications'
+                          ? "bg-gray-100 text-gray-900" 
+                          : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                      )}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                        </svg>
+                        <span className="ml-3">Mentor Applications</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/admin/dashboard" className={cn(
+                        "flex items-center p-3 rounded-lg transition-colors",
+                        router.pathname === '/admin/dashboard'
+                          ? "bg-gray-100 text-gray-900" 
+                          : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                      )}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+                        </svg>
+                        <span className="ml-3">Admin Dashboard</span>
+                      </Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   <Link href="/dashboard/library" className={cn(
@@ -437,6 +483,20 @@ const DashboardLayout = ({ children }) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="ml-3">Knowledge Hub</span>
+                  </Link>
+                </li>
+                
+                <li>
+                  <Link href="/dashboard/qz-folder" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname === '/dashboard/qz-folder'
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span className="ml-3">QZ Folder</span>
                   </Link>
                 </li>
                 <li>
