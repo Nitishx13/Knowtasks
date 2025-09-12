@@ -29,8 +29,8 @@ const SuperAdminLogin = () => {
     setError('');
 
     try {
-      // Use database API for authentication
-      const response = await fetch('/api/auth/superadmin', {
+      // Use test API for authentication (fallback)
+      const response = await fetch('/api/test-superadmin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
