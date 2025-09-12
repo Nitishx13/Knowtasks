@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
 import MentorManagement from '../../components/admin/MentorManagement';
+import DatabaseTables from '../../components/admin/DatabaseTables';
 
 const SuperAdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -20,6 +21,7 @@ const SuperAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showMentorManagement, setShowMentorManagement] = useState(false);
+  const [showDatabaseTables, setShowDatabaseTables] = useState(false);
   const [realStats, setRealStats] = useState({
     newUsers: 0,
     newMentors: 0,
@@ -226,17 +228,20 @@ const SuperAdminDashboard = () => {
             </div>
           </button>
 
-          <Link href="/admin/analytics" className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+          <button 
+            onClick={() => setShowDatabaseTables(!showDatabaseTables)}
+            className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300"
+          >
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H9zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Analytics</h3>
-              <p className="text-xs md:text-sm text-purple-200">System reports</p>
+              <h3 className="font-semibold text-white text-sm md:text-base">Database Tables</h3>
+              <p className="text-xs md:text-sm text-purple-200">View all data</p>
             </div>
-          </Link>
+          </button>
 
           <Link href="/admin/security" className="bg-gradient-to-br from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border border-green-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
@@ -337,22 +342,43 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* Mentor Management System */}
+      {/* Mentor Management Modal */}
       {showMentorManagement && (
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg md:text-xl font-semibold text-white">Mentor Login System</h2>
-            <Button
-              onClick={() => setShowMentorManagement(false)}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Close
-            </Button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Mentor Management</h2>
+              <button
+                onClick={() => setShowMentorManagement(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <MentorManagement />
           </div>
-          <MentorManagement />
+        </div>
+      )}
+
+      {/* Database Tables Modal */}
+      {showDatabaseTables && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Database Tables Overview</h2>
+              <button
+                onClick={() => setShowDatabaseTables(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <DatabaseTables />
+          </div>
         </div>
       )}
 
