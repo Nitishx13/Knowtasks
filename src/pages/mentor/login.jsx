@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
@@ -10,7 +10,12 @@ const MentorLogin = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,9 +46,11 @@ const MentorLogin = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Store authentication in localStorage
-        localStorage.setItem('isMentorAuthenticated', 'true');
-        localStorage.setItem('mentorData', JSON.stringify(data.data));
+        // Store authentication in localStorage (only on client side)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('isMentorAuthenticated', 'true');
+          localStorage.setItem('mentorData', JSON.stringify(data.data));
+        }
         router.push('/mentor/dashboard');
       } else {
         const errorData = await response.json();
@@ -56,6 +63,11 @@ const MentorLogin = () => {
       setLoading(false);
     }
   };
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -73,7 +85,7 @@ const MentorLogin = () => {
 
         {/* Login Form */}
         <div className="bg-gray-900 rounded-2xl p-6 border border-gray-700 shadow-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
