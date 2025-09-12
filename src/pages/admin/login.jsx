@@ -12,9 +12,7 @@ const SuperAdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Hardcoded SuperAdmin credentials
-  const SUPERADMIN_EMAIL = 'nitishx13@gmail.com';
-  const SUPERADMIN_PASSWORD = 'Nitish@98990';
+  // Database SuperAdmin credentials are handled via API
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
