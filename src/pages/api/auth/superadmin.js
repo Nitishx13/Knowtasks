@@ -11,6 +11,51 @@ export default async function handler(req, res) {
     }
 
     try {
+      // First, ensure the superadmin_users table exists
+      await sql`
+        CREATE TABLE IF NOT EXISTS superadmin_users (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password_hash VARCHAR(255) NOT NULL,
+          role VARCHAR(50) DEFAULT 'superadmin',
+          status VARCHAR(20) DEFAULT 'active',
+          last_login TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      // Check if any superadmin users exist, if not, create default ones
+      const existingUsers = await sql`SELECT COUNT(*) as count FROM superadmin_users`;
+      
+      if (existingUsers.rows[0].count === '0') {
+        console.log('No SuperAdmin users found, creating default users...');
+        
+        const defaultUsers = [
+          {
+            name: 'Super Admin',
+            email: 'admin@knowtasks.com',
+            password: 'admin123'
+          },
+          {
+            name: 'Nitish Kumar',
+            email: 'nitishx13@gmail.com',
+            password: 'nitish@9899'
+          }
+        ];
+
+        for (const user of defaultUsers) {
+          const hashedPassword = await bcrypt.hash(user.password, 10);
+          await sql`
+            INSERT INTO superadmin_users (name, email, password_hash, role, status)
+            VALUES (${user.name}, ${user.email}, ${hashedPassword}, 'superadmin', 'active')
+          `;
+        }
+        
+        console.log('Default SuperAdmin users created successfully');
+      }
+
       const result = await sql`
         SELECT id, name, email, password_hash, role, status, last_login
         FROM superadmin_users 
