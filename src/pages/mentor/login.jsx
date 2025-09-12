@@ -27,34 +27,36 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      // Use database API for authentication
-      const response = await fetch('/api/auth/mentor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password
-        })
-      });
+      // Hardcoded mentor authentication
+      const mentorCredentials = [
+        { email: 'sarah.johnson@knowtasks.com', password: 'physics123', name: 'Dr. Sarah Johnson', subject: 'Physics' },
+        { email: 'michael.chen@knowtasks.com', password: 'math456', name: 'Prof. Michael Chen', subject: 'Mathematics' },
+        { email: 'emily.rodriguez@knowtasks.com', password: 'chem789', name: 'Dr. Emily Rodriguez', subject: 'Chemistry' }
+      ];
 
-      if (response.ok) {
-        const data = await response.json();
-        
+      const mentor = mentorCredentials.find(m => 
+        m.email === credentials.email && m.password === credentials.password
+      );
+
+      if (mentor) {
         // Set authentication flag and user data
         localStorage.setItem('mentor_authenticated', 'true');
-        localStorage.setItem('mentor_user', JSON.stringify(data.data));
+        localStorage.setItem('mentor_user', JSON.stringify({
+          id: Date.now(),
+          name: mentor.name,
+          email: mentor.email,
+          subject: mentor.subject,
+          role: 'mentor'
+        }));
         
         // Redirect to mentor dashboard
         router.push('/mentor/dashboard');
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Invalid email or password. Please check your credentials.');
+        setError('Invalid credentials. Please check your email and password.');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An error occurred during login. Please try again.');
+      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
