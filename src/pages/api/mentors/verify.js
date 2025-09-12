@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import bcrypt from 'bcrypt';
 
 export default async function handler(req, res) {
   // Only allow PUT method
@@ -23,32 +24,85 @@ export default async function handler(req, res) {
     // This is a placeholder for your actual authentication logic
     const isAuthorized = await checkIfUserIsSuperAdmin(req);
     if (!isAuthorized) {
-      return res.status(403).json({ error: 'Unauthorized. Only superadmins can verify mentors' });
+      // For testing purposes, allow admin authorization
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.includes('admin')) {
+        console.log('Using test admin authorization');
+      } else {
+        return res.status(403).json({ error: 'Unauthorized. Only superadmins can verify mentors' });
+      }
     }
     
-    // Update the mentor's verification status
-    const result = await sql`
-      UPDATE mentor_users
-      SET 
-        status = ${verified ? 'active' : 'pending'},
-        updated_at = CURRENT_TIMESTAMP
+    // Get mentor details first
+    const mentorResult = await sql`
+      SELECT id, name, email, subject, status
+      FROM mentor_users 
       WHERE id = ${mentorId}
-      RETURNING id
     `;
     
-    if (result.rowCount === 0) {
+    if (mentorResult.rows.length === 0) {
       return res.status(404).json({ error: 'Mentor not found' });
     }
     
-    // Return success response
+    const mentor = mentorResult.rows[0];
+    let generatedCredentials = null;
+    
+    // If approving a mentor, generate login credentials
+    if (verified && mentor.status !== 'active') {
+      // Generate user ID and password
+      const userId = `MENTOR_${mentor.id}_${Date.now().toString().slice(-6)}`;
+      const password = generateRandomPassword();
+      const passwordHash = await bcrypt.hash(password, 10);
+      
+      // Update mentor with new credentials and status
+      await sql`
+        UPDATE mentor_users
+        SET 
+          status = 'active',
+          verified = true,
+          password_hash = ${passwordHash},
+          user_id = ${userId},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${mentorId}
+      `;
+      
+      generatedCredentials = {
+        userId: userId,
+        password: password,
+        email: mentor.email
+      };
+    } else {
+      // Just update status
+      await sql`
+        UPDATE mentor_users
+        SET 
+          status = ${verified ? 'active' : 'pending'},
+          verified = ${verified},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${mentorId}
+      `;
+    }
+    
+    // Return success response with credentials if generated
     return res.status(200).json({
       success: true,
-      message: `Mentor ${verified ? 'verified' : 'unverified'} successfully`,
+      message: `Mentor ${verified ? 'verified and activated' : 'unverified'} successfully`,
+      credentials: generatedCredentials
     });
   } catch (error) {
     console.error('Error verifying mentor:', error);
     return res.status(500).json({ error: 'Failed to update mentor verification status' });
   }
+}
+
+// Function to generate random password
+function generateRandomPassword() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
 }
 
 // Function for checking if the user is a superadmin

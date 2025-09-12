@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '../../components/ui/Button';
-import MentorManagement from '../../components/admin/MentorManagement';
 import DatabaseTables from '../../components/admin/DatabaseTables';
 
 const SuperAdminDashboard = () => {
@@ -20,7 +19,6 @@ const SuperAdminDashboard = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showMentorManagement, setShowMentorManagement] = useState(false);
   const [showDatabaseTables, setShowDatabaseTables] = useState(false);
   const [realStats, setRealStats] = useState({
     newUsers: 0,
@@ -67,7 +65,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Educational Context Banners */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 md:mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 md:mb-8">
         {/* SuperAdmin Panel */}
         <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
           <div className="relative z-10">
@@ -100,6 +98,26 @@ const SuperAdminDashboard = () => {
           <div className="absolute top-0 right-0 w-24 h-full opacity-20">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Mentor Applications Panel */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-lg font-bold text-white mb-2">Mentor Applications</h3>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-blue-400">{realStats.newMentors}</p>
+              <p className="text-gray-400 text-sm">Pending Reviews</p>
+            </div>
+            <p className="text-sm text-blue-100 mb-3">Review and approve mentor applications</p>
+            <Link href="/admin/mentor-applications" className="inline-block bg-white text-blue-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-50 transition-all">
+              Review Applications
+            </Link>
+          </div>
+          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+              <path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
             </svg>
           </div>
         </div>
@@ -213,20 +231,17 @@ const SuperAdminDashboard = () => {
             </div>
           </Link>
 
-          <button 
-            onClick={() => setShowMentorManagement(!showMentorManagement)}
-            className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300"
-          >
+          <Link href="/admin/mentor-applications" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
             <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Mentor System</h3>
-              <p className="text-xs md:text-sm text-blue-200">Manage mentors</p>
+              <h3 className="font-semibold text-white text-sm md:text-base">Mentor Applications</h3>
+              <p className="text-xs md:text-sm text-blue-200">Review & approve mentors</p>
             </div>
-          </button>
+          </Link>
 
           <button 
             onClick={() => setShowDatabaseTables(!showDatabaseTables)}
@@ -341,26 +356,6 @@ const SuperAdminDashboard = () => {
           )}
         </div>
       </div>
-
-      {/* Mentor Management Modal */}
-      {showMentorManagement && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">Mentor Management</h2>
-              <button
-                onClick={() => setShowMentorManagement(false)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <MentorManagement />
-          </div>
-        </div>
-      )}
 
       {/* Database Tables Modal */}
       {showDatabaseTables && (

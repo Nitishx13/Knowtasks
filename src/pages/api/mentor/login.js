@@ -22,13 +22,13 @@ export default async function handler(req, res) {
     });
   }
 
-  const { email, password } = req.body;
+  const { email, password, loginType = 'email' } = req.body;
 
   // Validate input
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email and password are required'
+      message: 'Email/User ID and password are required'
     });
   }
 
@@ -42,12 +42,23 @@ export default async function handler(req, res) {
       });
     }
 
-    // Query mentor from database
-    const result = await sql`
-      SELECT id, name, email, password_hash, subject, role, status, last_login, created_at
-      FROM mentor_users 
-      WHERE email = ${email.toLowerCase().trim()}
-    `;
+    // Query mentor from database based on login type
+    let result;
+    if (loginType === 'userid') {
+      // For user ID login, search by user_id field
+      result = await sql`
+        SELECT id, name, email, password_hash, subject, role, status, last_login, created_at, user_id
+        FROM mentor_users 
+        WHERE user_id = ${email.trim()} AND status = 'active'
+      `;
+    } else {
+      // For email login
+      result = await sql`
+        SELECT id, name, email, password_hash, subject, role, status, last_login, created_at, user_id
+        FROM mentor_users 
+        WHERE email = ${email.toLowerCase().trim()}
+      `;
+    }
 
     if (result.rows.length === 0) {
       return res.status(401).json({

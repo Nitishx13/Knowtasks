@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import FlashcardUploadModal from '../../components/ui/FlashcardUploadModal';
+import PyqUploadModal from '../../components/ui/PyqUploadModal';
 
 const MentorDashboardNew = () => {
   const [mentorData, setMentorData] = useState(null);
@@ -8,6 +10,37 @@ const MentorDashboardNew = () => {
   const [contentStats, setContentStats] = useState({});
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  // Upload modal states
+  const [showFormulaModal, setShowFormulaModal] = useState(false);
+  const [showFlashcardModal, setShowFlashcardModal] = useState(false);
+  const [showPyqModal, setShowPyqModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Upload form states
+  const [formulaForm, setFormulaForm] = useState({
+    title: '',
+    description: '',
+    category: 'Physics',
+    subject: 'Physics',
+    tags: []
+  });
+
+  const [flashcardForm, setFlashcardForm] = useState({
+    title: '',
+    description: '',
+    category: 'Biology',
+    subject: 'Biology'
+  });
+
+  const [pyqForm, setPyqForm] = useState({
+    title: '',
+    description: '',
+    category: 'Physics',
+    subject: 'Physics',
+    year: new Date().getFullYear(),
+    examType: 'Midterm'
+  });
 
   useEffect(() => {
     // Check authentication and load data
@@ -53,6 +86,154 @@ const MentorDashboardNew = () => {
 
     setLoading(false);
   }, [router]);
+
+  // Upload handlers
+  const handleFormulaUpload = async (e) => {
+    e.preventDefault();
+    if (!e.target.file.files[0]) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', e.target.file.files[0]);
+    formData.append('title', formulaForm.title);
+    formData.append('description', formulaForm.description);
+    formData.append('category', formulaForm.category);
+    formData.append('subject', formulaForm.subject);
+    formData.append('uploadedBy', mentorData?.email || 'mentor');
+    formData.append('uploaderRole', 'mentor');
+    formData.append('tags', JSON.stringify(formulaForm.tags));
+
+    try {
+      const response = await fetch('/api/formula-bank/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setShowFormulaModal(false);
+        setFormulaForm({
+          title: '',
+          description: '',
+          category: 'Physics',
+          subject: 'Physics',
+          tags: []
+        });
+        // Update content stats
+        setContentStats(prev => ({
+          ...prev,
+          formula_count: (prev.formula_count || 0) + 1
+        }));
+        alert('Formula Bank PDF uploaded successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Upload failed: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFlashcardUpload = async (e) => {
+    e.preventDefault();
+    if (!e.target.file.files[0]) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', e.target.file.files[0]);
+    formData.append('title', flashcardForm.title);
+    formData.append('description', flashcardForm.description);
+    formData.append('category', flashcardForm.category);
+    formData.append('subject', flashcardForm.subject);
+    formData.append('uploadedBy', mentorData?.email || 'mentor');
+    formData.append('uploaderRole', 'mentor');
+
+    try {
+      const response = await fetch('/api/flashcards/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setShowFlashcardModal(false);
+        setFlashcardForm({
+          title: '',
+          description: '',
+          category: 'Biology',
+          subject: 'Biology'
+        });
+        // Update content stats
+        setContentStats(prev => ({
+          ...prev,
+          flashcard_count: (prev.flashcard_count || 0) + 1
+        }));
+        alert('Flashcard uploaded successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Upload failed: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePyqUpload = async (e) => {
+    e.preventDefault();
+    if (!e.target.file.files[0]) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', e.target.file.files[0]);
+    formData.append('title', pyqForm.title);
+    formData.append('description', pyqForm.description);
+    formData.append('category', pyqForm.category);
+    formData.append('subject', pyqForm.subject);
+    formData.append('year', pyqForm.year);
+    formData.append('exam_type', pyqForm.examType);
+    formData.append('uploadedBy', mentorData?.email || 'mentor');
+    formData.append('uploaderRole', 'mentor');
+
+    try {
+      const response = await fetch('/api/pyq/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setShowPyqModal(false);
+        setPyqForm({
+          title: '',
+          description: '',
+          category: 'Physics',
+          subject: 'Physics',
+          year: new Date().getFullYear(),
+          examType: 'Midterm'
+        });
+        // Update content stats
+        setContentStats(prev => ({
+          ...prev,
+          pyq_count: (prev.pyq_count || 0) + 1
+        }));
+        alert('Previous Year Question uploaded successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Upload failed: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('isMentorAuthenticated');
@@ -217,23 +398,32 @@ const MentorDashboardNew = () => {
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
             <h3 className="text-xl font-bold text-white mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-4">
-              <button className="p-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors">
+              <button 
+                onClick={() => setShowFormulaModal(true)}
+                className="p-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
+              >
                 <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Upload Content
+                Upload Formula Bank
               </button>
-              <button className="p-4 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors">
+              <button 
+                onClick={() => setShowFlashcardModal(true)}
+                className="p-4 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors"
+              >
                 <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                Manage Students
+                Upload Flashcards
               </button>
-              <button className="p-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white transition-colors">
+              <button 
+                onClick={() => setShowPyqModal(true)}
+                className="p-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white transition-colors"
+              >
                 <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                View Analytics
+                Upload PYQ
               </button>
               <button className="p-4 bg-orange-600 hover:bg-orange-700 rounded-lg text-white transition-colors">
                 <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,6 +476,127 @@ const MentorDashboardNew = () => {
           )}
         </div>
       </div>
+
+      {/* Formula Bank Upload Modal */}
+      {showFormulaModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Upload Formula Bank PDF</h2>
+              <button
+                onClick={() => setShowFormulaModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleFormulaUpload} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">PDF File</label>
+                <input
+                  type="file"
+                  name="file"
+                  accept=".pdf"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={formulaForm.title}
+                  onChange={(e) => setFormulaForm({...formulaForm, title: e.target.value})}
+                  placeholder="Enter formula bank title"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={formulaForm.description}
+                  onChange={(e) => setFormulaForm({...formulaForm, description: e.target.value})}
+                  placeholder="Brief description of the formula bank"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={formulaForm.category}
+                    onChange={(e) => setFormulaForm({...formulaForm, category: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Biology">Biology</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <select
+                    value={formulaForm.subject}
+                    onChange={(e) => setFormulaForm({...formulaForm, subject: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Biology">Biology</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowFormulaModal(false)}
+                  className="flex-1 px-4 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {uploading ? 'Uploading...' : 'Upload PDF'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Flashcard Upload Modal */}
+      <FlashcardUploadModal
+        show={showFlashcardModal}
+        onClose={() => setShowFlashcardModal(false)}
+        onSubmit={handleFlashcardUpload}
+        uploading={uploading}
+        form={flashcardForm}
+        setForm={setFlashcardForm}
+      />
+
+      {/* PYQ Upload Modal */}
+      <PyqUploadModal
+        show={showPyqModal}
+        onClose={() => setShowPyqModal(false)}
+        onSubmit={handlePyqUpload}
+        uploading={uploading}
+        form={pyqForm}
+        setForm={setPyqForm}
+      />
     </div>
   );
 };

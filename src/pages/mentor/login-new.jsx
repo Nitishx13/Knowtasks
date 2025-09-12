@@ -9,6 +9,7 @@ const MentorLoginNew = () => {
     email: '',
     password: ''
   });
+  const [loginType, setLoginType] = useState('email'); // 'email' or 'userid'
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -33,14 +34,15 @@ const MentorLoginNew = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/mentor/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email: credentials.email,
-          password: credentials.password
+          password: credentials.password,
+          loginType: loginType
         })
       });
 
@@ -59,8 +61,8 @@ const MentorLoginNew = () => {
         // Store mentor authentication data
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
-          localStorage.setItem('mentorData', JSON.stringify(data.user));
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('mentorData', JSON.stringify(data.mentor));
+          localStorage.setItem('authToken', 'mentor-token-' + Date.now());
         }
         
         // Force redirect
@@ -70,7 +72,7 @@ const MentorLoginNew = () => {
           router.push('/mentor/dashboard-new');
         }
       } else {
-        setError(data.error || 'Invalid email or password');
+        setError(data.message || 'Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -125,10 +127,36 @@ const MentorLoginNew = () => {
           transition={{ delay: 0.4 }}
         >
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
+            {/* Login Type Toggle */}
+            <div className="flex bg-gray-800 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setLoginType('email')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  loginType === 'email'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Email Login
+              </button>
+              <button
+                type="button"
+                onClick={() => setLoginType('userid')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  loginType === 'userid'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                User ID Login
+              </button>
+            </div>
+
+            {/* Email/User ID Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+                {loginType === 'email' ? 'Email Address' : 'User ID'}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -144,7 +172,7 @@ const MentorLoginNew = () => {
                   value={credentials.email}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-                  placeholder="Enter your email"
+                  placeholder={loginType === 'email' ? 'Enter your email' : 'Enter your User ID'}
                 />
               </div>
             </div>
@@ -214,10 +242,11 @@ const MentorLoginNew = () => {
 
           {/* Link to email-only login */}
           <div className="mt-6 text-center">
-            <Link href="/mentor/email-login">
-              <a className="text-blue-400 hover:text-blue-300 text-sm transition-colors duration-300">
-                Quick access? Login with email only
-              </a>
+            <Link 
+              href="/mentor/email-login"
+              className="text-blue-400 hover:text-blue-300 text-sm transition-colors duration-300"
+            >
+              Quick access? Login with email only
             </Link>
           </div>
 
