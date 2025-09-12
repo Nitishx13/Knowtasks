@@ -27,14 +27,26 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      // Hardcoded mentor authentication
+      // Hardcoded mentor authentication - sync with localStorage data
       const mentorCredentials = [
         { email: 'sarah.johnson@knowtasks.com', password: 'physics123', name: 'Dr. Sarah Johnson', subject: 'Physics' },
         { email: 'michael.chen@knowtasks.com', password: 'math456', name: 'Prof. Michael Chen', subject: 'Mathematics' },
         { email: 'emily.rodriguez@knowtasks.com', password: 'chem789', name: 'Dr. Emily Rodriguez', subject: 'Chemistry' }
       ];
 
-      const mentor = mentorCredentials.find(m => 
+      // Also check localStorage for dynamically added mentors
+      let allMentors = [...mentorCredentials];
+      if (typeof window !== 'undefined') {
+        const savedMentors = localStorage.getItem('mentors_data');
+        if (savedMentors) {
+          const localMentors = JSON.parse(savedMentors);
+          allMentors = [...mentorCredentials, ...localMentors.filter(m => 
+            !mentorCredentials.some(staticMentor => staticMentor.email === m.email)
+          )];
+        }
+      }
+
+      const mentor = allMentors.find(m => 
         m.email === credentials.email && m.password === credentials.password
       );
 
