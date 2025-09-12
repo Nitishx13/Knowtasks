@@ -18,31 +18,89 @@ const MentorManagement = () => {
     status: 'active'
   });
 
-  // Fetch mentors from database
+  // Fetch mentors from database with fallback to mock data
   const fetchMentors = async () => {
     try {
       const response = await fetch('/api/auth/mentor');
       if (response.ok) {
         const data = await response.json();
-        const formattedMentors = data.data.map(mentor => ({
-          id: mentor.id,
-          name: mentor.name,
-          email: mentor.email,
-          subject: mentor.subject,
-          status: mentor.status,
-          students: mentor.students_count || 0,
-          joinDate: new Date(mentor.created_at).toLocaleDateString(),
-          lastLogin: mentor.last_login ? new Date(mentor.last_login).toLocaleDateString() : 'Never'
-        }));
-        setMentors(formattedMentors);
+        if (data.data && data.data.length > 0) {
+          const formattedMentors = data.data.map(mentor => ({
+            id: mentor.id,
+            name: mentor.name,
+            email: mentor.email,
+            subject: mentor.subject,
+            status: mentor.status,
+            students: mentor.students_count || 0,
+            joinDate: new Date(mentor.created_at).toLocaleDateString(),
+            lastLogin: mentor.last_login ? new Date(mentor.last_login).toLocaleDateString() : 'Never'
+          }));
+          setMentors(formattedMentors);
+        } else {
+          // If no mentors in database, add initial mentors
+          await addInitialMentors();
+        }
       } else {
-        console.error('Failed to fetch mentors');
+        console.error('Failed to fetch mentors, using fallback');
+        await addInitialMentors();
       }
     } catch (error) {
       console.error('Error fetching mentors:', error);
+      await addInitialMentors();
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add initial mentors if database is empty
+  const addInitialMentors = async () => {
+    const initialMentors = [
+      {
+        name: 'Dr. Sarah Johnson',
+        email: 'sarah.johnson@knowtasks.com',
+        password: 'physics123',
+        subject: 'Physics',
+        status: 'active'
+      },
+      {
+        name: 'Prof. Michael Chen',
+        email: 'michael.chen@knowtasks.com',
+        password: 'math456',
+        subject: 'Mathematics',
+        status: 'active'
+      },
+      {
+        name: 'Dr. Emily Rodriguez',
+        email: 'emily.rodriguez@knowtasks.com',
+        password: 'chem789',
+        subject: 'Chemistry',
+        status: 'pending'
+      }
+    ];
+
+    console.log('Adding initial mentors to database...');
+    for (const mentor of initialMentors) {
+      try {
+        const response = await fetch('/api/auth/mentor', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(mentor)
+        });
+        
+        if (response.ok) {
+          console.log(`Added mentor: ${mentor.name}`);
+        }
+      } catch (error) {
+        console.error(`Error adding mentor ${mentor.name}:`, error);
+      }
+    }
+    
+    // Fetch mentors again after adding initial data
+    setTimeout(() => {
+      fetchMentors();
+    }, 1000);
   };
 
   useEffect(() => {
