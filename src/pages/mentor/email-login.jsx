@@ -2,13 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-// import { Button } from '../../components/ui/Button';
 
-const MentorLoginNew = () => {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  });
+const MentorEmailLogin = () => {
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -19,11 +15,7 @@ const MentorLoginNew = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEmail(e.target.value);
     setError('');
   };
 
@@ -33,34 +25,24 @@ const MentorLoginNew = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/mentors/email-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password
-        })
+        body: JSON.stringify({ email })
       });
 
-      const responseText = await response.text();
-      let data;
-      
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-      } catch (jsonError) {
-        console.error('JSON parse error:', jsonError);
-        setError('Server response error. Please try again.');
-        return;
-      }
+      const data = await response.json();
 
       if (response.ok && data.success) {
         // Store mentor authentication data
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
-          localStorage.setItem('mentorData', JSON.stringify(data.user));
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('mentorData', JSON.stringify(data.mentor));
+          localStorage.setItem('mentorProfile', JSON.stringify(data.mentor.profile));
+          localStorage.setItem('mentorStudents', JSON.stringify(data.mentor.students));
+          localStorage.setItem('mentorContentStats', JSON.stringify(data.mentor.content_stats));
         }
         
         // Force redirect
@@ -70,7 +52,7 @@ const MentorLoginNew = () => {
           router.push('/mentor/dashboard-new');
         }
       } else {
-        setError(data.error || 'Invalid email or password');
+        setError(data.message || 'Authentication failed');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -105,7 +87,7 @@ const MentorLoginNew = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Mentor Portal
+            Mentor Email Access
           </motion.h1>
           <motion.p 
             className="text-gray-400"
@@ -113,7 +95,7 @@ const MentorLoginNew = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Access your comprehensive mentoring dashboard
+            Quick access for registered mentors
           </motion.p>
         </div>
 
@@ -141,34 +123,10 @@ const MentorLoginNew = () => {
                   name="email"
                   type="email"
                   required
-                  value={credentials.email}
+                  value={email}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-                  placeholder="Enter your email"
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={credentials.password}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 bg-black/30 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
-                  placeholder="Enter your password"
+                  placeholder="Enter your registered email"
                 />
               </div>
             </div>
@@ -212,11 +170,11 @@ const MentorLoginNew = () => {
             </button>
           </form>
 
-          {/* Link to email-only login */}
+          {/* Link to regular login */}
           <div className="mt-6 text-center">
-            <Link href="/mentor/email-login">
+            <Link href="/mentor/login-new">
               <a className="text-blue-400 hover:text-blue-300 text-sm transition-colors duration-300">
-                Quick access? Login with email only
+                Need to use password? Go to regular login
               </a>
             </Link>
           </div>
@@ -228,12 +186,12 @@ const MentorLoginNew = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-blue-400 text-sm font-medium mb-1">New Mentor Dashboard Features</p>
+                <p className="text-blue-400 text-sm font-medium mb-1">Email Login Benefits</p>
                 <ul className="text-blue-300 text-xs space-y-1">
-                  <li>• Comprehensive student management</li>
-                  <li>• Real-time analytics and statistics</li>
-                  <li>• Content upload and organization</li>
-                  <li>• Performance tracking and insights</li>
+                  <li>• Quick email-only access</li>
+                  <li>• No password required</li>
+                  <li>• Faster dashboard access</li>
+                  <li>• Streamlined login experience</li>
                 </ul>
               </div>
             </div>
@@ -243,7 +201,7 @@ const MentorLoginNew = () => {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-400 text-sm">
-            © 2024 Knowtasks - Advanced Mentor Portal
+            © 2024 Knowtasks - Mentor Portal
           </p>
         </div>
       </div>
@@ -251,4 +209,4 @@ const MentorLoginNew = () => {
   );
 };
 
-export default MentorLoginNew;
+export default MentorEmailLogin;

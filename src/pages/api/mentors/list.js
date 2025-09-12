@@ -21,14 +21,14 @@ export default async function handler(req, res) {
     const result = await sql`
       SELECT 
         m.id, m.name, m.email, m.subject, m.phone, m.bio, 
-        m.specialization, m.experience, m.status, m.created_at, m.last_login,
+        m.specialization, m.experience, m.status, m.created_at, m.last_login, m.verified,
         mp.total_students, mp.total_uploads, mp.total_sessions, mp.rating,
         COUNT(s.id) as active_students
       FROM mentor_users m
       LEFT JOIN mentor_profiles mp ON m.id = mp.mentor_id
       LEFT JOIN students s ON m.id = s.mentor_id
       GROUP BY m.id, m.name, m.email, m.subject, m.phone, m.bio, 
-               m.specialization, m.experience, m.status, m.created_at, m.last_login,
+               m.specialization, m.experience, m.status, m.created_at, m.last_login, m.verified,
                mp.total_students, mp.total_uploads, mp.total_sessions, mp.rating
       ORDER BY m.created_at DESC
     `;
@@ -43,6 +43,7 @@ export default async function handler(req, res) {
       specialization: mentor.specialization,
       experience: mentor.experience,
       status: mentor.status,
+      verified: mentor.verified || false,
       created_at: mentor.created_at,
       last_login: mentor.last_login,
       profile: {

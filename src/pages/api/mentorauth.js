@@ -35,9 +35,9 @@ export default async function handler(req, res) {
   try {
     // Query mentor from database
     const result = await sql`
-      SELECT id, name, email, password_hash, subject, role, status, last_login, created_at
+      SELECT id, name, email, password_hash, subject, role, status, verified, last_login, created_at
       FROM mentor_users 
-      WHERE email = ${email.toLowerCase().trim()} AND status = 'active'
+      WHERE email = ${email.toLowerCase().trim()} AND status = 'active' AND verified = true
     `;
 
     if (result.rows.length === 0) {
@@ -78,6 +78,7 @@ export default async function handler(req, res) {
       subject: mentor.subject,
       role: mentor.role,
       status: mentor.status,
+      verified: mentor.verified,
       last_login: new Date().toISOString(),
       created_at: mentor.created_at
     };

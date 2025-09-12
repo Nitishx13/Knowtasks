@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { cn } from '../../lib/utils';
+import BecomeMentorButton from '../../components/home/BecomeMentorButton';
 
 const HomePage = () => {
   const { scrollY } = useScroll();
@@ -122,6 +123,7 @@ const HomePage = () => {
                   </Link>
                 </Button>
               </motion.div>
+              <BecomeMentorButton />
             </motion.div>
             
             <motion.div 
