@@ -81,12 +81,22 @@ const MentorManagement = () => {
           fetchMentors(); // Refresh the list
           alert('Mentor added successfully!');
         } else {
-          const error = await response.json();
-          alert(`Error: ${error.error}`);
+          // Handle non-JSON error responses
+          let errorMessage = 'Failed to add mentor. Please try again.';
+          try {
+            const error = await response.json();
+            errorMessage = error.error || errorMessage;
+          } catch (jsonError) {
+            console.error('Error parsing response JSON:', jsonError);
+            if (response.status === 405) {
+              errorMessage = 'Server configuration error. Please contact administrator.';
+            }
+          }
+          alert(`Error: ${errorMessage}`);
         }
       } catch (error) {
         console.error('Error adding mentor:', error);
-        alert('Failed to add mentor. Please try again.');
+        alert('Network error occurred. Please check your connection and try again.');
       }
     }
   };
@@ -102,12 +112,22 @@ const MentorManagement = () => {
           fetchMentors(); // Refresh the list
           alert('Mentor deleted successfully!');
         } else {
-          const error = await response.json();
-          alert(`Error: ${error.error}`);
+          // Handle non-JSON error responses
+          let errorMessage = 'Failed to delete mentor. Please try again.';
+          try {
+            const error = await response.json();
+            errorMessage = error.error || errorMessage;
+          } catch (jsonError) {
+            console.error('Error parsing response JSON:', jsonError);
+            if (response.status === 405) {
+              errorMessage = 'Server configuration error. Please contact administrator.';
+            }
+          }
+          alert(`Error: ${errorMessage}`);
         }
       } catch (error) {
         console.error('Error deleting mentor:', error);
-        alert('Failed to delete mentor. Please try again.');
+        alert('Network error occurred. Please check your connection and try again.');
       }
     }
   };
@@ -134,12 +154,22 @@ const MentorManagement = () => {
       if (response.ok) {
         fetchMentors(); // Refresh the list
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
+        // Handle non-JSON error responses
+        let errorMessage = 'Failed to update mentor status. Please try again.';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || errorMessage;
+        } catch (jsonError) {
+          console.error('Error parsing response JSON:', jsonError);
+          if (response.status === 405) {
+            errorMessage = 'Server configuration error. Please contact administrator.';
+          }
+        }
+        alert(`Error: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Error updating mentor status:', error);
-      alert('Failed to update mentor status. Please try again.');
+      alert('Network error occurred. Please check your connection and try again.');
     }
   };
 
