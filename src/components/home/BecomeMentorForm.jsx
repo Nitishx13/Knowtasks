@@ -95,7 +95,7 @@ const BecomeMentorForm = ({ onClose }) => {
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Application Submitted!</h3>
             <p className="text-gray-300 mb-6">
-              Thank you for your interest in becoming a mentor. We'll review your application and get back to you soon.
+              Thank you for your interest in becoming a mentor. We&apos;ll review your application and get back to you soon.
             </p>
             <Button onClick={onClose} className="bg-blue-600 hover:bg-blue-700 text-white">
               Close
@@ -228,7 +228,7 @@ const BecomeMentorForm = ({ onClose }) => {
 
             <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
               <p className="text-blue-400 text-sm">
-                <span className="font-semibold">Note:</span> Your application will be reviewed by our team. Once approved, you'll receive login credentials to access the mentor dashboard.
+                <span className="font-semibold">Note:</span> Your application will be reviewed by our team. Once approved, you&apos;ll receive login credentials to access the mentor dashboard.
               </p>
             </div>
 

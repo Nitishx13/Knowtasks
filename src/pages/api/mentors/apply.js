@@ -1,4 +1,4 @@
-import { connectToDatabase } from '../../../lib/mongodb';
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
   // Only allow POST method
@@ -7,9 +7,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Connect to the database
-    const { db } = await connectToDatabase();
-    
     // Get the form data from the request body
     const {
       name,
@@ -28,34 +25,65 @@ export default async function handler(req, res) {
     }
     
     // Check if the email already exists in the mentor applications
-    const existingMentor = await db.collection('mentors').findOne({ email });
-    if (existingMentor) {
+    const existingMentor = await sql`
+      SELECT id FROM mentor_users WHERE email = ${email}
+    `;
+    
+    if (existingMentor.rows.length > 0) {
       return res.status(400).json({ error: 'A mentor with this email already exists' });
     }
     
-    // Create a new mentor application document
-    const mentorApplication = {
-      name,
-      email,
-      phone,
-      subject,
-      specialization: specialization || '',
-      experience,
-      bio,
-      status: 'pending', // Always set status to pending for new applications
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      verified: false, // Default to not verified
-    };
+    // Create a new mentor application
+    const result = await sql`
+      INSERT INTO mentor_users (
+        name,
+        email,
+        phone,
+        subject,
+        specialization,
+        experience,
+        bio,
+        status,
+        created_at,
+        updated_at
+      ) VALUES (
+        ${name},
+        ${email},
+        ${phone || ''},
+        ${subject},
+        ${specialization || ''},
+        ${experience},
+        ${bio},
+        ${'pending'}, 
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+      ) RETURNING id
+    `;
     
-    // Insert the mentor application into the database
-    const result = await db.collection('mentors').insertOne(mentorApplication);
+    // Create mentor profile entry
+    await sql`
+      INSERT INTO mentor_profiles (
+        mentor_id, 
+        total_students, 
+        total_uploads, 
+        total_sessions, 
+        rating, 
+        created_at
+      ) VALUES (
+        ${result.rows[0].id}, 
+        0, 
+        0, 
+        0, 
+        0.0, 
+        CURRENT_TIMESTAMP
+      )
+    `;
     
     // Return success response
     return res.status(201).json({
       success: true,
       message: 'Mentor application submitted successfully',
-      mentorId: result.insertedId,
+      mentorId: result.rows[0].id,
     });
   } catch (error) {
     console.error('Error submitting mentor application:', error);
