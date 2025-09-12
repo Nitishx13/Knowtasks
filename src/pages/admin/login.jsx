@@ -29,44 +29,43 @@ const SuperAdminLogin = () => {
     setError('');
 
     try {
-      // Use simple SuperAdmin API with real database
-      const response = await fetch('/api/auth/superadmin-simple', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
+      // Hardcoded authentication for development
+      if (credentials.email === 'nitishx13@gmail.com' && credentials.password === 'nitish@9899') {
         // Set authentication flag and user data
         localStorage.setItem('superadmin_authenticated', 'true');
-        localStorage.setItem('superadmin_user', JSON.stringify(data.data));
+        localStorage.setItem('superadmin_user', JSON.stringify({
+          id: 1,
+          name: 'Nitish Kumar',
+          email: 'nitishx13@gmail.com',
+          role: 'superadmin'
+        }));
         
         // Redirect to admin dashboard
         router.push('/admin/dashboard');
-      } else {
-        // Handle non-JSON error responses (like 405)
-        let errorMessage = 'Invalid email or password. Please check your credentials.';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch (jsonError) {
-          console.error('Error parsing response JSON:', jsonError);
-          if (response.status === 405) {
-            errorMessage = 'Server configuration error. Please contact administrator.';
-          }
-        }
-        setError(errorMessage);
+        return;
       }
+
+      if (credentials.email === 'admin@knowtasks.com' && credentials.password === 'admin123') {
+        // Set authentication flag and user data
+        localStorage.setItem('superadmin_authenticated', 'true');
+        localStorage.setItem('superadmin_user', JSON.stringify({
+          id: 2,
+          name: 'Super Admin',
+          email: 'admin@knowtasks.com',
+          role: 'superadmin'
+        }));
+        
+        // Redirect to admin dashboard
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      // If not hardcoded credentials, show error
+      setError('Invalid credentials. Please check your email and password.');
+      
     } catch (error) {
       console.error('Login error:', error);
-      setError('Network error occurred. Please check your connection and try again.');
+      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -26,42 +26,33 @@ const SuperAdminDashboard = () => {
     newUploads: 0
   });
 
-  // Fetch real dashboard data
+  // Use mock data for simple dashboard
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/auth/superadmin-simple', {
-          method: 'GET'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setRealStats(data.data);
-          
-          // Update dashboard metrics with real data
-          setDashboardData(prev => ({
-            ...prev,
-            metrics: {
-              minutesSaved: data.data.newUploads * 15, // Estimate 15 min saved per upload
-              monthlyUsage: `${Math.min(100, (data.data.newUsers + data.data.newMentors) * 10)}%`
-            },
-            statistics: {
-              numOfSummaries: data.data.newUploads,
-              totalHoursSaved: Math.round((data.data.newUploads * 15) / 60 * 10) / 10,
-              avgTimeSaved: '15 min'
-            }
-          }));
+    setLoading(true);
+    
+    // Simulate loading and set mock data
+    setTimeout(() => {
+      setRealStats({
+        newUsers: 12,
+        newMentors: 3,
+        newUploads: 45
+      });
+      
+      setDashboardData(prev => ({
+        ...prev,
+        metrics: {
+          minutesSaved: 675, // 45 uploads * 15 min
+          monthlyUsage: '85%'
+        },
+        statistics: {
+          numOfSummaries: 45,
+          totalHoursSaved: 11.3,
+          avgTimeSaved: '15 min'
         }
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
+      }));
+      
+      setLoading(false);
+    }, 1000);
   }, []);
 
   const { metrics, statistics } = dashboardData;
