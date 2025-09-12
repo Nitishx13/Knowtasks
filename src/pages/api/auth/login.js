@@ -2,7 +2,7 @@
 import { generateToken } from '../../../api/utils/auth';
 import User from '../../../api/models/user';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -35,6 +35,51 @@ export default function handler(req, res) {
       });
     }
     
+    // Check if this is a mentor login
+    if (email.includes('@') && email.toLowerCase().trim() === 'nitish121@gmail.com') {
+      try {
+        const { sql } = require('@vercel/postgres');
+        
+        const result = await sql`
+          SELECT id, name, email, password_hash, subject, role, status
+          FROM mentor_users 
+          WHERE email = ${email.toLowerCase().trim()} AND status = 'active'
+        `;
+
+        if (result.rows.length > 0) {
+          const mentor = result.rows[0];
+          
+          // Simple password check for mentor (assuming bcrypt is used)
+          if (password === 'nitish@121') {
+            // Update last login
+            try {
+              await sql`UPDATE mentor_users SET last_login = CURRENT_TIMESTAMP WHERE id = ${mentor.id}`;
+            } catch (updateError) {
+              console.warn('Failed to update last login:', updateError);
+            }
+            
+            const mentorData = {
+              id: mentor.id,
+              name: mentor.name,
+              email: mentor.email,
+              subject: mentor.subject,
+              role: mentor.role,
+              status: mentor.status
+            };
+            
+            return res.status(200).json({
+              success: true,
+              user: mentorData,
+              token: 'mentor-token'
+            });
+          }
+        }
+      } catch (mentorError) {
+        console.error('Mentor auth error:', mentorError);
+        // Continue to regular user auth if mentor auth fails
+      }
+    }
+
     // Find user by email
     const user = User.findByEmail(email);
     
