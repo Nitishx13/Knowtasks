@@ -29,41 +29,17 @@ const SuperAdminLogin = () => {
     setError('');
 
     try {
-      // Try main API first, then fallback to test API
-      let response;
-      let apiEndpoint = '/api/auth/superadmin';
-      
-      try {
-        response = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: credentials.email,
-            password: credentials.password
-          })
-        });
-        
-        // If 405 error, try fallback API
-        if (response.status === 405) {
-          console.log('Main API returned 405, trying fallback...');
-          apiEndpoint = '/api/test-superadmin';
-          response = await fetch(apiEndpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password
-            })
-          });
-        }
-      } catch (fetchError) {
-        console.error('Fetch error:', fetchError);
-        throw fetchError;
-      }
+      // Use simple SuperAdmin API with real database
+      const response = await fetch('/api/auth/superadmin-simple', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
 
       if (response.ok) {
         const data = await response.json();

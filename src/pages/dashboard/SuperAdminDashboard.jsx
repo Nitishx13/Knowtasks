@@ -6,24 +6,63 @@ import MentorManagement from '../../components/admin/MentorManagement';
 const SuperAdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     metrics: {
-      minutesSaved: 2847,
-      monthlyUsage: '98.5%'
+      minutesSaved: 0,
+      monthlyUsage: '0%'
     },
     statistics: {
-      numOfSummaries: 456,
-      totalHoursSaved: 47.5,
-      avgTimeSaved: '6.2 min'
+      numOfSummaries: 0,
+      totalHoursSaved: 0,
+      avgTimeSaved: '0 min'
     },
-    recentSummaries: [
-      { id: 1, title: 'System Performance Report', createdAt: '2024-01-20T10:30:00Z', wordCount: 1250 },
-      { id: 2, title: 'User Analytics Summary', createdAt: '2024-01-19T15:45:00Z', wordCount: 980 },
-      { id: 3, title: 'Security Audit Results', createdAt: '2024-01-18T09:15:00Z', wordCount: 1560 }
-    ]
+    recentSummaries: []
   });
   
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showMentorManagement, setShowMentorManagement] = useState(false);
+  const [realStats, setRealStats] = useState({
+    newUsers: 0,
+    newMentors: 0,
+    newUploads: 0
+  });
+
+  // Fetch real dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/auth/superadmin-simple', {
+          method: 'GET'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setRealStats(data.data);
+          
+          // Update dashboard metrics with real data
+          setDashboardData(prev => ({
+            ...prev,
+            metrics: {
+              minutesSaved: data.data.newUploads * 15, // Estimate 15 min saved per upload
+              monthlyUsage: `${Math.min(100, (data.data.newUsers + data.data.newMentors) * 10)}%`
+            },
+            statistics: {
+              numOfSummaries: data.data.newUploads,
+              totalHoursSaved: Math.round((data.data.newUploads * 15) / 60 * 10) / 10,
+              avgTimeSaved: '15 min'
+            }
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const { metrics, statistics } = dashboardData;
 
@@ -40,7 +79,11 @@ const SuperAdminDashboard = () => {
         <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
           <div className="relative z-10">
             <h3 className="text-lg font-bold text-white mb-2">System Management</h3>
-            <p className="text-sm text-red-100 mb-3">Monitor and manage all system operations and users</p>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-blue-400">{realStats.newUsers}</p>
+              <p className="text-gray-400 text-sm">New Users (30d)</p>
+            </div>
+            <p className="text-sm text-red-100 mb-3">Manage all system operations and users</p>
             <Link href="/admin/users" className="inline-block bg-white text-red-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-red-50 transition-all">
               Manage Users
             </Link>
