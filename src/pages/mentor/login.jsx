@@ -21,54 +21,37 @@ const MentorLogin = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // Hardcoded mentor authentication - sync with localStorage data
-      const mentorCredentials = [
-        { email: 'sarah.johnson@knowtasks.com', password: 'physics123', name: 'Dr. Sarah Johnson', subject: 'Physics' },
-        { email: 'michael.chen@knowtasks.com', password: 'math456', name: 'Prof. Michael Chen', subject: 'Mathematics' },
-        { email: 'emily.rodriguez@knowtasks.com', password: 'chem789', name: 'Dr. Emily Rodriguez', subject: 'Chemistry' }
-      ];
+      // Use the mentor API for authentication
+      const response = await fetch('/api/auth/mentor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
 
-      // Also check localStorage for dynamically added mentors
-      let allMentors = [...mentorCredentials];
-      if (typeof window !== 'undefined') {
-        const savedMentors = localStorage.getItem('mentors_data');
-        if (savedMentors) {
-          const localMentors = JSON.parse(savedMentors);
-          allMentors = [...mentorCredentials, ...localMentors.filter(m => 
-            !mentorCredentials.some(staticMentor => staticMentor.email === m.email)
-          )];
-        }
-      }
-
-      const mentor = allMentors.find(m => 
-        m.email === credentials.email && m.password === credentials.password
-      );
-
-      if (mentor) {
-        // Set authentication flag and user data
-        localStorage.setItem('mentor_authenticated', 'true');
-        localStorage.setItem('mentor_user', JSON.stringify({
-          id: Date.now(),
-          name: mentor.name,
-          email: mentor.email,
-          subject: mentor.subject,
-          role: 'mentor'
-        }));
-        
-        // Redirect to mentor dashboard
+      if (response.ok) {
+        const data = await response.json();
+        // Store authentication in localStorage
+        localStorage.setItem('isMentorAuthenticated', 'true');
+        localStorage.setItem('mentorData', JSON.stringify(data.data));
         router.push('/mentor/dashboard');
       } else {
-        setError('Invalid credentials. Please check your email and password.');
+        const errorData = await response.json();
+        setError(errorData.error || 'Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('Login failed. Please try again.');
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }

@@ -42,6 +42,24 @@ async function setupTables() {
     `;
     console.log('✓ PYQ table ready');
     
+    // Create mentor_users table
+    await sql`
+      CREATE TABLE IF NOT EXISTS mentor_users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        subject VARCHAR(100) NOT NULL,
+        role VARCHAR(50) DEFAULT 'mentor',
+        status VARCHAR(20) DEFAULT 'active',
+        students_count INTEGER DEFAULT 0,
+        last_login TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    console.log('✓ Mentor users table ready');
+    
     console.log('All tables setup complete!');
     
   } catch (error) {

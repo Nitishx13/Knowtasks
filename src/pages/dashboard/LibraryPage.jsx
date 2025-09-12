@@ -76,111 +76,85 @@ const LibraryPage = () => {
     }
   ], []);
 
-  // Function to fetch library items from API
+  // Function to fetch library items from localStorage
   const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
       const allItems = [];
 
-      // Fetch Formula Bank items
-      try {
-        const formulaResponse = await fetch('/api/formula-bank/list?' + new URLSearchParams({
-          category: activeTab === 'formula' ? '' : '',
-          search: searchQuery
+      // Get Formula Bank items from localStorage
+      const formulaBankData = localStorage.getItem('formula_bank_items');
+      if (formulaBankData) {
+        const formulaItems = JSON.parse(formulaBankData).map(item => ({
+          id: `formula-${item.id}`,
+          title: item.title,
+          type: 'formula',
+          category: item.subject || item.category,
+          date: new Date(item.created_at).toLocaleDateString(),
+          size: item.file_name ? `PDF File` : 'Formula Bank',
+          status: 'completed',
+          description: item.description,
+          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
+          fileName: item.file_name,
+          uploadedBy: 'mentor',
+          tags: item.tags || [],
+          created_at: item.created_at
         }));
-        
-        if (formulaResponse.ok) {
-          const formulaData = await formulaResponse.json();
-          const formulaItems = formulaData.data.map(item => ({
-            id: `formula-${item.id}`,
-            title: item.title,
-            type: 'formula',
-            category: item.subject,
-            date: new Date(item.created_at).toLocaleDateString(),
-            size: `${Math.round(item.file_size / 1024)} KB`,
-            status: 'completed',
-            description: item.description,
-            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
-            fileName: item.file_name,
-            uploadedBy: item.uploaded_by,
-            tags: item.tags || [],
-            created_at: item.created_at
-          }));
-          allItems.push(...formulaItems);
-        }
-      } catch (error) {
-        console.error('Error fetching formula bank items:', error);
+        allItems.push(...formulaItems);
       }
 
-      // Fetch Flashcards
-      try {
-        const flashcardResponse = await fetch('/api/flashcards/list?' + new URLSearchParams({
-          category: activeTab === 'flashcard' ? '' : '',
-          search: searchQuery
+      // Get Flashcards from localStorage
+      const flashcardData = localStorage.getItem('flashcard_items');
+      if (flashcardData) {
+        const flashcardItems = JSON.parse(flashcardData).map(item => ({
+          id: `flashcard-${item.id}`,
+          title: item.title,
+          type: 'flashcard',
+          category: item.subject || item.category,
+          date: new Date(item.created_at).toLocaleDateString(),
+          size: item.file_name ? `PDF File` : 'Flashcard',
+          status: 'completed',
+          description: item.description,
+          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
+          fileName: item.file_name,
+          uploadedBy: 'mentor',
+          tags: item.tags || [],
+          created_at: item.created_at
         }));
-        
-        if (flashcardResponse.ok) {
-          const flashcardData = await flashcardResponse.json();
-          const flashcardItems = flashcardData.data.map(item => ({
-            id: `flashcard-${item.id}`,
-            title: item.title,
-            type: 'flashcard',
-            category: item.subject,
-            date: new Date(item.created_at).toLocaleDateString(),
-            size: `${Math.round(item.file_size / 1024)} KB`,
-            status: 'completed',
-            description: item.description,
-            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
-            fileName: item.file_name,
-            uploadedBy: item.uploaded_by,
-            tags: item.tags || [],
-            created_at: item.created_at
-          }));
-          allItems.push(...flashcardItems);
-        }
-      } catch (error) {
-        console.error('Error fetching flashcard items:', error);
+        allItems.push(...flashcardItems);
       }
 
-      // Fetch PYQ items
-      try {
-        const pyqResponse = await fetch('/api/pyq/list?' + new URLSearchParams({
-          category: activeTab === 'pyq' ? '' : '',
-          search: searchQuery
+      // Get PYQ items from localStorage
+      const pyqData = localStorage.getItem('pyq_items');
+      if (pyqData) {
+        const pyqItems = JSON.parse(pyqData).map(item => ({
+          id: `pyq-${item.id}`,
+          title: item.title,
+          type: 'pyq',
+          category: item.subject || item.category,
+          date: new Date(item.created_at).toLocaleDateString(),
+          size: item.file_name ? `PDF File` : 'PYQ',
+          status: 'completed',
+          description: item.description,
+          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
+          fileName: item.file_name,
+          uploadedBy: 'mentor',
+          year: item.year,
+          examType: item.exam_type,
+          tags: item.tags || [],
+          created_at: item.created_at
         }));
-        
-        if (pyqResponse.ok) {
-          const pyqData = await pyqResponse.json();
-          const pyqItems = pyqData.data.map(item => ({
-            id: `pyq-${item.id}`,
-            title: item.title,
-            type: 'pyq',
-            category: item.subject,
-            date: new Date(item.created_at).toLocaleDateString(),
-            size: `${Math.round(item.file_size / 1024)} KB`,
-            status: 'completed',
-            description: item.description,
-            fileUrl: `/api/uploads/${encodeURIComponent(item.file_name)}`,
-            fileName: item.file_name,
-            uploadedBy: item.uploaded_by,
-            year: item.year,
-            examType: item.exam_type,
-            tags: item.tags || [],
-            created_at: item.created_at
-          }));
-          allItems.push(...pyqItems);
-        }
-      } catch (error) {
-        console.error('Error fetching PYQ items:', error);
+        allItems.push(...pyqItems);
       }
 
       // Sort items by creation date (newest first)
       allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       
+      // Use real data if available, otherwise fallback to mock data
       setLibraryItems(allItems.length > 0 ? allItems : mockLibraryItems);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching library items:', error);
+      console.error('Error loading library items from localStorage:', error);
       // Fallback to mock data
       setLibraryItems(mockLibraryItems);
       setLoading(false);

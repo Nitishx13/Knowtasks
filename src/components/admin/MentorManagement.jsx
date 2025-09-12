@@ -3,16 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 
 const MentorManagement = () => {
-  const [mentors, setMentors] = useState(() => {
-    // Load mentors from localStorage on initialization
-    if (typeof window !== 'undefined') {
-      const savedMentors = localStorage.getItem('mentors_data');
-      if (savedMentors) {
-        return JSON.parse(savedMentors);
-      }
-    }
-    return [];
-  });
+  const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -27,53 +18,28 @@ const MentorManagement = () => {
     status: 'active'
   });
 
-  // Load initial mock mentors if none exist in localStorage
+  // Fetch mentors from database
   const fetchMentors = async () => {
     try {
-      // Check if mentors already exist in localStorage
-      const savedMentors = localStorage.getItem('mentors_data');
-      if (!savedMentors) {
-        // Set initial mock mentors data only if none exist
-        const mockMentors = [
-          {
-            id: 1,
-            name: 'Dr. Sarah Johnson',
-            email: 'sarah.johnson@knowtasks.com',
-            subject: 'Physics',
-            status: 'active',
-            students: 25,
-            joinDate: '12/1/2023',
-            lastLogin: '1/10/2024',
-            password: 'physics123'
-          },
-          {
-            id: 2,
-            name: 'Prof. Michael Chen',
-            email: 'michael.chen@knowtasks.com',
-            subject: 'Mathematics',
-            status: 'active',
-            students: 18,
-            joinDate: '11/15/2023',
-            lastLogin: '1/9/2024',
-            password: 'math456'
-          },
-          {
-            id: 3,
-            name: 'Dr. Emily Rodriguez',
-            email: 'emily.rodriguez@knowtasks.com',
-            subject: 'Chemistry',
-            status: 'pending',
-            students: 12,
-            joinDate: '1/5/2024',
-            lastLogin: 'Never',
-            password: 'chem789'
-          }
-        ];
-        setMentors(mockMentors);
-        localStorage.setItem('mentors_data', JSON.stringify(mockMentors));
+      const response = await fetch('/api/auth/mentor');
+      if (response.ok) {
+        const data = await response.json();
+        const formattedMentors = data.data.map(mentor => ({
+          id: mentor.id,
+          name: mentor.name,
+          email: mentor.email,
+          subject: mentor.subject,
+          status: mentor.status,
+          students: mentor.students_count || 0,
+          joinDate: new Date(mentor.created_at).toLocaleDateString(),
+          lastLogin: mentor.last_login ? new Date(mentor.last_login).toLocaleDateString() : 'Never'
+        }));
+        setMentors(formattedMentors);
+      } else {
+        console.error('Failed to fetch mentors');
       }
     } catch (error) {
-      console.error('Error loading mentors:', error);
+      console.error('Error fetching mentors:', error);
     } finally {
       setLoading(false);
     }
@@ -96,50 +62,89 @@ const MentorManagement = () => {
     if (newMentor.name && newMentor.email && newMentor.subject) {
       const password = newMentor.password || generatePassword();
       
-      // Create mock mentor with generated ID
-      const mockMentor = {
-        id: Date.now(), // Use timestamp as unique ID
-        name: newMentor.name,
-        email: newMentor.email,
-        subject: newMentor.subject,
-        status: newMentor.status,
-        students: 0,
-        joinDate: new Date().toLocaleDateString(),
-        lastLogin: 'Never',
-        password: password // Store password for display
-      };
+      try {
+        const response = await fetch('/api/auth/mentor', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: newMentor.name,
+            email: newMentor.email,
+            password: password,
+            subject: newMentor.subject,
+            status: newMentor.status
+          })
+        });
 
-      // Add to local state and save to localStorage
-      const updatedMentors = [...mentors, mockMentor];
-      setMentors(updatedMentors);
-      localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
-      
-      // Reset form and close modal
-      setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
-      setShowAddModal(false);
-      alert(`Mentor added successfully!\n\nLogin Credentials:\nEmail: ${mockMentor.email}\nPassword: ${password}`);
+        if (response.ok) {
+          setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
+          setShowAddModal(false);
+          fetchMentors(); // Refresh the list
+          alert(`Mentor added successfully!\n\nLogin Credentials:\nEmail: ${newMentor.email}\nPassword: ${password}`);
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.error || 'Failed to add mentor'}`);
+        }
+      } catch (error) {
+        console.error('Error adding mentor:', error);
+        alert('Network error occurred. Please check your connection and try again.');
+      }
     }
   };
 
   const handleDeleteMentor = async (mentorId) => {
     if (confirm('Are you sure you want to delete this mentor?')) {
-      // Remove from local state and save to localStorage
-      const updatedMentors = mentors.filter(mentor => mentor.id !== mentorId);
-      setMentors(updatedMentors);
-      localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
-      alert('Mentor deleted successfully!');
+      try {
+        const response = await fetch(`/api/auth/mentor?id=${mentorId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          fetchMentors(); // Refresh the list
+          alert('Mentor deleted successfully!');
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.error || 'Failed to delete mentor'}`);
+        }
+      } catch (error) {
+        console.error('Error deleting mentor:', error);
+        alert('Network error occurred. Please check your connection and try again.');
+      }
     }
   };
 
   const handleStatusChange = async (mentorId, newStatus) => {
-    // Update status in local state and save to localStorage
-    const updatedMentors = mentors.map(mentor => 
-      mentor.id === mentorId 
-        ? { ...mentor, status: newStatus }
-        : mentor
-    );
-    setMentors(updatedMentors);
-    localStorage.setItem('mentors_data', JSON.stringify(updatedMentors));
+    try {
+      // Find the mentor to get their details
+      const mentor = mentors.find(m => m.id === mentorId);
+      if (!mentor) return;
+
+      const response = await fetch('/api/auth/mentor', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: mentor.name,
+          email: mentor.email,
+          password: 'temp123', // Use a temporary password for status updates
+          subject: mentor.subject,
+          status: newStatus
+        })
+      });
+
+      if (response.ok) {
+        fetchMentors(); // Refresh the list
+        alert(`Mentor status updated to ${newStatus}!`);
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error || 'Failed to update mentor status'}`);
+      }
+    } catch (error) {
+      console.error('Error updating mentor status:', error);
+      alert('Network error occurred. Please check your connection and try again.');
+    }
   };
 
   const showPassword = (mentor) => {
