@@ -29,17 +29,41 @@ const SuperAdminLogin = () => {
     setError('');
 
     try {
-      // Use test API for authentication (fallback)
-      const response = await fetch('/api/test-superadmin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password
-        })
-      });
+      // Try main API first, then fallback to test API
+      let response;
+      let apiEndpoint = '/api/auth/superadmin';
+      
+      try {
+        response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password
+          })
+        });
+        
+        // If 405 error, try fallback API
+        if (response.status === 405) {
+          console.log('Main API returned 405, trying fallback...');
+          apiEndpoint = '/api/test-superadmin';
+          response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password
+            })
+          });
+        }
+      } catch (fetchError) {
+        console.error('Fetch error:', fetchError);
+        throw fetchError;
+      }
 
       if (response.ok) {
         const data = await response.json();
@@ -51,12 +75,22 @@ const SuperAdminLogin = () => {
         // Redirect to admin dashboard
         router.push('/admin/dashboard');
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Invalid email or password. Please check your credentials.');
+        // Handle non-JSON error responses (like 405)
+        let errorMessage = 'Invalid email or password. Please check your credentials.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (jsonError) {
+          console.error('Error parsing response JSON:', jsonError);
+          if (response.status === 405) {
+            errorMessage = 'Server configuration error. Please contact administrator.';
+          }
+        }
+        setError(errorMessage);
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An error occurred during login. Please try again.');
+      setError('Network error occurred. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
