@@ -33,6 +33,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'A mentor with this email already exists' });
     }
     
+    // Create a temporary password hash (will be replaced when user sets up their account)
+    const tempPasswordHash = 'temp_' + Math.random().toString(36).substring(2, 15);
+    
     // Create a new mentor application
     const result = await sql`
       INSERT INTO mentor_users (
@@ -44,6 +47,8 @@ export default async function handler(req, res) {
         experience,
         bio,
         status,
+        password_hash,
+        role,
         created_at,
         updated_at
       ) VALUES (
@@ -52,9 +57,11 @@ export default async function handler(req, res) {
         ${phone || ''},
         ${subject},
         ${specialization || ''},
-        ${experience},
+        ${parseInt(experience) || 0},
         ${bio},
-        ${'pending'}, 
+        ${'pending'},
+        ${tempPasswordHash},
+        ${'mentor'},
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
       ) RETURNING id
