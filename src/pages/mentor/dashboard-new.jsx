@@ -20,17 +20,23 @@ const MentorDashboardNew = () => {
 
     // Load mentor data from localStorage
     const storedMentorData = localStorage.getItem('mentorData');
-    const storedStudents = localStorage.getItem('mentorStudents');
-    const storedContentStats = localStorage.getItem('mentorContentStats');
 
     if (storedMentorData) {
-      setMentorData(JSON.parse(storedMentorData));
-    }
-    if (storedStudents) {
-      setStudents(JSON.parse(storedStudents));
-    }
-    if (storedContentStats) {
-      setContentStats(JSON.parse(storedContentStats));
+      const mentorInfo = JSON.parse(storedMentorData);
+      setMentorData(mentorInfo);
+      
+      // Set default values for demo
+      setStudents([
+        { id: 1, name: 'John Doe', email: 'john.doe@student.com', total_summaries: 5, total_notes: 3, created_at: '2024-01-15' },
+        { id: 2, name: 'Jane Smith', email: 'jane.smith@student.com', total_summaries: 8, total_notes: 6, created_at: '2024-01-20' },
+        { id: 3, name: 'Mike Johnson', email: 'mike.johnson@student.com', total_summaries: 3, total_notes: 2, created_at: '2024-02-01' }
+      ]);
+      
+      setContentStats({
+        formula_count: 12,
+        flashcard_count: 8,
+        pyq_count: 5
+      });
     }
 
     setLoading(false);
@@ -148,7 +154,7 @@ const MentorDashboardNew = () => {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-white">{mentorData.profile?.total_sessions || 0}</p>
+                <p className="text-2xl font-bold text-white">15</p>
                 <p className="text-gray-400 text-sm">Sessions</p>
               </div>
             </div>
@@ -165,7 +171,7 @@ const MentorDashboardNew = () => {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-white">{mentorData.profile?.rating || 0}</p>
+                <p className="text-2xl font-bold text-white">4.8</p>
                 <p className="text-gray-400 text-sm">Rating</p>
               </div>
             </div>

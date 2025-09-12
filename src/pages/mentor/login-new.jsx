@@ -32,7 +32,7 @@ const MentorLoginNew = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/mentors/authenticate', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,13 +55,11 @@ const MentorLoginNew = () => {
       }
 
       if (response.ok && data.success) {
-        // Store comprehensive mentor data
+        // Store mentor authentication data
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
-          localStorage.setItem('mentorData', JSON.stringify(data.mentor));
-          localStorage.setItem('mentorProfile', JSON.stringify(data.mentor.profile));
-          localStorage.setItem('mentorStudents', JSON.stringify(data.mentor.students));
-          localStorage.setItem('mentorContentStats', JSON.stringify(data.mentor.content_stats));
+          localStorage.setItem('mentorData', JSON.stringify(data.user));
+          localStorage.setItem('authToken', data.token);
         }
         
         // Force redirect
