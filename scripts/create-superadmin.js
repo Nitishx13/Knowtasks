@@ -6,11 +6,19 @@ async function createSuperAdmin() {
   try {
     console.log('Creating SuperAdmin user...');
     
-    const name = 'Super Admin';
-    const email = 'admin@knowtasks.com';
-    const password = 'admin123';
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create both admin users
+    const users = [
+      {
+        name: 'Super Admin',
+        email: 'admin@knowtasks.com',
+        password: 'admin123'
+      },
+      {
+        name: 'Nitish Kumar',
+        email: 'nitishx13@gmail.com',
+        password: 'nitish@9899'
+      }
+    ];
     
     // First, ensure the table exists
     await sql`
@@ -27,25 +35,29 @@ async function createSuperAdmin() {
       )
     `;
     
-    // Insert or update SuperAdmin
-    const result = await sql`
-      INSERT INTO superadmin_users (name, email, password_hash, role, status)
-      VALUES (${name}, ${email}, ${hashedPassword}, 'superadmin', 'active')
-      ON CONFLICT (email) 
-      DO UPDATE SET 
-        name = EXCLUDED.name,
-        password_hash = EXCLUDED.password_hash,
-        role = EXCLUDED.role,
-        status = EXCLUDED.status,
-        updated_at = CURRENT_TIMESTAMP
-      RETURNING id, name, email, role, status
-    `;
-    
-    console.log('SuperAdmin created successfully!');
-    console.log('Login credentials:');
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('User data:', result.rows[0]);
+    // Insert or update each SuperAdmin user
+    for (const user of users) {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      
+      const result = await sql`
+        INSERT INTO superadmin_users (name, email, password_hash, role, status)
+        VALUES (${user.name}, ${user.email}, ${hashedPassword}, 'superadmin', 'active')
+        ON CONFLICT (email) 
+        DO UPDATE SET 
+          name = EXCLUDED.name,
+          password_hash = EXCLUDED.password_hash,
+          role = EXCLUDED.role,
+          status = EXCLUDED.status,
+          updated_at = CURRENT_TIMESTAMP
+        RETURNING id, name, email, role, status
+      `;
+      
+      console.log(`SuperAdmin created successfully: ${user.name}`);
+      console.log('Email:', user.email);
+      console.log('Password:', user.password);
+      console.log('User data:', result.rows[0]);
+      console.log('---');
+    }
     
   } catch (error) {
     console.error('Error creating SuperAdmin:', error);
