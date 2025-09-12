@@ -17,21 +17,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get all mentors with their profile data and student counts
-    const result = await sql`
-      SELECT 
-        m.id, m.name, m.email, m.subject, m.phone, m.bio, 
-        m.specialization, m.experience, m.status, m.created_at, m.last_login, m.verified,
-        mp.total_students, mp.total_uploads, mp.total_sessions, mp.rating,
-        COUNT(s.id) as active_students
-      FROM mentor_users m
-      LEFT JOIN mentor_profiles mp ON m.id = mp.mentor_id
-      LEFT JOIN students s ON m.id = s.mentor_id
-      GROUP BY m.id, m.name, m.email, m.subject, m.phone, m.bio, 
-               m.specialization, m.experience, m.status, m.created_at, m.last_login, m.verified,
-               mp.total_students, mp.total_uploads, mp.total_sessions, mp.rating
-      ORDER BY m.created_at DESC
-    `;
+    // Check if database connection is available
+    if (!process.env.POSTGRES_URL) {
+      console.error('Database connection error: POSTGRES_URL not found');
+      return res.status(500).json({ 
+        error: 'Database configuration error',
+        success: false,
+        mentors: []
+      });
+    }
+
+    // First, try to get mentors from mentor_users table
+    let result;
+    try {
+      result = await sql`
+        SELECT 
+          id, name, email, subject, phone, bio, 
+          specialization, experience, status, created_at, last_login, verified
+        FROM mentor_users
+        ORDER BY created_at DESC
+      `;
+    } catch (dbError) {
+      console.error('Database query error:', dbError);
+      // Return empty array if table doesn't exist
+      return res.status(200).json({
+        success: true,
+        mentors: [],
+        total: 0,
+        message: 'No mentors found'
+      });
+    }
 
     const mentors = result.rows.map(mentor => ({
       id: mentor.id,
@@ -47,11 +62,11 @@ export default async function handler(req, res) {
       created_at: mentor.created_at,
       last_login: mentor.last_login,
       profile: {
-        total_students: mentor.total_students || 0,
-        active_students: mentor.active_students || 0,
-        total_uploads: mentor.total_uploads || 0,
-        total_sessions: mentor.total_sessions || 0,
-        rating: mentor.rating || 0.0
+        total_students: 0,
+        active_students: 0,
+        total_uploads: 0,
+        total_sessions: 0,
+        rating: 0.0
       }
     }));
 

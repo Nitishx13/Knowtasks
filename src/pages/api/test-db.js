@@ -1,55 +1,46 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Test database connection
-    const connectionTest = await sql`SELECT NOW() as current_time`;
-    
-    // Test table structure
-    const tableInfo = await sql`
-      SELECT 
-        column_name, 
-        data_type, 
-        is_nullable,
-        column_default
-      FROM information_schema.columns 
-      WHERE table_name = 'uploaded_files' 
-      ORDER BY ordinal_position
-    `;
-    
-    // Get current file count
-    const fileCount = await sql`SELECT COUNT(*) as count FROM uploaded_files`;
-    
-    // Get sample data (if any)
-    const sampleData = await sql`
-      SELECT id, file_name, file_type, status, upload_date 
-      FROM uploaded_files 
-      ORDER BY upload_date DESC 
-      LIMIT 5
-    `;
+    // Check if database connection is available
+    if (!process.env.POSTGRES_URL) {
+      return res.status(500).json({ 
+        error: 'Database configuration error: POSTGRES_URL not found',
+        success: false
+      });
+    }
 
+    // Test database connection
+    const result = await sql`SELECT NOW() as current_time`;
+    
     res.status(200).json({
       success: true,
-      database: {
-        connection: 'Connected',
-        currentTime: connectionTest.rows[0].current_time,
-        tableExists: tableInfo.rows.length > 0,
-        columns: tableInfo.rows,
-        totalFiles: parseInt(fileCount.rows[0].count),
-        sampleFiles: sampleData.rows
-      }
+      message: 'Database connection successful',
+      current_time: result.rows[0]?.current_time,
+      environment: process.env.NODE_ENV
     });
 
   } catch (error) {
     console.error('Database test error:', error);
     res.status(500).json({ 
-      success: false,
-      error: error.message,
-      details: 'Database connection or query failed'
+      error: 'Database connection failed',
+      details: error.message,
+      success: false
     });
   }
 }

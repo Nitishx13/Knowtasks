@@ -19,15 +19,30 @@ const MentorApplicationsPage = () => {
       try {
         setLoading(true);
         const response = await fetch('/api/mentors/list');
-        const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch mentor applications');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        setApplications(data.mentors || []);
+        const responseText = await response.text();
+        let data;
+        
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (jsonError) {
+          console.error('JSON parse error:', jsonError);
+          throw new Error('Invalid response format from server');
+        }
+        
+        if (data.success) {
+          setApplications(data.mentors || []);
+        } else {
+          throw new Error(data.error || 'Failed to fetch mentor applications');
+        }
       } catch (err) {
+        console.error('Fetch applications error:', err);
         setError(err.message);
+        setApplications([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
