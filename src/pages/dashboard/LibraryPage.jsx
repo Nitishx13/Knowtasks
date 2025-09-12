@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
@@ -19,7 +19,7 @@ const LibraryPage = () => {
   // Check if user is mentor - only allow uploads in mentor routes
   const isMentor = typeof window !== 'undefined' && router.pathname.includes('/mentor') && localStorage.getItem('mentor_authenticated');
 
-  const mockLibraryItems = [
+  const mockLibraryItems = useMemo(() => [
     {
       id: 1,
       title: 'Physics Equations',
@@ -74,7 +74,7 @@ const LibraryPage = () => {
       size: '10 questions',
       status: 'in-progress'
     }
-  ];
+  ], []);
 
   // Function to fetch library items from API
   const fetchLibraryItems = useCallback(async () => {

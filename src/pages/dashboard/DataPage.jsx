@@ -4,6 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 
+function formatTotalSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 const DataPage = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,18 +24,6 @@ const DataPage = () => {
   
   // Get current user from auth context
   const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      fetchFiles();
-    }
-    
-    // Cleanup function to reset selection when component unmounts
-    return () => {
-      setSelectedFiles([]);
-      setSelectAll(false);
-    };
-  }, [fetchFiles, user]);
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -59,6 +55,23 @@ const DataPage = () => {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchFiles();
+    }
+    
+    // Cleanup function to reset selection when component unmounts
+    return () => {
+      setSelectedFiles([]);
+      setSelectAll(false);
+    };
+  }, [fetchFiles, user]);
+
+  // Prevent SSR issues by only rendering on client
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   const filteredFiles = files.filter(file => {
     const matchesSearch = file.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -581,13 +594,5 @@ const DataPage = () => {
     </div>
   );
 };
-
-function formatTotalSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
 
 export default DataPage;

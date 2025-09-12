@@ -199,8 +199,15 @@ const UserDashboard = () => {
   };
 
   const handleViewFile = (fileUrl, fileName) => {
-    window.open(fileUrl, '_blank');
+    if (typeof window !== 'undefined') {
+      window.open(fileUrl, '_blank');
+    }
   };
+
+  // Ensure component only renders on client side to avoid SSR issues
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   if (loading) {
     return (
@@ -226,7 +233,7 @@ const UserDashboard = () => {
     <div className="space-y-6">
       {/* Main Actions */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/data'}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => typeof window !== 'undefined' && (window.location.href = '/dashboard/data')}>
           <CardContent className="flex flex-col items-center justify-center p-8 text-center">
             <FileIcon className="h-12 w-12 text-purple-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">My Data</h3>
@@ -234,7 +241,7 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/summarize'}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => typeof window !== 'undefined' && (window.location.href = '/dashboard/summarize')}>
           <CardContent className="flex flex-col items-center justify-center p-8 text-center">
             <UploadIcon className="h-12 w-12 text-blue-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Upload Documents</h3>
@@ -242,7 +249,7 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/dashboard/library'}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => typeof window !== 'undefined' && (window.location.href = '/dashboard/library')}>
           <CardContent className="flex flex-col items-center justify-center p-8 text-center">
             <FileTextIcon className="h-12 w-12 text-green-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Knowledge Hub</h3>
