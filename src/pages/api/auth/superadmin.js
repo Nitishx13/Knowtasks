@@ -90,7 +90,16 @@ export default async function handler(req, res) {
 
     } catch (error) {
       console.error('SuperAdmin login error:', error);
-      res.status(500).json({ error: 'Login failed', details: error.message });
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        code: error.code
+      });
+      res.status(500).json({ 
+        error: 'Login failed', 
+        details: error.message,
+        code: error.code 
+      });
     }
 
   } else if (req.method === 'PUT') {
