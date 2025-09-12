@@ -32,8 +32,8 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      // Use the mentor login API endpoint
-      const response = await fetch('/api/mentor/login', {
+      // Use the mentorauth API endpoint
+      const response = await fetch('/api/mentorauth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,17 +44,28 @@ const MentorLogin = () => {
         })
       });
 
-      const data = await response.json();
+      // Check if response has content before parsing JSON
+      const responseText = await response.text();
+      let data;
+      
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        console.error('Response text:', responseText);
+        setError('Server response error. Please try again.');
+        return;
+      }
 
       if (response.ok && data.success) {
         // Store authentication in localStorage (only on client side)
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
-          localStorage.setItem('mentorData', JSON.stringify(data.mentor));
+          localStorage.setItem('mentorData', JSON.stringify(data.data));
         }
         router.push('/mentor/dashboard');
       } else {
-        setError(data.message || 'Invalid email or password');
+        setError(data.message || data.error || 'Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);

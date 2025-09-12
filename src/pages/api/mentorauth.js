@@ -33,38 +33,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Ensure database connection
-    if (!process.env.POSTGRES_URL) {
-      console.error('Database connection error: POSTGRES_URL not found');
-      return res.status(500).json({
-        success: false,
-        message: 'Database configuration error'
-      });
-    }
-
     // Query mentor from database
     const result = await sql`
       SELECT id, name, email, password_hash, subject, role, status, last_login, created_at
       FROM mentor_users 
-      WHERE email = ${email.toLowerCase().trim()}
+      WHERE email = ${email.toLowerCase().trim()} AND status = 'active'
     `;
 
     if (result.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
       });
     }
 
     const mentor = result.rows[0];
-
-    // Check if mentor is active
-    if (mentor.status !== 'active') {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is not active. Please contact administrator.'
-      });
-    }
 
     // Verify password
     const isValidPassword = await bcrypt.compare(password, mentor.password_hash);
@@ -72,7 +55,7 @@ export default async function handler(req, res) {
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid credentials'
       });
     }
 
@@ -85,7 +68,6 @@ export default async function handler(req, res) {
       `;
     } catch (updateError) {
       console.warn('Failed to update last login:', updateError);
-      // Continue with login even if update fails
     }
 
     // Prepare mentor data (exclude password hash)
@@ -104,17 +86,16 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: 'Login successful',
-      mentor: mentorData
+      data: mentorData
     });
 
   } catch (error) {
     console.error('Mentor login error:', error);
     
-    // Return proper JSON error response
     return res.status(500).json({
       success: false,
-      message: 'Internal server error. Please try again later.',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      message: 'Server error occurred',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal error'
     });
   }
 }
