@@ -18,26 +18,48 @@ const MentorManagement = () => {
     status: 'active'
   });
 
-  // Fetch mentors from database
+  // Load initial mock mentors
   const fetchMentors = async () => {
     try {
-      const response = await fetch('/api/auth/mentor');
-      if (response.ok) {
-        const data = await response.json();
-        const formattedMentors = data.data.map(mentor => ({
-          id: mentor.id,
-          name: mentor.name,
-          email: mentor.email,
-          subject: mentor.subject,
-          status: mentor.status,
-          students: mentor.students_count || 0,
-          joinDate: new Date(mentor.created_at).toLocaleDateString(),
-          lastLogin: mentor.last_login ? new Date(mentor.last_login).toLocaleDateString() : 'Never'
-        }));
-        setMentors(formattedMentors);
-      }
+      // Set mock mentors data
+      const mockMentors = [
+        {
+          id: 1,
+          name: 'Dr. Sarah Johnson',
+          email: 'sarah.johnson@knowtasks.com',
+          subject: 'Physics',
+          status: 'active',
+          students: 25,
+          joinDate: '12/1/2023',
+          lastLogin: '1/10/2024',
+          password: 'physics123'
+        },
+        {
+          id: 2,
+          name: 'Prof. Michael Chen',
+          email: 'michael.chen@knowtasks.com',
+          subject: 'Mathematics',
+          status: 'active',
+          students: 18,
+          joinDate: '11/15/2023',
+          lastLogin: '1/9/2024',
+          password: 'math456'
+        },
+        {
+          id: 3,
+          name: 'Dr. Emily Rodriguez',
+          email: 'emily.rodriguez@knowtasks.com',
+          subject: 'Chemistry',
+          status: 'pending',
+          students: 12,
+          joinDate: '1/5/2024',
+          lastLogin: 'Never',
+          password: 'chem789'
+        }
+      ];
+      setMentors(mockMentors);
     } catch (error) {
-      console.error('Error fetching mentors:', error);
+      console.error('Error loading mentors:', error);
     } finally {
       setLoading(false);
     }
@@ -60,117 +82,44 @@ const MentorManagement = () => {
     if (newMentor.name && newMentor.email && newMentor.subject) {
       const password = newMentor.password || generatePassword();
       
-      try {
-        const response = await fetch('/api/auth/mentor', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: newMentor.name,
-            email: newMentor.email,
-            password: password,
-            subject: newMentor.subject,
-            status: newMentor.status
-          })
-        });
+      // Create mock mentor with generated ID
+      const mockMentor = {
+        id: Date.now(), // Use timestamp as unique ID
+        name: newMentor.name,
+        email: newMentor.email,
+        subject: newMentor.subject,
+        status: newMentor.status,
+        students: 0,
+        joinDate: new Date().toLocaleDateString(),
+        lastLogin: 'Never',
+        password: password // Store password for display
+      };
 
-        if (response.ok) {
-          setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
-          setShowAddModal(false);
-          fetchMentors(); // Refresh the list
-          alert('Mentor added successfully!');
-        } else {
-          // Handle non-JSON error responses
-          let errorMessage = 'Failed to add mentor. Please try again.';
-          try {
-            const error = await response.json();
-            errorMessage = error.error || errorMessage;
-          } catch (jsonError) {
-            console.error('Error parsing response JSON:', jsonError);
-            if (response.status === 405) {
-              errorMessage = 'Server configuration error. Please contact administrator.';
-            }
-          }
-          alert(`Error: ${errorMessage}`);
-        }
-      } catch (error) {
-        console.error('Error adding mentor:', error);
-        alert('Network error occurred. Please check your connection and try again.');
-      }
+      // Add to local state
+      setMentors(prev => [...prev, mockMentor]);
+      
+      // Reset form and close modal
+      setNewMentor({ name: '', email: '', password: '', subject: '', status: 'active' });
+      setShowAddModal(false);
+      alert(`Mentor added successfully!\n\nLogin Credentials:\nEmail: ${mockMentor.email}\nPassword: ${password}`);
     }
   };
 
   const handleDeleteMentor = async (mentorId) => {
     if (confirm('Are you sure you want to delete this mentor?')) {
-      try {
-        const response = await fetch(`/api/auth/mentor?id=${mentorId}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          fetchMentors(); // Refresh the list
-          alert('Mentor deleted successfully!');
-        } else {
-          // Handle non-JSON error responses
-          let errorMessage = 'Failed to delete mentor. Please try again.';
-          try {
-            const error = await response.json();
-            errorMessage = error.error || errorMessage;
-          } catch (jsonError) {
-            console.error('Error parsing response JSON:', jsonError);
-            if (response.status === 405) {
-              errorMessage = 'Server configuration error. Please contact administrator.';
-            }
-          }
-          alert(`Error: ${errorMessage}`);
-        }
-      } catch (error) {
-        console.error('Error deleting mentor:', error);
-        alert('Network error occurred. Please check your connection and try again.');
-      }
+      // Remove from local state
+      setMentors(prev => prev.filter(mentor => mentor.id !== mentorId));
+      alert('Mentor deleted successfully!');
     }
   };
 
   const handleStatusChange = async (mentorId, newStatus) => {
-    const mentor = mentors.find(m => m.id === mentorId);
-    if (!mentor) return;
-
-    try {
-      const response = await fetch('/api/auth/mentor', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: mentor.name,
-          email: mentor.email,
-          password: 'unchanged', // Keep existing password
-          subject: mentor.subject,
-          status: newStatus
-        })
-      });
-
-      if (response.ok) {
-        fetchMentors(); // Refresh the list
-      } else {
-        // Handle non-JSON error responses
-        let errorMessage = 'Failed to update mentor status. Please try again.';
-        try {
-          const error = await response.json();
-          errorMessage = error.error || errorMessage;
-        } catch (jsonError) {
-          console.error('Error parsing response JSON:', jsonError);
-          if (response.status === 405) {
-            errorMessage = 'Server configuration error. Please contact administrator.';
-          }
-        }
-        alert(`Error: ${errorMessage}`);
-      }
-    } catch (error) {
-      console.error('Error updating mentor status:', error);
-      alert('Network error occurred. Please check your connection and try again.');
-    }
+    // Update status in local state
+    setMentors(prev => prev.map(mentor => 
+      mentor.id === mentorId 
+        ? { ...mentor, status: newStatus }
+        : mentor
+    ));
   };
 
   const showPassword = (mentor) => {
