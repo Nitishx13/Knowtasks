@@ -1,111 +1,90 @@
 # Knowtasks
 
-A Next.js application for task management and knowledge organization.
+A comprehensive educational platform for 9-12 class students with mentor content management and student learning resources.
 
 ## Features
 
-- Home page with feature showcase
-- User authentication (login/register)
-- Dashboard with summarization tools
-- Research and library management
-- Notes organization
+- **Student Dashboard**: Access to organized content library, summarization tools, and learning materials
+- **Mentor System**: Content upload and management for educational materials (PDFs, flashcards, notes, PYQ)
+- **Admin Panel**: User and mentor management with application approval system
+- **Content Library**: Searchable and filterable educational resources
+- **PDF Viewer**: Built-in PDF viewing and download capabilities
 
-## Development
+## Tech Stack
 
+- **Frontend**: Next.js 14, React 18, Tailwind CSS
+- **Backend**: Next.js API Routes, Node.js
+- **Database**: PostgreSQL (Vercel Postgres)
+- **Authentication**: Custom authentication system
+- **File Storage**: Local file system with API serving
+- **Deployment**: Vercel
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL database
+- Environment variables configured
+
+### Installation
+
+1. Clone the repository:
 ```bash
-# Install dependencies
-npm install
+git clone https://github.com/Nitishx13/Knowtasks.git
+cd Knowtasks
+```
 
-# Run development server
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.local.example .env.local
+# Configure your database and other environment variables
+```
+
+4. Initialize the database:
+```bash
+npm run setup-db
+```
+
+5. Run the development server:
+```bash
 npm run dev
 ```
 
-### Authentication Fallback for Development
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-This project includes an authentication fallback mechanism for development purposes. When enabled, it allows you to access protected routes without requiring actual authentication.
+## Project Structure
 
-To enable the authentication fallback:
-
-1. Create a `.env.local` file in the root directory (if it doesn't exist)
-2. Add the following environment variable:
-   ```
-   NEXT_PUBLIC_USE_TEST_AUTH=true
-   ```
-3. Restart the development server
-
-With this setting enabled, you can access the dashboard and API routes without authentication, which is useful for development and testing.
-
-## Building for Production
-
-```bash
-# Create production build
-npm run build
-
-# Start production server
-npm start
 ```
+src/
+├── components/          # Reusable UI components
+├── pages/              # Next.js pages and API routes
+│   ├── api/            # Backend API endpoints
+│   ├── admin/          # Admin dashboard pages
+│   ├── mentor/         # Mentor dashboard pages
+│   └── dashboard/      # Student dashboard pages
+└── styles/             # Global styles and CSS
+
+scripts/                # Database and setup scripts
+uploads/                # File storage directory
+```
+
+## API Endpoints
+
+- `/api/mentor/login` - Mentor authentication
+- `/api/uploads/mentor-content` - File upload management
+- `/api/uploads/get-mentor-content` - Retrieve uploaded content
+- `/api/uploads/serve-pdf-by-id` - Serve PDF files
+- `/api/mentors/apply` - Mentor application submission
+- `/api/mentors/create-login` - Admin mentor account creation
 
 ## Deployment
 
-This project is configured for deployment on Vercel:
-
-1. Push your code to GitHub
-2. Connect your GitHub repository to Vercel
-3. Vercel will automatically detect Next.js and deploy your application
-
-### Authentication Fallback for Production
-
-If you need to enable the authentication fallback in production (for testing or demo purposes), you can add the environment variable to your Vercel deployment:
-
-1. Go to your project settings in Vercel
-2. Navigate to the Environment Variables section
-3. Add a new environment variable:
-   - Name: `NEXT_PUBLIC_USE_TEST_AUTH`
-   - Value: `true`
-4. Deploy or redeploy your application
-
-**Note:** The authentication fallback is already configured in the `vercel.json` file for this project, so it should work automatically after deployment.
-
-### Setting up Neo4j on Vercel
-
-This application uses Neo4j as its database. To set up Neo4j for your Vercel deployment:
-
-1. Create a Neo4j Aura account and database at [Neo4j Aura](https://neo4j.com/cloud/aura/)
-2. Get your Neo4j connection details (URI, username, password)
-3. Add these as environment variables in your Vercel project settings:
-   - `NEO4J_URI`: Your Neo4j connection URI
-   - `NEO4J_USERNAME`: Your Neo4j username
-   - `NEO4J_PASSWORD`: Your Neo4j password
-
-### Setting up UploadThing
-
-For file uploads, this project uses UploadThing:
-
-1. Create an account at [UploadThing](https://uploadthing.com/)
-2. Create a new app and get your API keys
-3. Add these as environment variables in your Vercel project settings:
-   - `UPLOADTHING_SECRET`: Your UploadThing secret key
-   - `UPLOADTHING_APP_ID`: Your UploadThing app ID
-
-### Setting up OpenAI API
-
-For summarization features, you need an OpenAI API key:
-
-1. Get an API key from [OpenAI](https://platform.openai.com/)
-2. Add it as an environment variable in your Vercel project settings:
-   - `OPENAI_API_KEY`: Your OpenAI API key
-
-### Setting up Clerk Authentication
-
-For user authentication, this project uses Clerk:
-
-1. Create an account at [Clerk](https://clerk.dev/)
-2. Create a new application and get your API keys
-3. Add these as environment variables in your Vercel project settings:
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Your Clerk publishable key
-   - `CLERK_SECRET_KEY`: Your Clerk secret key
-
-Alternatively, you can deploy using the Vercel CLI:
+The application is optimized for Vercel deployment:
 
 ```bash
 # Install Vercel CLI
@@ -114,3 +93,15 @@ npm install -g vercel
 # Deploy to Vercel
 vercel
 ```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

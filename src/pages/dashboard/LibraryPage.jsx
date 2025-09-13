@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 import { useRouter } from 'next/router';
-import PDFViewer from '../../components/ui/PDFViewer';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -76,75 +75,43 @@ const LibraryPage = () => {
     }
   ], []);
 
-  // Function to fetch library items from localStorage
+  // Function to fetch library items from API
   const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
       const allItems = [];
 
-      // Get Formula Bank items from localStorage
-      const formulaBankData = localStorage.getItem('formula_bank_items');
-      if (formulaBankData) {
-        const formulaItems = JSON.parse(formulaBankData).map(item => ({
-          id: `formula-${item.id}`,
-          title: item.title,
-          type: 'formula',
-          category: item.subject || item.category,
-          date: new Date(item.created_at).toLocaleDateString(),
-          size: item.file_name ? `PDF File` : 'Formula Bank',
-          status: 'completed',
-          description: item.description,
-          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
-          fileName: item.file_name,
-          uploadedBy: 'mentor',
-          tags: item.tags || [],
-          created_at: item.created_at
-        }));
-        allItems.push(...formulaItems);
-      }
-
-      // Get Flashcards from localStorage
-      const flashcardData = localStorage.getItem('flashcard_items');
-      if (flashcardData) {
-        const flashcardItems = JSON.parse(flashcardData).map(item => ({
-          id: `flashcard-${item.id}`,
-          title: item.title,
-          type: 'flashcard',
-          category: item.subject || item.category,
-          date: new Date(item.created_at).toLocaleDateString(),
-          size: item.file_name ? `PDF File` : 'Flashcard',
-          status: 'completed',
-          description: item.description,
-          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
-          fileName: item.file_name,
-          uploadedBy: 'mentor',
-          tags: item.tags || [],
-          created_at: item.created_at
-        }));
-        allItems.push(...flashcardItems);
-      }
-
-      // Get PYQ items from localStorage
-      const pyqData = localStorage.getItem('pyq_items');
-      if (pyqData) {
-        const pyqItems = JSON.parse(pyqData).map(item => ({
-          id: `pyq-${item.id}`,
-          title: item.title,
-          type: 'pyq',
-          category: item.subject || item.category,
-          date: new Date(item.created_at).toLocaleDateString(),
-          size: item.file_name ? `PDF File` : 'PYQ',
-          status: 'completed',
-          description: item.description,
-          fileUrl: `/uploads/${encodeURIComponent(item.file_name)}`,
-          fileName: item.file_name,
-          uploadedBy: 'mentor',
-          year: item.year,
-          examType: item.exam_type,
-          tags: item.tags || [],
-          created_at: item.created_at
-        }));
-        allItems.push(...pyqItems);
+      // Fetch all content types from mentor uploads API
+      const contentTypes = ['formula', 'flashcard', 'pyq', 'notes'];
+      
+      for (const type of contentTypes) {
+        try {
+          const response = await fetch(`/api/uploads/get-mentor-content?type=${type}`);
+          const data = await response.json();
+          
+          if (data.success && data.uploads) {
+            const items = data.uploads.map(item => ({
+              id: `${type}-${item.id}`,
+              title: item.title,
+              type: type,
+              category: item.subject || item.category,
+              date: new Date(item.created_at).toLocaleDateString(),
+              size: 'PDF File',
+              status: 'completed',
+              description: item.description,
+              fileUrl: `/api/uploads/serve-pdf-by-id?id=${item.id}`,
+              fileName: item.file_name,
+              uploadedBy: 'mentor',
+              year: item.year,
+              examType: item.exam_type,
+              tags: item.tags || [],
+              created_at: item.created_at
+            }));
+            allItems.push(...items);
+          }
+        } catch (error) {
+          console.error(`Error fetching ${type} items:`, error);
+        }
       }
 
       // Sort items by creation date (newest first)
@@ -154,7 +121,7 @@ const LibraryPage = () => {
       setLibraryItems(allItems.length > 0 ? allItems : mockLibraryItems);
       setLoading(false);
     } catch (error) {
-      console.error('Error loading library items from localStorage:', error);
+      console.error('Error loading library items from API:', error);
       // Fallback to mock data
       setLibraryItems(mockLibraryItems);
       setLoading(false);
@@ -220,6 +187,12 @@ const LibraryPage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
+      case 'notes':
+        return (
+          <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        );
       default:
         return (
           <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,6 +249,13 @@ const LibraryPage = () => {
               className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'pyq' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
             >
               PYQ
+            </Button>
+            <Button 
+              onClick={() => setActiveTab('notes')}
+              variant={activeTab === 'notes' ? 'default' : 'outline'}
+              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'notes' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
+            >
+              Notes
             </Button>
           </div>
         </div>
@@ -361,12 +341,10 @@ const LibraryPage = () => {
             </div>
             
             <div className="flex-1 p-4">
-              <PDFViewer
-                fileUrl={selectedPDF.fileUrl}
-                fileName={selectedPDF.fileName}
-                onError={(error) => {
-                  console.error('PDF load error:', error);
-                }}
+              <iframe
+                src={selectedPDF.fileUrl}
+                className="w-full h-full border-0"
+                title={selectedPDF.title}
               />
             </div>
             

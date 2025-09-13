@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import MentorDashboard from '../dashboard/MentorDashboard';
+import MentorDashboardSimple from './dashboard-simple';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 
 const MentorDashboardPage = () => {
@@ -18,7 +18,7 @@ const MentorDashboardPage = () => {
 
   return (
     <DashboardLayout>
-      <MentorDashboard />
+      <MentorDashboardSimple />
     </DashboardLayout>
   );
 };

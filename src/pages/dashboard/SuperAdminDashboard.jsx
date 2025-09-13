@@ -1,61 +1,225 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
-import DatabaseTables from '../../components/admin/DatabaseTables';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Badge } from '../../components/ui/Badge';
 
 const SuperAdminDashboard = () => {
-  const [dashboardData, setDashboardData] = useState({
-    metrics: {
-      minutesSaved: 0,
-      monthlyUsage: '0%'
-    },
-    statistics: {
-      numOfSummaries: 0,
-      totalHoursSaved: 0,
-      avgTimeSaved: '0 min'
-    },
-    recentSummaries: []
-  });
-  
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showDatabaseTables, setShowDatabaseTables] = useState(false);
+  const router = useRouter();
   const [realStats, setRealStats] = useState({
     newUsers: 0,
-    newMentors: 0,
-    newUploads: 0
+    newMentors: 0
   });
+  const [activeSection, setActiveSection] = useState('overview'); // 'overview', 'mentors', 'users'
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [showCredentials, setShowCredentials] = useState(false);
+  const [generatedCredentials, setGeneratedCredentials] = useState(null);
+  const [showMentorDetails, setShowMentorDetails] = useState(false);
+  const [selectedMentor, setSelectedMentor] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState('');
 
-  // Use mock data for simple dashboard
+  // Load simple stats for the dashboard
   useEffect(() => {
-    setLoading(true);
-    
     // Simulate loading and set mock data
     setTimeout(() => {
       setRealStats({
         newUsers: 12,
-        newMentors: 3,
-        newUploads: 45
+        newMentors: 3
       });
-      
-      setDashboardData(prev => ({
-        ...prev,
-        metrics: {
-          minutesSaved: 675, // 45 uploads * 15 min
-          monthlyUsage: '85%'
-        },
-        statistics: {
-          numOfSummaries: 45,
-          totalHoursSaved: 11.3,
-          avgTimeSaved: '15 min'
-        }
-      }));
-      
-      setLoading(false);
-    }, 1000);
+    }, 500);
   }, []);
 
-  const { metrics, statistics } = dashboardData;
+  // Handle URL-based routing for sections
+  useEffect(() => {
+    const section = router.query.section;
+    if (section === 'User Management') {
+      setActiveSection('users');
+    } else if (section === 'Mentor Management') {
+      setActiveSection('mentors');
+    } else {
+      setActiveSection('overview');
+    }
+  }, [router.query.section]);
+
+  // Fetch mentor applications when mentors section is active
+  useEffect(() => {
+    if (activeSection === 'mentors') {
+      fetchApplications();
+    }
+  }, [activeSection]);
+
+  // Handle section navigation with URL updates
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
+    const sectionName = section === 'users' ? 'User Management' : 
+                       section === 'mentors' ? 'Mentor Management' : 
+                       'overview';
+    
+    if (section === 'overview') {
+      router.push('/admin/dashboard', undefined, { shallow: true });
+    } else {
+      router.push(`/admin/dashboard?section=${encodeURIComponent(sectionName)}`, undefined, { shallow: true });
+    }
+  };
+
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/mentors/list');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const responseText = await response.text();
+      let data;
+      
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Invalid response format from server');
+      }
+      
+      if (data.success) {
+        setApplications(data.mentors || []);
+      } else {
+        throw new Error(data.error || 'Failed to fetch mentor applications');
+      }
+    } catch (err) {
+      console.error('Fetch applications error:', err);
+      setError(err.message);
+      setApplications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle verification status change
+  const handleVerificationChange = async (mentorId, verified) => {
+    try {
+      // Generate a password for the mentor when verifying
+      const generatePassword = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%';
+        let password = '';
+        for (let i = 0; i < 12; i++) {
+          password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return password;
+      };
+
+      const password = generatePassword();
+
+      const response = await fetch('/api/mentors/verify', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer admin'
+        },
+        body: JSON.stringify({ 
+          mentorId, 
+          verified,
+          password: verified ? password : null // Only send password when verifying
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update verification status');
+      }
+      
+      // Update the local state
+      setApplications(prevApplications => 
+        prevApplications.map(app => 
+          app.id === mentorId ? { ...app, verified, status: verified ? 'active' : 'pending' } : app
+        )
+      );
+      
+      // Show credentials when verifying
+      if (verified && data.success) {
+        const mentor = applications.find(app => app.id === mentorId);
+        setGeneratedCredentials({
+          email: mentor.email,
+          userId: mentor.email,
+          password: password
+        });
+        setShowCredentials(true);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // Handle view mentor details
+  const handleViewDetails = (mentor) => {
+    setSelectedMentor(mentor);
+    setShowMentorDetails(true);
+  };
+
+  const handleCreateLogin = async (mentorId, email, password) => {
+    try {
+      const response = await fetch('/api/mentors/create-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer admin_token'
+        },
+        body: JSON.stringify({ 
+          mentorId,
+          email,
+          password
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Login created successfully!\n\nCredentials:\nEmail: ${email}\nPassword: ${password}\nLogin URL: /mentor/login-new`);
+        
+        // Refresh mentor list
+        fetchApplications();
+        setSelectedMentor(null);
+        setGeneratedPassword('');
+      } else {
+        alert('Failed to create login: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error creating login:', error);
+      alert('Failed to create login');
+    }
+  };
+
+  // Generate or retrieve mentor password
+  const handleShowPassword = (mentorId) => {
+    // Generate a secure password for the mentor
+    const generatePassword = () => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%';
+      let password = '';
+      for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return password;
+    };
+
+    const generatedPassword = generatePassword();
+    setSelectedMentor(prev => ({ ...prev, password: generatedPassword }));
+    setShowPassword(true);
+  };
+
+  // Filter applications based on selected filter
+  const filteredApplications = applications.filter(app => {
+    if (filter === 'all') return true;
+    if (filter === 'pending') return !app.verified;
+    if (filter === 'verified') return app.verified;
+    return true;
+  });
 
   return (
     <>
@@ -64,307 +228,440 @@ const SuperAdminDashboard = () => {
         <p className="text-gray-400 text-base md:text-lg">Welcome back to your SuperAdmin dashboard</p>
       </div>
 
-      {/* Educational Context Banners */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 md:mb-8">
-        {/* SuperAdmin Panel */}
-        <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+      {/* Core Management Panels */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* User Management Panel */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 relative overflow-hidden">
           <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">System Management</h3>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-blue-400">{realStats.newUsers}</p>
-              <p className="text-gray-400 text-sm">New Users (30d)</p>
+            <h3 className="text-xl font-bold text-white mb-4">User Management</h3>
+            <div className="text-center mb-4">
+              <p className="text-3xl font-bold text-blue-200">{realStats.newUsers}</p>
+              <p className="text-blue-100 text-sm">Total Users</p>
             </div>
-            <p className="text-sm text-red-100 mb-3">Manage all system operations and users</p>
-            <Link href="/admin/users" className="inline-block bg-white text-red-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-red-50 transition-all">
+            <p className="text-sm text-blue-100 mb-4">Manage all system users and their permissions</p>
+            <Link href="/admin/users" className="inline-block bg-white text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition-all">
               Manage Users
             </Link>
           </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+          <div className="absolute top-0 right-0 w-32 h-full opacity-20">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+              <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
             </svg>
           </div>
         </div>
 
-        {/* Analytics Panel */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
+        {/* Mentor Management Panel */}
+        <div className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl p-6 relative overflow-hidden">
           <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">Analytics & Reports</h3>
-            <p className="text-sm text-purple-100 mb-3">View system analytics and generate comprehensive reports</p>
-            <Link href="/admin/analytics" className="inline-block bg-white text-purple-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-purple-50 transition-all">
-              View Analytics
-            </Link>
-          </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Mentor Applications Panel */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">Mentor Applications</h3>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-blue-400">{realStats.newMentors}</p>
-              <p className="text-gray-400 text-sm">Pending Reviews</p>
+            <h3 className="text-xl font-bold text-white mb-4">Mentor Management</h3>
+            <div className="text-center mb-4">
+              <p className="text-3xl font-bold text-purple-200">{realStats.newMentors}</p>
+              <p className="text-purple-100 text-sm">Active Mentors</p>
             </div>
-            <p className="text-sm text-blue-100 mb-3">Review and approve mentor applications</p>
-            <Link href="/admin/mentor-applications" className="inline-block bg-white text-blue-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-blue-50 transition-all">
-              Review Applications
+            <p className="text-sm text-purple-100 mb-4">Review applications and manage mentors</p>
+            <Link href="/admin/mentor-applications" className="inline-block bg-white text-purple-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-all">
+              Manage Mentors
             </Link>
           </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
+          <div className="absolute top-0 right-0 w-32 h-full opacity-20">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
               <path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
             </svg>
           </div>
         </div>
-
-        {/* Security Panel */}
-        <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-xl p-4 md:p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">Security & Monitoring</h3>
-            <p className="text-sm text-green-100 mb-3">Monitor system security and access logs</p>
-            <Link href="/admin/security" className="inline-block bg-white text-green-700 px-3 py-1 rounded-md text-sm font-medium hover:bg-green-50 transition-all">
-              Security Center
-            </Link>
-          </div>
-          <div className="absolute top-0 right-0 w-24 h-full opacity-20">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-              <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
-            </svg>
-          </div>
-        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
-        {/* Metrics Cards - First Row */}
-        <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
-          <div className="flex items-center justify-between mb-2 md:mb-4">
-            <h3 className="text-sm md:text-lg font-semibold text-white">Minutes Saved</h3>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xl md:text-3xl font-bold text-white mb-1">{metrics.minutesSaved}</p>
-          <div className="flex items-center text-gray-300 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-            <span>12% from last week</span>
-          </div>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
+      {/* Simple Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm md:text-lg font-semibold text-white">Docs Processed</h3>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xl md:text-3xl font-bold text-white mb-1">{statistics.numOfSummaries}</p>
-          <div className="flex items-center text-gray-300 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-            <span>8% from last week</span>
-          </div>
-        </div>
-
-        <div className="bg-black rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm md:text-lg font-semibold text-white">Monthly Usage</h3>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xl md:text-3xl font-bold text-white mb-1">{metrics.monthlyUsage}</p>
-          <div className="flex items-center text-gray-300 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-            <span>15% from last week</span>
-          </div>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700 hover:border-white/30 transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm md:text-lg font-semibold text-white">Hours Saved</h3>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-xl md:text-3xl font-bold text-white mb-1">{statistics.totalHoursSaved}</p>
-          <div className="flex items-center text-gray-300 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-            <span>22% from last week</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mb-6 md:mb-8">
-        <h2 className="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-
-          <Link href="/admin/users" className="bg-gradient-to-br from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border border-red-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
-            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="text-lg font-semibold text-white">Total Users</h3>
+            <div className="p-3 bg-blue-600 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               </svg>
             </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">User Management</h3>
-              <p className="text-xs md:text-sm text-red-200">Manage system users</p>
-            </div>
-          </Link>
+          </div>
+          <p className="text-3xl font-bold text-white mb-2">{realStats.newUsers}</p>
+          <p className="text-gray-400 text-sm">Registered users in the system</p>
+        </div>
 
-          <Link href="/admin/mentor-applications" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
-            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Total Mentors</h3>
+            <div className="p-3 bg-purple-600 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
               </svg>
             </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Mentor Applications</h3>
-              <p className="text-xs md:text-sm text-blue-200">Review & approve mentors</p>
-            </div>
-          </Link>
-
-          <button 
-            onClick={() => setShowDatabaseTables(!showDatabaseTables)}
-            className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300"
-          >
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Database Tables</h3>
-              <p className="text-xs md:text-sm text-purple-200">View all data</p>
-            </div>
-          </button>
-
-          <Link href="/admin/security" className="bg-gradient-to-br from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border border-green-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
-            <div className="p-3 bg-white/10 rounded-lg mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Security</h3>
-              <p className="text-xs md:text-sm text-green-200">Monitor & protect</p>
-            </div>
-          </Link>
-
-          <Link href="/admin/settings" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
-            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">System Settings</h3>
-              <p className="text-xs md:text-sm text-gray-400">Configure system</p>
-            </div>
-          </Link>
-
+          </div>
+          <p className="text-3xl font-bold text-white mb-2">{realStats.newMentors}</p>
+          <p className="text-gray-400 text-sm">Active mentors in the system</p>
         </div>
       </div>
 
-      {/* Usage Statistics */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-        <div className="lg:col-span-2">
-          <div className="bg-gray-900 rounded-xl shadow-lg p-4 md:p-6 border border-gray-700 h-full">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 space-y-2 md:space-y-0">
-              <h3 className="text-lg md:text-xl font-semibold text-white">System Analytics</h3>
-              <div className="flex space-x-1 md:space-x-2">
-                <button className="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-md hover:bg-gray-700">Week</button>
-                <button className="px-3 py-1 bg-white text-black text-sm rounded-md">Month</button>
-                <button className="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-md hover:bg-gray-700">Year</button>
-              </div>
+      {/* Navigation Tabs */}
+      <div className="mb-8">
+        <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
+          <button
+            onClick={() => handleSectionChange('overview')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeSection === 'overview'
+                ? 'bg-white text-gray-900'
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => handleSectionChange('users')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeSection === 'users'
+                ? 'bg-white text-gray-900'
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+            }`}
+          >
+            User Management
+          </button>
+          <button
+            onClick={() => handleSectionChange('mentors')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeSection === 'mentors'
+                ? 'bg-white text-gray-900'
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+            }`}
+          >
+            Mentor Management
+          </button>
+        </div>
+      </div>
+
+      {/* Content based on active section */}
+      {activeSection === 'overview' && (
+        <>
+          {/* Quick Actions */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4">Management Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <button 
+                onClick={() => handleSectionChange('users')}
+                className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-6 flex items-center transition-all duration-300"
+              >
+                <div className="p-3 bg-white/10 rounded-lg mr-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-lg">User Management</h3>
+                  <p className="text-sm text-blue-200">Manage all system users and permissions</p>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => handleSectionChange('mentors')}
+                className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-6 flex items-center transition-all duration-300"
+              >
+                <div className="p-3 bg-white/10 rounded-lg mr-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 616.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-lg">Mentor Management</h3>
+                  <p className="text-sm text-purple-200">Review applications and manage mentors</p>
+                </div>
+              </button>
+
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeSection === 'users' && (
+        <div className="bg-gray-900 rounded-xl p-6 border border-gray-700">
+          <h2 className="text-2xl font-bold text-white mb-4">User Management</h2>
+          <p className="text-gray-400 mb-4">User management functionality will be implemented here.</p>
+          <div className="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+            <p className="text-gray-500">User management interface coming soon</p>
+          </div>
+        </div>
+      )}
+
+      {activeSection === 'mentors' && (
+        <div className="bg-gray-900 rounded-xl p-6 border border-gray-700">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-white">Mentor Applications</h2>
+            <div className="flex gap-2">
+              <Button 
+                variant={filter === 'all' ? 'default' : 'outline'}
+                onClick={() => setFilter('all')}
+                size="sm"
+              >
+                All
+              </Button>
+              <Button 
+                variant={filter === 'pending' ? 'default' : 'outline'}
+                onClick={() => setFilter('pending')}
+                size="sm"
+              >
+                Pending
+              </Button>
+              <Button 
+                variant={filter === 'verified' ? 'default' : 'outline'}
+                onClick={() => setFilter('verified')}
+                size="sm"
+              >
+                Verified
+              </Button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded">
+              <p>{error}</p>
+            </div>
+          ) : filteredApplications.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-400 text-lg">No mentor applications found.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredApplications.map((mentor) => (
+                <Card key={mentor.id} className="bg-gray-800 border-gray-700 text-white">
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-white">{mentor.name}</CardTitle>
+                        <CardDescription className="text-gray-400">{mentor.email}</CardDescription>
+                      </div>
+                      <Badge className={`${mentor.verified ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                        {mentor.verified ? 'Verified' : 'Pending'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-300">Subject:</span>
+                        <span className="text-sm text-gray-200">{mentor.subject}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-300">Experience:</span>
+                        <span className="text-sm text-gray-200">{mentor.experience} years</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-300">Phone:</span>
+                        <span className="text-sm text-gray-200">{mentor.phone}</span>
+                      </div>
+                      <div className="mt-2">
+                        <span className="text-sm font-medium text-gray-300">Bio:</span>
+                        <p className="text-sm mt-1 line-clamp-3 text-gray-200">{mentor.bio}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between pt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(mentor)}
+                    >
+                      View Details
+                    </Button>
+                    {mentor.verified ? (
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleVerificationChange(mentor.id, false)}
+                      >
+                        Revoke Access
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="default" 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedMentor(mentor);
+                          setGeneratedPassword('');
+                        }}
+                      >
+                        Create Login
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Credentials Modal */}
+      {showCredentials && generatedCredentials && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Mentor Login Credentials</h2>
+              <button
+                onClick={() => {
+                  setShowCredentials(false);
+                  setGeneratedCredentials(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             
-            {/* Placeholder for chart */}
-            <div className="h-40 md:h-64 bg-black/30 rounded-lg flex items-center justify-center border border-gray-700">
-              <div className="text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H9zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <p className="text-gray-400">System analytics visualization</p>
-                <p className="text-gray-500 text-sm mt-1">Real-time performance metrics</p>
+            <div className="space-y-4">
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 font-medium mb-2">✅ Mentor Approved Successfully!</p>
+                <p className="text-green-700 text-sm">
+                  Login credentials have been generated for {generatedCredentials.email}
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <div className="p-3 bg-gray-100 rounded-lg font-mono text-sm">
+                    {generatedCredentials.email}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+                  <div className="p-3 bg-gray-100 rounded-lg font-mono text-sm">
+                    {generatedCredentials.userId}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <div className="p-3 bg-gray-100 rounded-lg font-mono text-sm">
+                    {generatedCredentials.password}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  <strong>Important:</strong> Please save these credentials securely. 
+                  The mentor will use these to login at <code>/mentor/login-new</code>
+                </p>
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `Email: ${generatedCredentials.email}\nUser ID: ${generatedCredentials.userId}\nPassword: ${generatedCredentials.password}`
+                    );
+                    alert('Credentials copied to clipboard!');
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Copy Credentials
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCredentials(false);
+                    setGeneratedCredentials(null);
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
         </div>
+      )}
 
-        <div className="bg-black rounded-xl shadow-lg p-4 md:p-6 border border-gray-700">
-          <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6">Recent Summaries</h3>
-          
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-800 rounded w-3/4"></div>
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-8">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-gray-400 text-sm">{error}</p>
-            </div>
-          ) : (
-            <div className="space-y-3 md:space-y-4">
-              {dashboardData.recentSummaries.slice(0, 3).map((summary) => (
-                <div key={summary.id} className="p-3 md:p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-                  <h4 className="font-medium text-white text-sm md:text-base mb-1 md:mb-2 line-clamp-2">{summary.title}</h4>
-                  <div className="flex justify-between items-center text-xs md:text-sm text-gray-400">
-                    <span>{new Date(summary.createdAt).toLocaleDateString()}</span>
-                    <span>{summary.wordCount} words</span>
-                  </div>
-                </div>
-              ))}
-              
-              {dashboardData.recentSummaries.length === 0 && (
-                <div className="text-center py-6 md:py-8">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      {/* Create Login Modal */}
+      {selectedMentor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl max-w-md w-full">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-white">Create Login for {selectedMentor.name}</h2>
+                <button
+                  onClick={() => setSelectedMentor(null)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  <p className="text-gray-400 text-sm">No summaries yet</p>
-                  <p className="text-gray-500 text-xs mt-1">Start by uploading documents</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+                </button>
+              </div>
 
-      {/* Database Tables Modal */}
-      {showDatabaseTables && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-white">Database Tables Overview</h2>
+              {/* Login Form */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={selectedMentor.email}
+                    readOnly
+                    className="w-full p-3 bg-gray-700 rounded-lg text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                  <input
+                    type="text"
+                    value={generatedPassword}
+                    onChange={(e) => setGeneratedPassword(e.target.value)}
+                    placeholder="Enter password for mentor"
+                    className="w-full p-3 bg-gray-700 rounded-lg text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setSelectedMentor(null)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleCreateLogin(selectedMentor.id, selectedMentor.email, generatedPassword)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  disabled={!generatedPassword}
+                >
+                  Create Login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mentor Details Modal */}
+      {showMentorDetails && selectedMentor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="flex justify-between items-center p-6 border-b border-gray-700">
+              <h2 className="text-2xl font-bold text-white">Mentor Details</h2>
               <button
-                onClick={() => setShowDatabaseTables(false)}
+                onClick={() => {
+                  setShowMentorDetails(false);
+                  setSelectedMentor(null);
+                  setShowPassword(false);
+                }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,19 +669,163 @@ const SuperAdminDashboard = () => {
                 </svg>
               </button>
             </div>
-            <DatabaseTables />
+            
+            <div className="p-6 space-y-6">
+              {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                  <div className="p-3 bg-gray-700 rounded-lg text-white">
+                    {selectedMentor.name}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                  <div className="p-3 bg-gray-700 rounded-lg text-white">
+                    {selectedMentor.email}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                  <div className="p-3 bg-gray-700 rounded-lg text-white">
+                    {selectedMentor.phone}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                  <div className="p-3 bg-gray-700 rounded-lg text-white">
+                    {selectedMentor.subject}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Experience</label>
+                  <div className="p-3 bg-gray-700 rounded-lg text-white">
+                    {selectedMentor.experience} years
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <Badge className={`${selectedMentor.verified ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                      {selectedMentor.verified ? 'Verified' : 'Pending'}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Biography</label>
+                <div className="p-4 bg-gray-700 rounded-lg text-white">
+                  {selectedMentor.bio}
+                </div>
+              </div>
+
+              {/* Login Credentials Section */}
+              <div className="border-t border-gray-700 pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-white">Login Credentials</h3>
+                  {!showPassword && (
+                    <button
+                      onClick={() => setSelectedMentor(mentor)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                    >
+                      Create Login
+                    </button>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">User ID</label>
+                    <div className="p-3 bg-gray-700 rounded-lg text-white font-mono">
+                      {selectedMentor.email}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <div className="p-3 bg-gray-700 rounded-lg text-white font-mono flex justify-between items-center">
+                      {showPassword && selectedMentor.password ? (
+                        <>
+                          <span>{selectedMentor.password}</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(selectedMentor.password);
+                              alert('Password copied to clipboard!');
+                            }}
+                            className="ml-2 text-blue-400 hover:text-blue-300"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-gray-400">••••••••</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {showPassword && selectedMentor.password && (
+                  <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                    <p className="text-blue-300 text-sm">
+                      <strong>Login URL:</strong> <code>/mentor/login-new</code>
+                    </p>
+                    <p className="text-blue-300 text-sm mt-1">
+                      The mentor can use their email and this password to access the mentor dashboard.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between pt-4 border-t border-gray-700">
+                <div className="flex space-x-3">
+                  {selectedMentor.verified ? (
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => {
+                        handleVerificationChange(selectedMentor.id, false);
+                        setShowMentorDetails(false);
+                      }}
+                    >
+                      Revoke Access
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="default" 
+                      onClick={() => {
+                        handleVerificationChange(selectedMentor.id, true);
+                        setShowMentorDetails(false);
+                      }}
+                    >
+                      Verify & Activate
+                    </Button>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowMentorDetails(false);
+                    setSelectedMentor(null);
+                    setShowPassword(false);
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      <div className="text-center py-4 md:py-6 border-t border-gray-700">
-        <p className="text-gray-400 text-sm">
-          2024 Knowtasks. All rights reserved. | 
-          <Link href="/privacy" className="text-blue-400 hover:text-blue-300 ml-1">Privacy Policy</Link> | 
-          <Link href="/terms" className="text-blue-400 hover:text-blue-300 ml-1">Terms of Service</Link>
-        </p>
-      </div>
     </>
   );
 };

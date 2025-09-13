@@ -27,14 +27,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // First, try to get mentors from mentor_users table
+    // Get mentors from mentor_applications table (pending applications)
     let result;
     try {
       result = await sql`
         SELECT 
           id, name, email, subject, phone, bio, 
-          specialization, experience, status, created_at, last_login, verified
-        FROM mentor_users
+          experience, status, created_at, verified
+        FROM mentor_applications
         ORDER BY created_at DESC
       `;
     } catch (dbError) {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         success: true,
         mentors: [],
         total: 0,
-        message: 'No mentors found'
+        message: 'No mentor applications found'
       });
     }
 
@@ -55,12 +55,11 @@ export default async function handler(req, res) {
       subject: mentor.subject,
       phone: mentor.phone,
       bio: mentor.bio,
-      specialization: mentor.specialization,
       experience: mentor.experience,
-      status: mentor.status,
+      status: mentor.status || 'pending',
       verified: mentor.verified || false,
       created_at: mentor.created_at,
-      last_login: mentor.last_login,
+      last_login: null,
       profile: {
         total_students: 0,
         active_students: 0,

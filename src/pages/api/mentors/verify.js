@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   try {
     // Get the mentor ID and verification status from the request body
-    const { mentorId, verified } = req.body;
+    const { mentorId, verified, password } = req.body;
     
     // Validate required fields
     if (!mentorId) {
@@ -49,10 +49,10 @@ export default async function handler(req, res) {
     
     // If approving a mentor, generate login credentials
     if (verified && mentor.status !== 'active') {
-      // Generate user ID and password
+      // Use provided password or generate one
       const userId = `MENTOR_${mentor.id}_${Date.now().toString().slice(-6)}`;
-      const password = generateRandomPassword();
-      const passwordHash = await bcrypt.hash(password, 10);
+      const mentorPassword = password || generateRandomPassword();
+      const passwordHash = await bcrypt.hash(mentorPassword, 10);
       
       // Update mentor with new credentials and status
       await sql`
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       
       generatedCredentials = {
         userId: userId,
-        password: password,
+        password: mentorPassword,
         email: mentor.email
       };
     } else {
