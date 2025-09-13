@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 export default function QuizMakerComponent() {
   const [quizTitle, setQuizTitle] = useState('');

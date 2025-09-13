@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
+import { getAuthHeaders, hasPermission, PERMISSIONS } from '../../utils/auth';
 
 const MentorManagement = () => {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -20,8 +23,11 @@ const MentorManagement = () => {
 
   // Fetch mentors from database with fallback to mock data
   const fetchMentors = async () => {
+    if (!user?.id) return;
+    
     try {
-      const response = await fetch('/api/auth/mentor');
+      const headers = await getAuthHeaders(user.id);
+      const response = await fetch('/api/mentors', { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.data && data.data.length > 0) {
