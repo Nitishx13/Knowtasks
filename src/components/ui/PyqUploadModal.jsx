@@ -124,7 +124,6 @@ const PyqUploadModal = ({
               >
                 <option value="Midterm">Midterm</option>
                 <option value="Final">Final</option>
-                <option value="Quiz">Quiz</option>
                 <option value="Assignment">Assignment</option>
                 <option value="Board Exam">Board Exam</option>
                 <option value="Entrance Exam">Entrance Exam</option>

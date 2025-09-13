@@ -227,7 +227,7 @@ const SummarizePage = () => {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-gray-900">Document Upload & Processing</h1>
           <p className="text-gray-600 text-base md:text-lg">
-            Upload study materials, research papers, and documents for AI-powered summarization and knowledge extraction
+            Upload study materials, research papers, and documents for processing and knowledge extraction
           </p>
         </div>
         <div className="w-full md:w-auto">

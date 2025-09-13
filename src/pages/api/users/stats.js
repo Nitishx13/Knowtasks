@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const stats = await database.getUserStats(effectiveUserId);
     
     // Calculate additional metrics
-    const totalItems = stats.documents + stats.summaries + stats.notes + stats.flashcards + stats.quizzes;
+    const totalItems = stats.documents + stats.summaries + stats.notes + stats.flashcards;
     const estimatedTimeSaved = stats.summaries * 15; // 15 minutes per summary
     
     res.status(200).json({

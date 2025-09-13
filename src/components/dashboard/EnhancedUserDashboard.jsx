@@ -13,7 +13,6 @@ const EnhancedUserDashboard = () => {
       summaries: 0,
       notes: 0,
       flashcards: 0,
-      quizzes: 0,
       totalItems: 0,
       estimatedTimeSaved: 0,
       monthlyUsage: '0%'
@@ -201,59 +200,45 @@ const EnhancedUserDashboard = () => {
         {/* Quick Actions - Mobile Optimized */}
         <div className="mb-6">
           <h2 className="text-lg md:text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <Link href="/dashboard/summarize" className="group">
-              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-4 transition-all duration-300 border border-gray-700 hover:border-blue-500">
+              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-6 transition-all duration-300 border border-gray-700 hover:border-blue-500">
                 <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-blue-600 rounded-lg mb-3 group-hover:scale-110 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <div className="p-4 bg-blue-600 rounded-lg mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                   </div>
-                  <h3 className="font-semibold text-sm md:text-base mb-1">Summarize</h3>
-                  <p className="text-xs text-gray-400">AI summaries</p>
+                  <h3 className="font-semibold text-base md:text-lg mb-2">Upload</h3>
+                  <p className="text-sm text-gray-400">Upload files & get AI summaries</p>
                 </div>
               </div>
             </Link>
 
-            <Link href="/dashboard/notes" className="group">
-              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-4 transition-all duration-300 border border-gray-700 hover:border-green-500">
+            <Link href="/dashboard/library" className="group">
+              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-6 transition-all duration-300 border border-gray-700 hover:border-green-500">
                 <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-green-600 rounded-lg mb-3 group-hover:scale-110 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  <div className="p-4 bg-green-600 rounded-lg mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="font-semibold text-sm md:text-base mb-1">Notes</h3>
-                  <p className="text-xs text-gray-400">Take notes</p>
+                  <h3 className="font-semibold text-base md:text-lg mb-2">Knowledge Hub</h3>
+                  <p className="text-sm text-gray-400">Browse your documents & summaries</p>
                 </div>
               </div>
             </Link>
 
-            <Link href="/dashboard/flashcards" className="group">
-              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-4 transition-all duration-300 border border-gray-700 hover:border-purple-500">
+            <Link href="/dashboard/data" className="group">
+              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-6 transition-all duration-300 border border-gray-700 hover:border-purple-500">
                 <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-purple-600 rounded-lg mb-3 group-hover:scale-110 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  <div className="p-4 bg-purple-600 rounded-lg mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <h3 className="font-semibold text-sm md:text-base mb-1">Flashcards</h3>
-                  <p className="text-xs text-gray-400">Study cards</p>
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/dashboard/quiz-maker" className="group">
-              <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-4 transition-all duration-300 border border-gray-700 hover:border-orange-500">
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-orange-600 rounded-lg mb-3 group-hover:scale-110 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-sm md:text-base mb-1">Quiz</h3>
-                  <p className="text-xs text-gray-400">Practice tests</p>
+                  <h3 className="font-semibold text-base md:text-lg mb-2">My Data</h3>
+                  <p className="text-sm text-gray-400">Manage your notes & content</p>
                 </div>
               </div>
             </Link>

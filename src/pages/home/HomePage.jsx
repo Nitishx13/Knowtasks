@@ -60,7 +60,7 @@ const HomePage = () => {
               Transform Knowledge into
               <br className="hidden sm:block"/>
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
-                Smart Notes
+                Organized Content
               </span>
             </motion.h1>
             
@@ -217,7 +217,7 @@ const HomePage = () => {
                     transition={{ duration: 0.8, delay: 1.8 }}
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-white text-lg">🧠 AI-Generated Notes</h3>
+                      <h3 className="font-bold text-white text-lg">🧠 Generated Notes</h3>
                       <span className="text-xs px-3 py-1 bg-green-500 text-white rounded-full font-medium">READY</span>
                     </div>
                     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
@@ -294,8 +294,8 @@ const HomePage = () => {
             {[
               {
                 icon: "🧠",
-                title: "AI-Powered Summarization",
-                description: "Advanced algorithms analyze your documents and extract key concepts, creating comprehensive summaries that capture the essence of any material.",
+                title: "Document Summarization",
+                description: "Advanced processing analyzes your documents and extracts key concepts, creating comprehensive summaries that capture the essence of any material.",
                 color: "from-blue-500 to-cyan-500",
                 delay: 0.2
               },
@@ -551,10 +551,10 @@ const HomePage = () => {
             <div className="inline-block mb-4 px-4 py-1.5 bg-blue-100 rounded-full backdrop-blur-md border border-blue-200">
               <p className="text-xs font-bold tracking-wider text-blue-800">EFFORTLESS WORKFLOW</p>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-800 leading-tight">Smart Notes <span className="relative">Made Simple
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-800 leading-tight">Document Processing <span className="relative">Made Simple
               <span className="absolute bottom-1 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></span>
             </span></h2>
-            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">Our AI-powered platform transforms any document into intelligent, organized notes so you can focus on what matters most - understanding and learning.</p>
+            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">Our platform transforms any document into organized, structured content so you can focus on what matters most - understanding and learning.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 relative">
@@ -577,7 +577,7 @@ const HomePage = () => {
             <div className="group bg-white backdrop-blur-md p-8 rounded-2xl border border-purple-200 shadow-lg hover:shadow-xl hover:shadow-purple-100/30 hover:border-purple-300 transition-all duration-500 text-center relative z-10 transform hover:-translate-y-2">
               <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg group-hover:bg-purple-600 transition-all duration-300">2</div>
               <h3 className="font-bold text-gray-800 text-xl mb-4">Generate</h3>
-              <p className="text-gray-600 mb-6">Our AI creates smart, organized notes with key concepts highlighted.</p>
+              <p className="text-gray-600 mb-6">Our system creates organized, structured content with key concepts highlighted.</p>
               <div className="mt-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-purple-400 opacity-50 group-hover:text-purple-500 group-hover:opacity-70 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -589,7 +589,7 @@ const HomePage = () => {
             <div className="group bg-white backdrop-blur-md p-8 rounded-2xl border border-green-200 shadow-lg hover:shadow-xl hover:shadow-green-100/30 hover:border-green-300 transition-all duration-500 text-center relative z-10 transform hover:-translate-y-2">
               <div className="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg group-hover:bg-green-600 transition-all duration-300">3</div>
               <h3 className="font-bold text-gray-800 text-xl mb-4">Learn</h3>
-              <p className="text-gray-600 mb-6">Review your smart notes with summaries, key points, and study guides.</p>
+              <p className="text-gray-600 mb-6">Review your organized content with summaries, key points, and study guides.</p>
               <div className="mt-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-green-400 opacity-50 group-hover:text-green-500 group-hover:opacity-70 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -600,7 +600,7 @@ const HomePage = () => {
           
           <div className="mt-16 text-center">
             <Link href="/dashboard" className="inline-flex items-center gap-2 px-8 py-3 bg-blue-500 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-200/30 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-600">
-              Create Smart Notes Now
+              Start Processing Documents
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -877,7 +877,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">Medical Student</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">&ldquo;As a med student, I have mountains of reading. Knowtasks&rsquo;s smart notes feature extracts key concepts from dense medical texts and organizes them perfectly. The AI-generated summaries save me hours of work.&rdquo;</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;As a med student, I have mountains of reading. Knowtasks extracts key concepts from dense medical texts and organizes them perfectly. The generated summaries save me hours of work.&rdquo;</p>
               <div className="flex text-yellow-400 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -907,7 +907,7 @@ const HomePage = () => {
                   <p className="text-sm text-gray-600">History Major</p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">&ldquo;I was skeptical about AI for humanities subjects, but Knowtasks&rsquo;s smart notes actually understand context and themes in historical texts. The AI-generated notes capture nuances I might miss myself.&rdquo;</p>
+              <p className="text-gray-700 leading-relaxed">&ldquo;I was skeptical about automated processing for humanities subjects, but Knowtasks actually understands context and themes in historical texts. The generated notes capture nuances I might miss myself.&rdquo;</p>
               <div className="flex text-yellow-400 mt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -943,10 +943,10 @@ const HomePage = () => {
       <section className="py-20 bg-black border-t border-gray-800 relative overflow-hidden">
         <div className="absolute left-1/3 top-1/2 w-96 h-96 bg-white/5 rounded-full blur-[150px] -z-10"></div>
         <div className="container max-w-6xl px-4 sm:px-6 mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">Ready for <span className="relative">Smart Notes
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">Ready for <span className="relative">Organized Content
             <span className="absolute bottom-1 left-0 w-full h-1 bg-white"></span>
-          </span> that work for you?</h2>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300 font-medium">Join thousands of students who save time and improve productivity with AI-generated smart notes</p>
+          </span> that works for you?</h2>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-gray-300 font-medium">Join thousands of students who save time and improve productivity with organized content processing</p>
           
           {/* Educational Context CTAs */}
           <div className="flex flex-wrap justify-center gap-4 mb-10">
@@ -978,7 +978,7 @@ const HomePage = () => {
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-xl hover:shadow-lg hover:shadow-white/20 transition-all duration-300 hover:-translate-y-1 text-lg">
-              Create Smart Notes
+              Start Processing Documents
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -994,10 +994,6 @@ const HomePage = () => {
           <p className="text-sm mt-6 text-gray-400 font-medium">No credit card required</p>
         </div>
       </section>
-      
-      
-     
-
     </div>
   );
 };

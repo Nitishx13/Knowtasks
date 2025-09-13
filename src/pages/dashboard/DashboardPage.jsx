@@ -183,45 +183,43 @@ const DashboardPage = () => {
       {/* Quick Actions */}
       <div className="mb-6 md:mb-8">
         <h2 className="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
 
-
-          <Link href="/dashboard/revision-plan" className="bg-gradient-to-br from-gray-800 to-black hover:from-gray-700 hover:to-gray-900 border border-gray-700 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
-            <div className="p-2 md:p-3 bg-white/10 rounded-lg mr-2 md:mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Revision & Daily Plan</h3>
-              <p className="text-xs md:text-sm text-gray-400">Organize your study schedule</p>
-            </div>
-          </Link>
-
-          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/summarize" className="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 border border-blue-500 rounded-xl p-4 md:p-6 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Summarize</h3>
-              <p className="text-xs md:text-sm text-blue-200">AI-powered summaries</p>
+              <h3 className="font-semibold text-white text-base md:text-lg">Upload</h3>
+              <p className="text-sm text-blue-200">Upload and process documents</p>
             </div>
           </Link>
 
-          <Link href="/dashboard/digital-skills" className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-3 md:p-5 flex items-center transition-all duration-300">
+          <Link href="/dashboard/library" className="bg-gradient-to-br from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border border-green-500 rounded-xl p-4 md:p-6 flex items-center transition-all duration-300">
             <div className="p-3 bg-white/10 rounded-lg mr-4">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm md:text-base">Digital Skills</h3>
-              <p className="text-xs md:text-sm text-purple-200">Learn new digital skills</p>
+              <h3 className="font-semibold text-white text-base md:text-lg">Knowledge Hub</h3>
+              <p className="text-sm text-green-200">Browse your documents</p>
             </div>
           </Link>
 
+          <Link href="/dashboard/data" className="bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 border border-purple-500 rounded-xl p-4 md:p-6 flex items-center transition-all duration-300">
+            <div className="p-3 bg-white/10 rounded-lg mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white text-base md:text-lg">My Data</h3>
+              <p className="text-sm text-purple-200">Manage your data</p>
+            </div>
+          </Link>
 
         </div>
       </div>

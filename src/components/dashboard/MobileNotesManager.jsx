@@ -423,27 +423,27 @@ const MobileNotesManager = () => {
         )}
       </AnimatePresence>
 
-        {/* Pro Tips Section */}
-        <Card className="bg-gradient-to-r from-blue-900/50 to-green-900/50 border-blue-700/50">
+        {/* Quick Tips Section */}
+        <Card className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 border-blue-700/50">
           <CardContent className="p-4">
             <h3 className="font-semibold text-white mb-3 flex items-center">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Study Tips
+              Quick Tips
             </h3>
             <ul className="text-gray-300 text-sm space-y-2">
               <li className="flex items-start space-x-2">
                 <span className="text-blue-400 mt-1">•</span>
-                <span>Organize notes by subject for better study sessions</span>
+                <span>Organize your content by subject for better management</span>
               </li>
               <li className="flex items-start space-x-2">
                 <span className="text-blue-400 mt-1">•</span>
-                <span>Use bullet points and short paragraphs for easy reading</span>
+                <span>Use clear titles and structured content for easy access</span>
               </li>
               <li className="flex items-start space-x-2">
                 <span className="text-blue-400 mt-1">•</span>
-                <span>Review your notes regularly to improve retention</span>
+                <span>Review and update your content regularly</span>
               </li>
             </ul>
           </CardContent>
