@@ -1,4 +1,4 @@
-import { getAuth } from '../../utils/auth';
+import { getAuth } from '../../utils/serverAuth';
 import { Database } from '../../../lib/database';
 import formidable from 'formidable';
 import fs from 'fs';

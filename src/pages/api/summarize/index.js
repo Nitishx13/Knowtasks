@@ -1,4 +1,4 @@
-import { getAuth } from '../../utils/auth';
+import { getAuth } from '../../utils/serverAuth';
 import { Database } from '../../../lib/database';
 
 const database = new Database();
