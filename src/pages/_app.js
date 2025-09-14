@@ -6,11 +6,8 @@ import { Toaster } from '../components/ui/toaster';
 import { AuthProvider } from '../contexts/AuthContext';
 
 function MyApp({ Component, pageProps }) {
-  // Fallback publishable key for build time
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_fallback';
-  
   return (
-    <ClerkProvider publishableKey={publishableKey} {...pageProps}>
+    <ClerkProvider {...pageProps}>
       <AuthProvider>
         <Component {...pageProps} />
         <Toaster />

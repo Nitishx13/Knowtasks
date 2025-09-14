@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 import { useRouter } from 'next/router';
+import PDFViewer from '../../components/ui/PDFViewer';
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -341,10 +342,12 @@ const LibraryPage = () => {
             </div>
             
             <div className="flex-1 p-4">
-              <iframe
-                src={selectedPDF.fileUrl}
-                className="w-full h-full border-0"
-                title={selectedPDF.title}
+              <PDFViewer
+                fileUrl={selectedPDF.fileUrl}
+                fileName={selectedPDF.fileName}
+                onError={(error) => {
+                  console.error('PDF load error:', error);
+                }}
               />
             </div>
             

@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import DashboardPage from '../../pages/dashboard/DashboardPage';
 import SuperAdminDashboard from '../../pages/dashboard/SuperAdminDashboard';
+import MentorDashboard from '../../pages/dashboard/MentorDashboard';
 
 const DashboardRouter = () => {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ const DashboardRouter = () => {
     case 'superadmin':
       return <SuperAdminDashboard />;
     case 'mentor':
-      return <DashboardPage />;
+      return <MentorDashboard />;
     case 'student':
     default:
       return <DashboardPage />;

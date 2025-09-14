@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
+import PDFViewer from '../../components/ui/PDFViewer';
 
 const MentorDashboardSimple = () => {
   const [activeSection, setActiveSection] = useState('formula');

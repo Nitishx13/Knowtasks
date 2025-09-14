@@ -14,8 +14,13 @@
     "lint": "next lint",
     "init-db": "node scripts/init-db.js",
     "init-users": "node scripts/init-users-table.js",
+    "sync-clerk": "node scripts/sync-clerk-users.js",
+    "check-user-id": "node scripts/check-user-id.js",
+    "clear-db": "node scripts/clear-db.js",
+    "test-auth": "node scripts/test-auth.js",
     "setup-db": "node scripts/setup-database-tables.js",
     "clear-all-data": "node scripts/clear-all-data.js",
+    "test-dashboard": "node scripts/test-dashboard.js",
     "postbuild": "npm run init-db && npm run init-users"
   },
   "dependencies": {
