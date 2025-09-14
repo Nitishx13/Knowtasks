@@ -398,132 +398,146 @@ const HomePage = () => {
                 <span className="absolute bottom-1 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></span>
               </span> Library
             </h2>
-            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">Organize your learning journey with our intelligent note system. Access all your subjects in one beautiful, intuitive interface.</p>
+            <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">Organize your IIT-JEE and NEET preparation with our intelligent study system. Access formulas, flashcards, PYQs, and notes - all in one beautiful interface.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {/* Biology Card */}
-            <div className="group relative bg-white p-6 rounded-2xl border border-blue-100 shadow-xl hover:shadow-2xl hover:shadow-blue-100/30 hover:border-blue-200 transition-all duration-300 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* NEET Biology Card */}
+            <div className="group relative bg-white p-6 rounded-2xl border border-green-100 shadow-xl hover:shadow-2xl hover:shadow-green-100/30 hover:border-green-200 transition-all duration-300 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center">
                     <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center mr-4 shadow-md">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
+                      <span className="text-xl">🧬</span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-800 text-xl">Biology 101</h3>
-                      <p className="text-sm text-gray-500">12 chapters</p>
+                      <h3 className="font-bold text-gray-800 text-xl">NEET Biology</h3>
+                      <p className="text-sm text-gray-500">67 flashcards • 15 formulas</p>
                     </div>
                   </div>
-                  <span className="bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full font-medium border border-green-200">Active</span>
+                  <span className="bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full font-medium border border-green-200">🏥 NEET</span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full mb-5">
-                  <div className="h-1.5 bg-green-500 rounded-full w-3/4"></div>
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Human Physiology</span>
+                    <span>85%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-100 rounded-full">
+                    <div className="h-2 bg-green-500 rounded-full w-[85%]"></div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Last updated: 2 days ago</span>
-                  <button className="px-5 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">View Notes</button>
+                  <span className="text-xs text-gray-500">Updated: Today</span>
+                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition-all duration-300">Study Now</button>
                 </div>
               </div>
             </div>
             
-            {/* World History Card */}
+            {/* JEE Physics Card */}
             <div className="group relative bg-white p-6 rounded-2xl border border-blue-100 shadow-xl hover:shadow-2xl hover:shadow-blue-100/30 hover:border-blue-200 transition-all duration-300 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center">
                     <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center mr-4 shadow-md">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <span className="text-xl">⚛️</span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-800 text-xl">World History</h3>
-                      <p className="text-sm text-gray-500">8 chapters</p>
+                      <h3 className="font-bold text-gray-800 text-xl">JEE Physics</h3>
+                      <p className="text-sm text-gray-500">45 formulas • 30 PYQs</p>
                     </div>
                   </div>
-                  <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1.5 rounded-full font-medium border border-blue-200">In Progress</span>
+                  <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1.5 rounded-full font-medium border border-blue-200">🎯 JEE</span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full mb-5">
-                  <div className="h-1.5 bg-blue-500 rounded-full w-1/2"></div>
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Mechanics & Waves</span>
+                    <span>60%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-100 rounded-full">
+                    <div className="h-2 bg-blue-500 rounded-full w-[60%]"></div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Last updated: 5 days ago</span>
-                  <button className="px-5 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">View Notes</button>
+                  <span className="text-xs text-gray-500">Updated: 2 days ago</span>
+                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">Study Now</button>
                 </div>
               </div>
             </div>
             
-            {/* Economics Card */}
-            <div className="group relative bg-white p-6 rounded-2xl border border-blue-100 shadow-xl hover:shadow-2xl hover:shadow-blue-100/30 hover:border-blue-200 transition-all duration-300 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* JEE Chemistry Card */}
+            <div className="group relative bg-white p-6 rounded-2xl border border-orange-100 shadow-xl hover:shadow-2xl hover:shadow-orange-100/30 hover:border-orange-200 transition-all duration-300 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center">
-                    <div className="h-12 w-12 rounded-xl bg-amber-100 flex items-center justify-center mr-4 shadow-md">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                    <div className="h-12 w-12 rounded-xl bg-orange-100 flex items-center justify-center mr-4 shadow-md">
+                      <span className="text-xl">🧪</span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-800 text-xl">Economics</h3>
-                      <p className="text-sm text-gray-500">5 chapters</p>
+                      <h3 className="font-bold text-gray-800 text-xl">JEE Chemistry</h3>
+                      <p className="text-sm text-gray-500">38 reactions • 25 PYQs</p>
                     </div>
                   </div>
-                  <span className="bg-amber-100 text-amber-700 text-xs px-3 py-1.5 rounded-full font-medium border border-amber-200">New</span>
+                  <span className="bg-orange-100 text-orange-700 text-xs px-3 py-1.5 rounded-full font-medium border border-orange-200">🎯 JEE</span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full mb-5">
-                  <div className="h-1.5 bg-amber-500 rounded-full w-1/4"></div>
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Organic Chemistry</span>
+                    <span>72%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-100 rounded-full">
+                    <div className="h-2 bg-orange-500 rounded-full w-[72%]"></div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Last updated: 1 week ago</span>
-                  <button className="px-5 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">View Notes</button>
+                  <span className="text-xs text-gray-500">Updated: Yesterday</span>
+                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition-all duration-300">Study Now</button>
                 </div>
               </div>
             </div>
             
-            {/* Computer Science Card */}
-            <div className="group relative bg-white p-6 rounded-2xl border border-blue-100 shadow-xl hover:shadow-2xl hover:shadow-blue-100/30 hover:border-blue-200 transition-all duration-300 overflow-hidden md:col-span-2 lg:col-span-1">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* JEE Mathematics Card */}
+            <div className="group relative bg-white p-6 rounded-2xl border border-purple-100 shadow-xl hover:shadow-2xl hover:shadow-purple-100/30 hover:border-purple-200 transition-all duration-300 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center">
                     <div className="h-12 w-12 rounded-xl bg-purple-100 flex items-center justify-center mr-4 shadow-md">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                      </svg>
+                      <span className="text-xl">📐</span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-800 text-xl">Computer Science</h3>
-                      <p className="text-sm text-gray-500">10 chapters</p>
+                      <h3 className="font-bold text-gray-800 text-xl">JEE Mathematics</h3>
+                      <p className="text-sm text-gray-500">52 formulas • 40 PYQs</p>
                     </div>
                   </div>
-                  <span className="bg-purple-100 text-purple-700 text-xs px-3 py-1.5 rounded-full font-medium border border-purple-200">Popular</span>
+                  <span className="bg-purple-100 text-purple-700 text-xs px-3 py-1.5 rounded-full font-medium border border-purple-200">🎯 JEE</span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full mb-5">
-                  <div className="h-1.5 bg-purple-500 rounded-full w-4/5"></div>
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Calculus & Algebra</span>
+                    <span>90%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-100 rounded-full">
+                    <div className="h-2 bg-purple-500 rounded-full w-[90%]"></div>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Last updated: 3 days ago</span>
-                  <button className="px-5 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">View Notes</button>
+                  <span className="text-xs text-gray-500">Updated: Today</span>
+                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-500 text-white hover:bg-purple-600 transition-all duration-300">Study Now</button>
                 </div>
               </div>
             </div>
             
-            {/* Add New Subject Card */}
-            <div className="group relative bg-white p-6 rounded-2xl border border-dashed border-blue-200 shadow-lg hover:shadow-xl hover:shadow-blue-100/20 hover:border-blue-300 transition-all duration-300 flex flex-col items-center justify-center text-center min-h-[220px]">
-              <div className="h-16 w-16 rounded-full bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-all duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500 group-hover:text-blue-600 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-                </svg>
+            {/* Upload Notes Card */}
+            <div className="group relative bg-white p-6 rounded-2xl border border-dashed border-indigo-200 shadow-lg hover:shadow-xl hover:shadow-indigo-100/20 hover:border-indigo-300 transition-all duration-300 flex flex-col items-center justify-center text-center min-h-[220px]">
+              <div className="h-16 w-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition-all duration-300">
+                <span className="text-2xl">📝</span>
               </div>
-              <h3 className="font-bold text-gray-800 text-xl mb-2">Add New Subject</h3>
-              <p className="text-gray-600 text-sm mb-4">Create a new collection for your study materials</p>
-              <button className="px-6 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300">Create New</button>
+              <h3 className="font-bold text-gray-800 text-xl mb-2">Upload New Notes</h3>
+              <p className="text-gray-600 text-sm mb-4">Add PDFs, documents, and study materials to your library</p>
+              <Link href="/dashboard/upload-task" className="px-6 py-2 rounded-lg text-sm font-medium bg-indigo-500 text-white hover:bg-indigo-600 transition-all duration-300">Upload Notes</Link>
             </div>
           </div>
           
