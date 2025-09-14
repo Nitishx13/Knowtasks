@@ -241,7 +241,7 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => typeof window !== 'undefined' && (window.location.href = '/dashboard/summarize')}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => typeof window !== 'undefined' && (window.location.href = '/dashboard/upload-task')}>
           <CardContent className="flex flex-col items-center justify-center p-8 text-center">
             <UploadIcon className="h-12 w-12 text-blue-500 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Upload Documents</h3>

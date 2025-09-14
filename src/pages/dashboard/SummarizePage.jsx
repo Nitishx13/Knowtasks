@@ -10,9 +10,16 @@ const SummarizePage = () => {
   const [error, setError] = useState(null);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'text'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'text', 'formula', 'concept'
   const [textInput, setTextInput] = useState('');
   const [isProcessingText, setIsProcessingText] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState('Physics');
+  const [noteType, setNoteType] = useState('general'); // 'general', 'formula', 'concept', 'question'
+  const [difficulty, setDifficulty] = useState('medium'); // 'easy', 'medium', 'hard'
+  const [chapter, setChapter] = useState('');
+  const [tags, setTags] = useState([]);
+  const [formulaData, setFormulaData] = useState({ name: '', formula: '', description: '', applications: '' });
+  const [conceptData, setConceptData] = useState({ title: '', description: '', keyPoints: '', examples: '' });
   const { user } = useAuth();
 
   // Function to fetch text files
@@ -221,13 +228,83 @@ const SummarizePage = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const handleSaveFormula = async () => {
+    if (!formulaData.name || !formulaData.formula) {
+      setError('Please provide both formula name and expression');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/formulas/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formulaData,
+          subject: selectedSubject,
+          chapter,
+          difficulty,
+          userId: user?.id
+        }),
+      });
+
+      if (response.ok) {
+        // Reset form
+        setFormulaData({ name: '', formula: '', description: '', applications: '' });
+        setChapter('');
+        alert(`Formula saved to ${selectedSubject} bank successfully!`);
+      } else {
+        throw new Error('Failed to save formula');
+      }
+    } catch (error) {
+      console.error('Error saving formula:', error);
+      setError('Failed to save formula. Please try again.');
+    }
+  };
+
+  const handleSaveConcept = async () => {
+    if (!conceptData.title || !conceptData.description) {
+      setError('Please provide both concept title and description');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/concepts/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...conceptData,
+          subject: selectedSubject,
+          chapter,
+          difficulty,
+          userId: user?.id
+        }),
+      });
+
+      if (response.ok) {
+        // Reset form
+        setConceptData({ title: '', description: '', keyPoints: '', examples: '' });
+        setChapter('');
+        alert(`Concept map saved for ${selectedSubject} successfully!`);
+      } else {
+        throw new Error('Failed to save concept');
+      }
+    } catch (error) {
+      console.error('Error saving concept:', error);
+      setError('Failed to save concept. Please try again.');
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-gray-900">Document Upload & Processing</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2 text-gray-900">Upload Notes</h1>
           <p className="text-gray-600 text-base md:text-lg">
-            Upload study materials, research papers, and documents for processing and knowledge extraction
+            Advanced note-taking system for NEET & IIT preparation - Upload, organize, and master your study materials
           </p>
         </div>
         <div className="w-full md:w-auto">
@@ -240,20 +317,60 @@ const SummarizePage = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Subject Selection */}
       <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6 md:mb-8">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold mb-3 text-gray-900">Select Subject</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            {['Physics', 'Chemistry', 'Mathematics', 'Biology'].map((subject) => (
+              <button
+                key={subject}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  selectedSubject === subject
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+                onClick={() => setSelectedSubject(subject)}
+              >
+                <div className="text-center">
+                  <div className="text-2xl mb-1">
+                    {subject === 'Physics' && '⚛️'}
+                    {subject === 'Chemistry' && '🧪'}
+                    {subject === 'Mathematics' && '📐'}
+                    {subject === 'Biology' && '🧬'}
+                  </div>
+                  <div className="text-sm font-medium">{subject}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 mb-4 md:mb-6 overflow-x-auto">
           <button
             className={`px-3 md:px-4 py-2 font-medium text-xs md:text-sm whitespace-nowrap ${activeTab === 'upload' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setActiveTab('upload')}
           >
-            Upload File
+            📄 Upload File
           </button>
           <button
             className={`px-3 md:px-4 py-2 font-medium text-xs md:text-sm whitespace-nowrap ${activeTab === 'text' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setActiveTab('text')}
           >
-            Paste Text
+            ✍️ Write Notes
+          </button>
+          <button
+            className={`px-3 md:px-4 py-2 font-medium text-xs md:text-sm whitespace-nowrap ${activeTab === 'formula' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('formula')}
+          >
+            🧮 Add Formula
+          </button>
+          <button
+            className={`px-3 md:px-4 py-2 font-medium text-xs md:text-sm whitespace-nowrap ${activeTab === 'concept' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('concept')}
+          >
+            💡 Concept Map
           </button>
         </div>
 
@@ -279,7 +396,7 @@ const SummarizePage = () => {
                     </span>{' '}
                     or drag and drop
                   </div>
-                  <p className="text-xs text-gray-500">Study materials: PDF, TXT, DOC, DOCX up to 50MB</p>
+                  <p className="text-xs text-gray-500">{selectedSubject} materials: PDF, TXT, DOC, DOCX up to 50MB</p>
                 </div>
               </label>
             </div>
@@ -308,14 +425,54 @@ const SummarizePage = () => {
           </div>
         )}
 
-        {/* Text Input Section */}
+        {/* Enhanced Text Input Section */}
         {activeTab === 'text' && (
-          <div className="space-y-3 md:space-y-4">
+          <div className="space-y-4">
+            {/* Note Metadata */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Chapter/Topic</label>
+                <input
+                  type="text"
+                  value={chapter}
+                  onChange={(e) => setChapter(e.target.value)}
+                  placeholder="e.g., Thermodynamics, Organic Chemistry"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty Level</label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="easy">🟢 Easy (Basic Concepts)</option>
+                  <option value="medium">🟡 Medium (JEE Main Level)</option>
+                  <option value="hard">🔴 Hard (JEE Advanced/NEET)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Note Type</label>
+                <select
+                  value={noteType}
+                  onChange={(e) => setNoteType(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="general">📝 General Notes</option>
+                  <option value="formula">🧮 Formula & Derivation</option>
+                  <option value="concept">💡 Key Concept</option>
+                  <option value="question">❓ Practice Question</option>
+                  <option value="trick">⚡ Shortcut/Trick</option>
+                </select>
+              </div>
+            </div>
+
             <div className="border border-gray-300 rounded-lg">
               <textarea
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Paste lecture notes, research content, or study material here for AI analysis..."
+                placeholder={`Write your ${selectedSubject} notes here...\n\nTips for better organization:\n• Use clear headings and subheadings\n• Include formulas with proper notation\n• Add examples and practice problems\n• Mention important concepts and definitions`}
                 className="w-full h-48 md:h-64 p-3 md:p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               />
             </div>
@@ -325,7 +482,137 @@ const SummarizePage = () => {
               disabled={!textInput.trim() || isProcessingText}
               className="w-full px-4 py-2 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium text-sm md:text-base"
             >
-              {isProcessingText ? 'Analyzing...' : 'Analyze & Summarize'}
+              {isProcessingText ? 'Processing & Organizing...' : `📚 Save ${selectedSubject} Notes`}
+            </button>
+          </div>
+        )}
+
+        {/* Formula Input Section */}
+        {activeTab === 'formula' && (
+          <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-2">🧮 Add Formula for {selectedSubject}</h4>
+              <p className="text-sm text-blue-600">Create a comprehensive formula entry with derivations and applications</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Formula Name</label>
+                <input
+                  type="text"
+                  value={formulaData.name}
+                  onChange={(e) => setFormulaData({...formulaData, name: e.target.value})}
+                  placeholder="e.g., Newton's Second Law, Ideal Gas Law"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Chapter</label>
+                <input
+                  type="text"
+                  value={chapter}
+                  onChange={(e) => setChapter(e.target.value)}
+                  placeholder="Chapter or topic name"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Formula Expression</label>
+              <textarea
+                value={formulaData.formula}
+                onChange={(e) => setFormulaData({...formulaData, formula: e.target.value})}
+                placeholder="Write the formula using standard notation\ne.g., F = ma, PV = nRT, E = mc²"
+                className="w-full h-20 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description & Derivation</label>
+              <textarea
+                value={formulaData.description}
+                onChange={(e) => setFormulaData({...formulaData, description: e.target.value})}
+                placeholder="Explain the formula, its derivation, and when to use it..."
+                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Applications & Examples</label>
+              <textarea
+                value={formulaData.applications}
+                onChange={(e) => setFormulaData({...formulaData, applications: e.target.value})}
+                placeholder="List practical applications, example problems, and tips for remembering..."
+                className="w-full h-24 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <button
+              onClick={() => handleSaveFormula()}
+              disabled={!formulaData.name || !formulaData.formula}
+              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            >
+              🧮 Save Formula to {selectedSubject} Bank
+            </button>
+          </div>
+        )}
+
+        {/* Concept Map Section */}
+        {activeTab === 'concept' && (
+          <div className="space-y-4">
+            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+              <h4 className="font-semibold text-purple-800 mb-2">💡 Create Concept Map for {selectedSubject}</h4>
+              <p className="text-sm text-purple-600">Build interconnected concept maps to visualize relationships between topics</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Concept Title</label>
+              <input
+                type="text"
+                value={conceptData.title}
+                onChange={(e) => setConceptData({...conceptData, title: e.target.value})}
+                placeholder="e.g., Electromagnetic Induction, Chemical Bonding"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Core Description</label>
+              <textarea
+                value={conceptData.description}
+                onChange={(e) => setConceptData({...conceptData, description: e.target.value})}
+                placeholder="Explain the fundamental concept in simple terms..."
+                className="w-full h-24 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Key Points & Sub-concepts</label>
+              <textarea
+                value={conceptData.keyPoints}
+                onChange={(e) => setConceptData({...conceptData, keyPoints: e.target.value})}
+                placeholder="• List important points\n• Related sub-concepts\n• Prerequisites\n• Common misconceptions"
+                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Examples & Applications</label>
+              <textarea
+                value={conceptData.examples}
+                onChange={(e) => setConceptData({...conceptData, examples: e.target.value})}
+                placeholder="Real-world examples, practice problems, and applications..."
+                className="w-full h-24 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+
+            <button
+              onClick={() => handleSaveConcept()}
+              disabled={!conceptData.title || !conceptData.description}
+              className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            >
+              💡 Save Concept Map
             </button>
           </div>
         )}

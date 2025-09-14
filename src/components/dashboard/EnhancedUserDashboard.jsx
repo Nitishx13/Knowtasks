@@ -201,7 +201,7 @@ const EnhancedUserDashboard = () => {
         <div className="mb-6">
           <h2 className="text-lg md:text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            <Link href="/dashboard/summarize" className="group">
+            <Link href="/dashboard/upload-task" className="group">
               <div className="bg-gray-800 hover:bg-gray-700 rounded-xl p-6 transition-all duration-300 border border-gray-700 hover:border-blue-500">
                 <div className="flex flex-col items-center text-center">
                   <div className="p-4 bg-blue-600 rounded-lg mb-4 group-hover:scale-110 transition-transform">

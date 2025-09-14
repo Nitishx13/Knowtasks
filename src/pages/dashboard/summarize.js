@@ -1,10 +1,13 @@
-import SummarizePage from './SummarizePage';
-import DashboardLayout from '../../components/layout/DashboardLayout';
+// This file redirects to the new upload-task route
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export default function Summarize() {
-  return (
-    <DashboardLayout>
-      <SummarizePage />
-    </DashboardLayout>
-  );
+export default function SummarizePage() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    router.replace('/dashboard/upload-task');
+  }, [router]);
+  
+  return null;
 }

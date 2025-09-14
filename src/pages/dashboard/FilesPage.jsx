@@ -120,7 +120,7 @@ const FilesPage = () => {
                   Go to the Summarize page to create your first text file.
                 </p>
                 <div className="mt-4">
-                  <Link href="/dashboard/summarize">
+                  <Link href="/dashboard/upload-task">
                     <a className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                       Create Text File
                     </a>
