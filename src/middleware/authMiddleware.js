@@ -89,6 +89,7 @@ export function authMiddleware(handler) {
       
       // If still no userId, authentication failed
       if (!userId) {
+        res.setHeader('Content-Type', 'application/json');
         return res.status(401).json({ 
           success: false, 
           error: 'Authentication failed',
@@ -107,6 +108,7 @@ export function authMiddleware(handler) {
       return handler(req, res);
     } catch (error) {
       console.error('Auth middleware error:', error);
+      res.setHeader('Content-Type', 'application/json');
       return res.status(401).json({ 
         success: false, 
         error: 'Authentication failed',

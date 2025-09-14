@@ -56,27 +56,57 @@ const TextUpload = ({ onUploadSuccess }) => {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        console.log('Text saved successfully:', data);
-        
-        // Reset form
-        setTextInput('');
-        setTitle('');
-        
-        // Call the success callback if provided
-        if (onUploadSuccess && typeof onUploadSuccess === 'function') {
-          onUploadSuccess(data.file);
+        // Check if response has content before parsing JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          console.log('Text saved successfully:', data);
+          
+          // Reset form
+          setTextInput('');
+          setTitle('');
+          
+          // Call the success callback if provided
+          if (onUploadSuccess && typeof onUploadSuccess === 'function') {
+            onUploadSuccess(data.file);
+          }
+        } else {
+          // Handle non-JSON response
+          const textResponse = await response.text();
+          console.log('Non-JSON response:', textResponse);
+          
+          // Reset form anyway since response was ok
+          setTextInput('');
+          setTitle('');
+          
+          if (onUploadSuccess && typeof onUploadSuccess === 'function') {
+            onUploadSuccess({ title, text: textInput });
+          }
         }
       } else {
-        const errorData = await response.json();
-        console.error('Text saving failed:', errorData);
-        
-        let errorMessage = errorData.error || 'Failed to save text';
-        if (errorData.details) {
-          errorMessage += `: ${errorData.details}`;
+        // Handle error responses
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            console.error('Text saving failed:', errorData);
+            
+            let errorMessage = errorData.error || 'Failed to save text';
+            if (errorData.details) {
+              errorMessage += `: ${errorData.details}`;
+            }
+            
+            setError(errorMessage);
+          } else {
+            // Handle non-JSON error response
+            const errorText = await response.text();
+            console.error('Non-JSON error response:', errorText);
+            setError(`Server error: ${response.status} ${response.statusText}`);
+          }
+        } catch (parseError) {
+          console.error('Error parsing response:', parseError);
+          setError(`Failed to save text. Server returned: ${response.status} ${response.statusText}`);
         }
-        
-        setError(errorMessage);
       }
     } catch (error) {
       console.error('Text processing error:', error);

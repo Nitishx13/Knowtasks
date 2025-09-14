@@ -2,6 +2,9 @@ import { sql } from '@vercel/postgres';
 import { authMiddleware } from '../../../../middleware/authMiddleware';
 
 async function handler(req, res) {
+  // Set proper headers for JSON response
+  res.setHeader('Content-Type', 'application/json');
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
