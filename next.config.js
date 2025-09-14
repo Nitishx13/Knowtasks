@@ -2,6 +2,11 @@
 const path = require('path');
 
 const nextConfig = {
+  env: {
+    // Fallback values for build time when env vars might not be available
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_fallback',
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || 'sk_test_fallback',
+  },
   experimental: {
     // Remove appDir as it's not supported in this Next.js version
   },

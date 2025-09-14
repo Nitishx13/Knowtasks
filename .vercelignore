@@ -1,5 +1,4 @@
-# Development files
-*.log
+# Environment files (keep .env.local.example for reference)
 .env.local
 .env.development.local
 .env.test.local
