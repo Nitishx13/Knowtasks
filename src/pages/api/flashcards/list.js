@@ -1,16 +1,28 @@
 import { sql } from '@vercel/postgres';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to access flashcards'
+      });
+    }
+
     const { category, search } = req.query;
 
-    let query = 'SELECT * FROM flashcards WHERE 1=1';
-    const params = [];
-    let paramIndex = 1;
+    let query = 'SELECT * FROM flashcards WHERE user_id = $1';
+    const params = [userId];
+    let paramIndex = 2;
 
     if (category && category !== '') {
       query += ` AND category = $${paramIndex}`;
@@ -38,3 +50,6 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Failed to fetch flashcards' });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

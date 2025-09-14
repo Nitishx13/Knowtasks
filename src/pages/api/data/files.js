@@ -3,26 +3,23 @@ import { authMiddleware } from '../../../middleware/authMiddleware';
 
 async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    // Test database connection
-    await sql`SELECT NOW()`;
-    
-    // Get user ID from request (added by auth middleware)
-    const userId = req.userId || req.headers['user-id'];
-    
-    console.log('Files API - User ID from request:', userId);
+    // Get user ID from auth middleware - MUST be authenticated
+    const userId = req.userId;
     
     if (!userId) {
-      console.error('Files API - No user ID found in request');
+      console.error('Files API - No authenticated user ID found');
       return res.status(401).json({ 
         success: false, 
         error: 'Authentication required',
-        message: 'User ID is required to fetch files'
+        message: 'User must be authenticated to access files'
       });
     }
+    
+    console.log('Files API - Authenticated user ID:', userId);
 
     // Fetch only files belonging to the current user
     const result = await sql`
@@ -84,5 +81,28 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Apply auth middleware to protect this route
-export default authMiddleware(handler);
+// Enhanced handler with better error handling
+async function enhancedHandler(req, res) {
+  try {
+    // Add CORS headers for better compatibility
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, user-id');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    return await handler(req, res);
+  } catch (error) {
+    console.error('Enhanced handler error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+}
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(enhancedHandler);

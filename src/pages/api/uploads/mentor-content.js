@@ -2,6 +2,7 @@ import { sql } from '@vercel/postgres';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
 // Configure multer for file uploads
 const upload = multer({
@@ -37,12 +38,23 @@ export const config = {
   },
 };
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to upload mentor content'
+      });
+    }
+
     // Use multer middleware
     upload.single('file')(req, res, async (err) => {
       if (err) {
@@ -78,15 +90,16 @@ export default async function handler(req, res) {
           file_path VARCHAR(500) NOT NULL,
           file_size INTEGER,
           uploaded_by VARCHAR(255),
+          user_id VARCHAR(255) NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `;
 
-      // Insert upload record
+      // Insert upload record with authenticated user ID
       const result = await sql`
         INSERT INTO mentor_uploads (
           title, description, category, subject, type, year, exam_type,
-          file_name, file_path, file_size, uploaded_by, created_at
+          file_name, file_path, file_size, uploaded_by, user_id, created_at
         ) VALUES (
           ${title}, 
           ${description || ''}, 
@@ -99,6 +112,7 @@ export default async function handler(req, res) {
           ${req.file.path},
           ${req.file.size},
           'mentor',
+          ${userId},
           CURRENT_TIMESTAMP
         ) RETURNING id, title, file_name, created_at
       `;
@@ -125,3 +139,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

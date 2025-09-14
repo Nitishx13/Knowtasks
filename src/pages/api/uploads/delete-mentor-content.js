@@ -1,32 +1,45 @@
 import { sql } from '@vercel/postgres';
 import fs from 'fs';
 import path from 'path';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to delete mentor content'
+      });
+    }
+
     const { id } = req.body;
 
     if (!id) {
       return res.status(400).json({ error: 'Missing required field: id' });
     }
 
-    // Get file info before deletion
+    // Get file info before deletion - SECURE: only allow deletion of user's own files
     const fileResult = await sql`
-      SELECT file_path, file_name FROM mentor_uploads WHERE id = ${id}
+      SELECT file_path, file_name FROM mentor_uploads 
+      WHERE id = ${id} AND user_id = ${userId}
     `;
 
     if (fileResult.rows.length === 0) {
-      return res.status(404).json({ error: 'File not found' });
+      return res.status(404).json({ error: 'File not found or access denied' });
     }
 
     const { file_path } = fileResult.rows[0];
 
-    // Delete from database
-    await sql`DELETE FROM mentor_uploads WHERE id = ${id}`;
+    // Delete from database - SECURE: only delete user's own files
+    await sql`DELETE FROM mentor_uploads WHERE id = ${id} AND user_id = ${userId}`;
 
     // Delete physical file if it exists
     if (file_path && fs.existsSync(file_path)) {
@@ -50,3 +63,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

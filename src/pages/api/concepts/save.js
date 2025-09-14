@@ -1,15 +1,27 @@
 import { sql } from '@vercel/postgres';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { title, description, keyPoints, examples, subject, chapter, difficulty, userId } = req.body;
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to save concepts'
+      });
+    }
 
-    if (!title || !description || !subject || !userId) {
-      return res.status(400).json({ error: 'Missing required fields: title, description, subject, userId' });
+    const { title, description, keyPoints, examples, subject, chapter, difficulty } = req.body;
+
+    if (!title || !description || !subject) {
+      return res.status(400).json({ error: 'Missing required fields: title, description, subject' });
     }
 
     // Insert concept into database
@@ -47,3 +59,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

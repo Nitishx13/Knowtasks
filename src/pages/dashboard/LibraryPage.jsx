@@ -126,50 +126,59 @@ const LibraryPage = () => {
     }
   ], []);
 
-  // Function to fetch library items from API
+  // Function to fetch library items from unified API
   const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
-      const allItems = [];
-
-      // Fetch all content types from mentor uploads API
-      const contentTypes = ['formula', 'flashcard', 'pyq', 'notes'];
+      const headers = getAuthHeaders();
       
-      for (const type of contentTypes) {
-        try {
-          const response = await fetch(`/api/uploads/get-mentor-content?type=${type}`);
-          const data = await response.json();
-          
-          if (data.success && data.uploads) {
-            const items = data.uploads.map(item => ({
-              id: `${type}-${item.id}`,
-              title: item.title,
-              type: type,
-              category: item.subject || item.category,
-              date: new Date(item.created_at).toLocaleDateString(),
-              size: 'PDF File',
-              status: 'completed',
-              description: item.description,
-              fileUrl: `/api/uploads/serve-pdf-by-id?id=${item.id}`,
-              fileName: item.file_name,
-              uploadedBy: 'mentor',
-              year: item.year,
-              examType: item.exam_type,
-              tags: item.tags || [],
-              created_at: item.created_at
-            }));
-            allItems.push(...items);
-          }
-        } catch (error) {
-          console.error(`Error fetching ${type} items:`, error);
-        }
+      // Fetch from unified library API that includes user content + shared mentor content
+      const response = await fetch('/api/library', {
+        method: 'GET',
+        headers: headers
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.library) {
+        const items = data.library.map(item => ({
+          id: `${item.content_type || 'user'}-${item.id}`,
+          title: item.title,
+          type: item.content_type === 'mentor_formula' ? 'formula' :
+                item.content_type === 'mentor_flashcard' ? 'flashcard' :
+                item.content_type === 'mentor_pyq' ? 'pyq' :
+                item.document_type?.toLowerCase() || 'notes',
+          category: item.subject || item.category || 'General',
+          date: new Date(item.created_at).toLocaleDateString(),
+          size: item.content_type?.startsWith('mentor_') ? 
+                (item.content_type === 'mentor_formula' ? 'Formula PDF' :
+                 item.content_type === 'mentor_flashcard' ? 'Flashcard Set' :
+                 item.content_type === 'mentor_pyq' ? 'Question Set' : 'Content') :
+                `${item.word_count || 0} words`,
+          status: 'completed',
+          description: item.content || item.description || '',
+          fileUrl: item.content_type?.startsWith('mentor_') ? 
+                   `/api/uploads/serve-pdf-by-id?id=${item.id}` : 
+                   item.file_url,
+          fileName: item.file_name,
+          uploadedBy: item.content_type?.startsWith('mentor_') ? 'mentor' : 'user',
+          year: item.year,
+          examType: item.exam_type,
+          tags: item.tags || [],
+          created_at: item.created_at,
+          content_type: item.content_type,
+          mentor_name: item.mentor_name,
+          difficulty: item.content_type?.startsWith('mentor_') ? 'High' : 'Medium'
+        }));
+        
+        console.log('Library stats:', data.stats);
+        setLibraryItems(items);
+      } else {
+        console.error('Failed to fetch library items:', data.error);
+        // Fallback to mock data
+        setLibraryItems(mockLibraryItems);
       }
-
-      // Sort items by creation date (newest first)
-      allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       
-      // Use real data if available, otherwise fallback to mock data
-      setLibraryItems(allItems.length > 0 ? allItems : mockLibraryItems);
       setLoading(false);
     } catch (error) {
       console.error('Error loading library items from API:', error);
@@ -187,8 +196,20 @@ const LibraryPage = () => {
 
   const filteredItems = libraryItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === 'all' || item.type === activeTab;
-    return matchesSearch && matchesTab;
+    
+    // Handle content type filtering
+    const matchesContentType = activeTab === 'all' || 
+                               activeTab === 'user' || 
+                               activeTab === 'mentor' || 
+                               item.type === activeTab;
+    
+    // Handle source filtering
+    const matchesSource = activeTab === 'all' || 
+                         (activeTab === 'user' && item.uploadedBy === 'user') ||
+                         (activeTab === 'mentor' && item.uploadedBy === 'mentor') ||
+                         (activeTab !== 'user' && activeTab !== 'mentor' && activeTab !== 'all');
+    
+    return matchesSearch && matchesContentType && matchesSource;
   });
 
   // Handle PDF viewing
@@ -264,7 +285,7 @@ const LibraryPage = () => {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">📚 Your Personal Library</h1>
-            <p className="text-gray-600 text-base md:text-lg">Organize your learning journey with our intelligent note system. Access all your subjects in one beautiful, intuitive interface.</p>
+            <p className="text-gray-600 text-base md:text-lg">Access your uploaded content plus high-quality study materials shared by expert mentors. All your learning resources in one place.</p>
           </div>
         </div>
         
@@ -347,6 +368,34 @@ const LibraryPage = () => {
             </div>
           </div>
           
+          {/* Content Source Filters */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Content Source</p>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={() => setActiveTab('all')}
+                variant={activeTab === 'all' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'all' ? 'bg-gray-600 text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🌟 All Sources
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('user')}
+                variant={activeTab === 'user' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'user' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                📝 My Content
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('mentor')}
+                variant={activeTab === 'mentor' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'mentor' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                👨‍🏫 Mentor Content
+              </Button>
+            </div>
+          </div>
+          
           {/* Subject Filters */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Subjects</p>
@@ -376,6 +425,17 @@ const LibraryPage = () => {
                     
                     {/* Exam Type and Chapter */}
                     <div className="flex flex-wrap items-center gap-2 mb-3">
+                      {/* Mentor Badge */}
+                      {item.uploadedBy === 'mentor' && (
+                        <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 text-xs font-semibold rounded-full border border-purple-200">
+                          👨‍🏫 Mentor Content
+                        </span>
+                      )}
+                      {item.uploadedBy === 'user' && (
+                        <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
+                          📝 My Content
+                        </span>
+                      )}
                       {item.examType && (
                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                           item.examType.includes('JEE') 

@@ -1,12 +1,24 @@
 import { sql } from '@vercel/postgres';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { search, page = 1, limit = 20, userId } = req.query;
+    // Get authenticated user ID from middleware - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to access summaries'
+      });
+    }
+    
+    const { search, page = 1, limit = 20 } = req.query;
     
     let query = `
       SELECT 
@@ -34,10 +46,9 @@ export default async function handler(req, res) {
       params.push(searchTerm, searchTerm, searchTerm);
     }
     
-    if (userId && userId !== 'anonymous') {
-      query += ` AND user_id = $${++paramCount}`;
-      params.push(userId);
-    }
+    // ALWAYS filter by authenticated user ID - no exceptions for security
+    query += ` AND user_id = $${++paramCount}`;
+    params.push(userId);
     
     query += ` ORDER BY upload_date DESC`;
     
@@ -58,10 +69,9 @@ export default async function handler(req, res) {
       countParams.push(searchTerm, searchTerm, searchTerm);
     }
     
-    if (userId && userId !== 'anonymous') {
-      countQuery += ` AND user_id = $${countParams.length + 1}`;
-      countParams.push(userId);
-    }
+    // ALWAYS filter count by authenticated user ID - no exceptions for security
+    countQuery += ` AND user_id = $${countParams.length + 1}`;
+    countParams.push(userId);
     
     const countResult = await sql.query(countQuery, countParams);
     const totalCount = parseInt(countResult.rows[0].count);
@@ -117,3 +127,6 @@ function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

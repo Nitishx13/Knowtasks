@@ -114,7 +114,7 @@ export const getAuthHeaders = async (userId) => {
   
   return {
     'Authorization': token ? `Bearer ${token}` : 'Bearer test_token',
-    'X-Test-User-Id': effectiveUserId || 'test_user_123',
+    'user-id': effectiveUserId || 'test_user_123',
     'Content-Type': 'application/json'
   };
 };

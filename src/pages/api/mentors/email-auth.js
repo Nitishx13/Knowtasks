@@ -65,12 +65,12 @@ export default async function handler(req, res) {
       ORDER BY s.created_at DESC
     `;
 
-    // Get mentor's content statistics
+    // Get mentor's content statistics - SECURE: filter by mentor user ID
     const contentStats = await sql`
       SELECT 
-        (SELECT COUNT(*) FROM formula_bank WHERE uploaded_by = ${mentor.email}) as formula_count,
-        (SELECT COUNT(*) FROM flashcards WHERE uploaded_by = ${mentor.email}) as flashcard_count,
-        (SELECT COUNT(*) FROM pyq WHERE uploaded_by = ${mentor.email}) as pyq_count
+        (SELECT COUNT(*) FROM formula_bank WHERE user_id = ${mentor.id}) as formula_count,
+        (SELECT COUNT(*) FROM flashcards WHERE user_id = ${mentor.id}) as flashcard_count,
+        (SELECT COUNT(*) FROM pyq WHERE user_id = ${mentor.id}) as pyq_count
     `;
 
     const mentorData = {

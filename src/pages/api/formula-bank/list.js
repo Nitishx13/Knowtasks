@@ -1,11 +1,23 @@
 import { sql } from '@vercel/postgres';
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to access formula bank'
+      });
+    }
+
     const { category, subject, search, limit = 50, offset = 0 } = req.query;
 
     let query = `
@@ -13,11 +25,11 @@ export default async function handler(req, res) {
              category, subject, uploaded_by, uploader_role, tags,
              download_count, created_at, updated_at
       FROM formula_bank 
-      WHERE status = 'active'
+      WHERE status = 'active' AND user_id = $1
     `;
     
-    const params = [];
-    let paramCount = 0;
+    const params = [userId];
+    let paramCount = 1;
 
     if (category && category !== 'all') {
       paramCount++;
@@ -50,9 +62,9 @@ export default async function handler(req, res) {
     const result = await sql.query(query, params);
 
     // Get total count for pagination
-    let countQuery = `SELECT COUNT(*) FROM formula_bank WHERE status = 'active'`;
-    const countParams = [];
-    let countParamCount = 0;
+    let countQuery = `SELECT COUNT(*) FROM formula_bank WHERE status = 'active' AND user_id = $1`;
+    const countParams = [userId];
+    let countParamCount = 1;
 
     if (category && category !== 'all') {
       countParamCount++;
@@ -94,3 +106,6 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);
