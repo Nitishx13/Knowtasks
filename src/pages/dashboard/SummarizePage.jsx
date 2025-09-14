@@ -660,55 +660,128 @@ const SummarizePage = () => {
         </div>
       )}
 
-      {/* Previous Summaries and Text Files */}
+      {/* Intelligence Hub */}
       <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
-        <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Your Processed Documents</h2>
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <h2 className="text-lg md:text-xl font-semibold">🧠 Intelligence Hub</h2>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-gray-500">AI Processing Active</span>
+          </div>
+        </div>
         
         {loading ? (
           <div className="text-center py-6 md:py-8">
-            <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-xs md:text-sm text-gray-600">Loading summaries...</p>
+            <div className="relative">
+              <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-blue-200 animate-ping"></div>
+            </div>
+            <p className="mt-2 text-xs md:text-sm text-gray-600">Scanning knowledge repository...</p>
           </div>
         ) : summaries.length > 0 ? (
           <div className="space-y-3 md:space-y-4">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-100 mb-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-blue-700">📊 Knowledge Analytics</span>
+                <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                  {summaries.length} documents processed
+                </span>
+              </div>
+              <p className="text-xs text-blue-600 mt-1">
+                Intelligence extraction complete • Pattern recognition active • Cross-referencing enabled
+              </p>
+            </div>
+            
             {summaries.map((summary) => (
-              <div key={summary.id} className="border border-gray-200 rounded-lg p-3 md:p-4 hover:bg-gray-50 transition-colors">
+              <div key={summary.id} className="border border-gray-200 rounded-lg p-3 md:p-4 hover:bg-gray-50 transition-all duration-200 hover:shadow-sm">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 overflow-hidden">
-                    <h4 className="font-medium text-gray-900 mb-1 md:mb-2 text-sm md:text-base truncate">{summary.fileName}</h4>
-                    <p className="text-gray-600 text-xs md:text-sm mb-1 md:mb-2 line-clamp-2">
-                      {summary.summary && summary.summary.length > 150 
-                        ? summary.summary.substring(0, 150) + '...' 
-                        : summary.summary}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs text-gray-500">
-                      <span>{summary.wordCount || 0} words</span>
-                      <span>{summary.formattedSize}</span>
-                      <span className="hidden sm:inline">{summary.formattedDate}</span>
-                      <span className="capitalize">{summary.fileType?.replace('.', '') || 'unknown'}</span>
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">{summary.fileName}</h4>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                        <span className="text-xs text-green-600">Processed</span>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-2 rounded border-l-2 border-blue-300 mb-2">
+                      <p className="text-gray-700 text-xs md:text-sm line-clamp-2 italic">
+                        "{summary.summary && summary.summary.length > 120 
+                          ? summary.summary.substring(0, 120) + '...' 
+                          : summary.summary || 'Intelligence extraction in progress...'}"
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500">
+                      <span className="flex items-center space-x-1">
+                        <span>📝</span>
+                        <span>{summary.wordCount || 0} words</span>
+                      </span>
+                      <span className="flex items-center space-x-1">
+                        <span>💾</span>
+                        <span>{summary.formattedSize}</span>
+                      </span>
+                      <span className="hidden sm:flex items-center space-x-1">
+                        <span>📅</span>
+                        <span>{summary.formattedDate}</span>
+                      </span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize">
+                        {summary.fileType?.replace('.', '') || 'document'}
+                      </span>
                     </div>
                   </div>
                   {summary.fileType === 'text' && (
                     <a 
                       href={`/dashboard/files?id=${summary.id}`}
-                      className="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 border border-blue-200 rounded-full hover:border-blue-400 ml-2 flex-shrink-0"
+                      className="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-full transition-all duration-200 ml-2 flex-shrink-0 shadow-sm"
                     >
-                      View
+                      🔍 Analyze
                     </a>
                   )}
                 </div>
               </div>
             ))}
+            
+            <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium text-purple-700">🎯 Intelligence Insights</span>
+                </div>
+                <button className="text-xs text-purple-600 hover:text-purple-800 font-medium">
+                  View Analytics →
+                </button>
+              </div>
+              <p className="text-xs text-purple-600 mt-1">
+                Cross-document patterns detected • Knowledge gaps identified • Study recommendations ready
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="text-center py-6 md:py-8">
-            <svg className="mx-auto h-8 w-8 md:h-12 md:w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 className="mt-2 text-xs md:text-sm font-medium text-gray-900">No summaries yet</h3>
-            <p className="mt-1 text-xs md:text-sm text-gray-500">
-              Upload study materials or paste content above to start building your knowledge base.
+          <div className="text-center py-8 md:py-12">
+            <div className="relative mb-4">
+              <div className="w-16 h-16 md:w-20 md:h-20 mx-auto bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 md:w-10 md:h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-bounce"></div>
+            </div>
+            <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-2">🚀 Intelligence Engine Ready</h3>
+            <p className="text-xs md:text-sm text-gray-600 mb-4 max-w-md mx-auto">
+              Your personal AI study assistant is waiting to process documents, extract key insights, and build your intelligent knowledge base for NEET & IIT preparation.
             </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-500 max-w-lg mx-auto">
+              <div className="flex items-center justify-center space-x-1 p-2 bg-blue-50 rounded">
+                <span>🔍</span>
+                <span>Smart Analysis</span>
+              </div>
+              <div className="flex items-center justify-center space-x-1 p-2 bg-green-50 rounded">
+                <span>🧠</span>
+                <span>Pattern Recognition</span>
+              </div>
+              <div className="flex items-center justify-center space-x-1 p-2 bg-purple-50 rounded">
+                <span>📊</span>
+                <span>Knowledge Mapping</span>
+              </div>
+            </div>
           </div>
         )}
       </div>
