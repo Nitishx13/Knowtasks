@@ -22,57 +22,107 @@ const LibraryPage = () => {
   const mockLibraryItems = useMemo(() => [
     {
       id: 1,
-      title: 'Physics Equations',
+      title: 'JEE Physics - Mechanics Formulas',
       type: 'formula',
       category: 'Physics',
-      date: '2023-11-15',
-      size: '25 formulas',
-      status: 'completed'
+      examType: 'JEE Main/Advanced',
+      chapter: 'Mechanics',
+      date: '2024-01-15',
+      size: '45 formulas',
+      status: 'completed',
+      difficulty: 'High',
+      tags: ['IIT-JEE', 'Mechanics', 'Motion', 'Forces']
     },
     {
       id: 2,
-      title: 'Organic Chemistry Reactions',
+      title: 'NEET Organic Chemistry Reactions',
       type: 'formula',
       category: 'Chemistry',
-      date: '2023-11-10',
-      size: '18 formulas',
-      status: 'in-progress'
+      examType: 'NEET',
+      chapter: 'Organic Chemistry',
+      date: '2024-01-12',
+      size: '38 formulas',
+      status: 'in-progress',
+      difficulty: 'Medium',
+      tags: ['NEET', 'Organic', 'Reactions', 'Mechanisms']
     },
     {
       id: 3,
-      title: 'Calculus Fundamentals',
+      title: 'JEE Advanced Calculus & Limits',
       type: 'flashcard',
       category: 'Mathematics',
-      date: '2023-11-08',
-      size: '32 cards',
-      status: 'completed'
+      examType: 'JEE Advanced',
+      chapter: 'Calculus',
+      date: '2024-01-10',
+      size: '52 cards',
+      status: 'completed',
+      difficulty: 'High',
+      tags: ['JEE Advanced', 'Calculus', 'Limits', 'Derivatives']
     },
     {
       id: 4,
-      title: 'Computer Science Concepts',
+      title: 'NEET Biology - Human Physiology',
       type: 'flashcard',
-      category: 'CS',
-      date: '2023-11-05',
-      size: '21 cards',
-      status: 'completed'
+      category: 'Biology',
+      examType: 'NEET',
+      chapter: 'Human Physiology',
+      date: '2024-01-08',
+      size: '67 cards',
+      status: 'completed',
+      difficulty: 'Medium',
+      tags: ['NEET', 'Biology', 'Physiology', 'Human Body']
     },
     {
       id: 5,
-      title: 'Physics 2022 Exam',
+      title: 'JEE Main 2023 Physics Paper',
       type: 'pyq',
       category: 'Physics',
-      date: '2023-11-03',
-      size: '15 questions',
-      status: 'completed'
+      examType: 'JEE Main',
+      year: '2023',
+      date: '2024-01-05',
+      size: '30 questions',
+      status: 'completed',
+      difficulty: 'Medium',
+      tags: ['JEE Main', 'Physics', '2023', 'Previous Year']
     },
     {
       id: 6,
-      title: 'Mathematics 2021 Midterm',
+      title: 'NEET 2023 Chemistry Solutions',
       type: 'pyq',
+      category: 'Chemistry',
+      examType: 'NEET',
+      year: '2023',
+      date: '2024-01-03',
+      size: '45 questions',
+      status: 'in-progress',
+      difficulty: 'Medium',
+      tags: ['NEET', 'Chemistry', '2023', 'Solutions']
+    },
+    {
+      id: 7,
+      title: 'JEE Advanced Coordinate Geometry',
+      type: 'notes',
       category: 'Mathematics',
-      date: '2023-11-01',
-      size: '10 questions',
-      status: 'in-progress'
+      examType: 'JEE Advanced',
+      chapter: 'Coordinate Geometry',
+      date: '2024-01-01',
+      size: 'Complete Notes',
+      status: 'completed',
+      difficulty: 'High',
+      tags: ['JEE Advanced', 'Mathematics', 'Coordinate Geometry']
+    },
+    {
+      id: 8,
+      title: 'NEET Plant Kingdom Classification',
+      type: 'notes',
+      category: 'Biology',
+      examType: 'NEET',
+      chapter: 'Plant Kingdom',
+      date: '2023-12-28',
+      size: 'Detailed Notes',
+      status: 'completed',
+      difficulty: 'Medium',
+      tags: ['NEET', 'Biology', 'Plant Kingdom', 'Classification']
     }
   ], []);
 
@@ -206,58 +256,106 @@ const LibraryPage = () => {
   return (
     <div>
       <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-900">Knowledge Hub</h1>
-        <p className="text-gray-600 text-base md:text-lg">Access your Formula Bank, Flashcards, and Previous Year Questions</p>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">📚 Your Personal Library</h1>
+            <p className="text-gray-600 text-base md:text-lg">Organize your learning journey with our intelligent note system. Access all your subjects in one beautiful, intuitive interface.</p>
+          </div>
+        </div>
+        
+        {/* IIT/NEET Focus Banner */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-2">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">🎯 IIT-JEE</span>
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded-full">🏥 NEET</span>
+              </div>
+              <span className="text-gray-600 text-sm">Competitive Exam Focused Content</span>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">Study Smart, Score High</p>
+              <p className="text-xs text-gray-500">Curated for competitive success</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
       <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm mb-6 md:mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col gap-4">
+          {/* Search Bar */}
           <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search your library..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-            />
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search formulas, notes, PYQs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-            <Button 
-              onClick={() => setActiveTab('all')}
-              variant={activeTab === 'all' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'all' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
-            >
-              All
-            </Button>
-            <Button 
-              onClick={() => setActiveTab('formula')}
-              variant={activeTab === 'formula' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'formula' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
-            >
-              Formula Bank
-            </Button>
-            <Button 
-              onClick={() => setActiveTab('flashcard')}
-              variant={activeTab === 'flashcard' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'flashcard' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
-            >
-              Flashcards
-            </Button>
-            <Button 
-              onClick={() => setActiveTab('pyq')}
-              variant={activeTab === 'pyq' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'pyq' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
-            >
-              PYQ
-            </Button>
-            <Button 
-              onClick={() => setActiveTab('notes')}
-              variant={activeTab === 'notes' ? 'default' : 'outline'}
-              className={`text-xs md:text-sm px-3 py-1.5 md:py-2 ${activeTab === 'notes' ? 'bg-gray-900 text-white' : 'border-gray-300 text-gray-700'}`}
-            >
-              Notes
-            </Button>
+          
+          {/* Content Type Filters */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Content Type</p>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={() => setActiveTab('all')}
+                variant={activeTab === 'all' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'all' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                📚 All Content
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('formula')}
+                variant={activeTab === 'formula' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'formula' ? 'bg-green-600 text-white hover:bg-green-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🧮 Formula Bank
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('flashcard')}
+                variant={activeTab === 'flashcard' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'flashcard' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🃏 Flashcards
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('pyq')}
+                variant={activeTab === 'pyq' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'pyq' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                📝 Previous Year Questions
+              </Button>
+              <Button 
+                onClick={() => setActiveTab('notes')}
+                variant={activeTab === 'notes' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'notes' ? 'bg-orange-600 text-white hover:bg-orange-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                📖 Study Notes
+              </Button>
+            </div>
+          </div>
+          
+          {/* Subject Filters */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Subjects</p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1.5 bg-red-100 text-red-800 text-xs font-medium rounded-full border border-red-200">⚛️ Physics</span>
+              <span className="px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full border border-blue-200">🧪 Chemistry</span>
+              <span className="px-3 py-1.5 bg-purple-100 text-purple-800 text-xs font-medium rounded-full border border-purple-200">📊 Mathematics</span>
+              <span className="px-3 py-1.5 bg-green-100 text-green-800 text-xs font-medium rounded-full border border-green-200">🧬 Biology</span>
+            </div>
           </div>
         </div>
       </div>
@@ -265,47 +363,143 @@ const LibraryPage = () => {
       {/* Library Items */}
       <div className="space-y-4">
         {filteredItems.map((item) => (
-          <div key={item.id} className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0">
-              <div className="flex items-start md:items-center space-x-3 md:space-x-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  {getTypeIcon(item.type)}
-                </div>
-                <div>
-                  <h3 className="text-base md:text-lg font-semibold text-gray-900">{item.title}</h3>
-                  <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-1">
-                    <span className="text-xs md:text-sm text-gray-500">{item.category}</span>
-                    {item.type === 'pyq' && item.year && (
-                      <span className="text-xs md:text-sm text-gray-500">{item.year}</span>
+          <div key={item.id} className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:border-blue-300">
+            <div className="flex flex-col gap-4">
+              {/* Header Section */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    {getTypeIcon(item.type)}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                    
+                    {/* Exam Type and Chapter */}
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      {item.examType && (
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          item.examType.includes('JEE') 
+                            ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                            : 'bg-green-100 text-green-800 border border-green-200'
+                        }`}>
+                          {item.examType.includes('JEE') ? '🎯' : '🏥'} {item.examType}
+                        </span>
+                      )}
+                      {item.chapter && (
+                        <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full border border-gray-200">
+                          📚 {item.chapter}
+                        </span>
+                      )}
+                      {item.difficulty && (
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          item.difficulty === 'High' 
+                            ? 'bg-red-100 text-red-800 border border-red-200' 
+                            : item.difficulty === 'Medium'
+                            ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                            : 'bg-green-100 text-green-800 border border-green-200'
+                        }`}>
+                          {item.difficulty === 'High' ? '🔥' : item.difficulty === 'Medium' ? '⚡' : '✨'} {item.difficulty}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Subject and Metadata */}
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                      <span className={`flex items-center gap-1 font-medium ${
+                        item.category === 'Physics' ? 'text-red-600' :
+                        item.category === 'Chemistry' ? 'text-blue-600' :
+                        item.category === 'Mathematics' ? 'text-purple-600' :
+                        item.category === 'Biology' ? 'text-green-600' : 'text-gray-600'
+                      }`}>
+                        {item.category === 'Physics' ? '⚛️' :
+                         item.category === 'Chemistry' ? '🧪' :
+                         item.category === 'Mathematics' ? '📊' :
+                         item.category === 'Biology' ? '🧬' : '📖'} {item.category}
+                      </span>
+                      <span className="text-gray-400">•</span>
+                      <span>{item.size}</span>
+                      <span className="text-gray-400">•</span>
+                      <span>{item.date}</span>
+                      {item.year && (
+                        <>
+                          <span className="text-gray-400">•</span>
+                          <span className="font-medium">{item.year}</span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Tags */}
+                    {item.tags && item.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {item.tags.slice(0, 4).map((tag, index) => (
+                          <span key={index} className="px-2 py-0.5 bg-gray-50 text-gray-600 text-xs rounded border">
+                            {tag}
+                          </span>
+                        ))}
+                        {item.tags.length > 4 && (
+                          <span className="px-2 py-0.5 bg-gray-50 text-gray-500 text-xs rounded border">
+                            +{item.tags.length - 4} more
+                          </span>
+                        )}
+                      </div>
                     )}
-                    {item.type === 'pyq' && item.examType && (
-                      <span className="text-xs md:text-sm text-gray-500">{item.examType}</span>
-                    )}
-                    <span className="text-xs md:text-sm text-gray-500">{item.size}</span>
-                    <span className="text-xs md:text-sm text-gray-500">{item.date}</span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(item.status)}`}>
-                      {item.status}
-                    </span>
                   </div>
                 </div>
+
+                {/* Status Badge */}
+                <span className={`px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 ${getStatusColor(item.status)}`}>
+                  {item.status === 'completed' ? '✅' : '🔄'} {item.status}
+                </span>
               </div>
-              <div className="flex items-center gap-2 self-end md:self-auto">
-                <Button 
-                  onClick={() => handleViewPDF(item)}
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
-                >
-                  View
-                </Button>
-                <Button 
-                  onClick={() => handleDownloadPDF(item)}
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs md:text-sm px-2 md:px-3 py-1 text-gray-700 border-gray-300 hover:bg-gray-50"
-                >
-                  Download
-                </Button>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Button 
+                    onClick={() => handleViewPDF(item)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    View Content
+                  </Button>
+                  <Button 
+                    onClick={() => handleDownloadPDF(item)}
+                    variant="outline" 
+                    className="text-gray-700 border-gray-300 hover:bg-gray-50 text-sm px-4 py-2 flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download
+                  </Button>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-700 p-2"
+                    title="Add to favorites"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-gray-500 hover:text-gray-700 p-2"
+                    title="Share"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

@@ -95,6 +95,12 @@ const MainLayout = ({ children }) => {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/become-mentor" className="text-gray-500 hover:text-black transition-colors flex items-center group">
+                    <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
+                    👨‍🏫 Become a Mentor
+                  </Link>
+                </li>
+                <li>
                   <Link href="/careers" className="text-gray-500 hover:text-black transition-colors flex items-center group">
                     <span className="w-0 h-0.5 bg-black mr-0 group-hover:w-2 group-hover:mr-2 transition-all duration-300"></span>
                     Careers

@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { cn } from '../../lib/utils';
-import BecomeMentorButton from '../../components/home/BecomeMentorButton';
 
 const HomePage = () => {
   const { scrollY } = useScroll();
@@ -57,10 +56,10 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Transform Knowledge into
+              Master IIT-JEE & NEET with
               <br className="hidden sm:block"/>
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-pulse">
-                Organized Content
+                Smart Study Tools
               </span>
             </motion.h1>
             
@@ -70,7 +69,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Harness the power of AI to instantly convert any document, textbook, or research paper into organized, intelligent notes. Save hours of reading time while improving comprehension and retention.
+              Transform your competitive exam preparation with intelligent note-taking, formula banks, concept mapping, and previous year question analysis. Built specifically for IIT-JEE and NEET aspirants to maximize study efficiency and boost scores.
             </motion.p>
             
             <motion.div 
@@ -79,7 +78,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              {['IIT-JEE', 'NEET', 'Digital Skills', 'Classes 9-12', 'Graduation'].map((tag, index) => (
+              {['🎯 IIT-JEE Main', '🏥 NEET UG', '⚡ JEE Advanced', '📚 Classes 11-12', '🧠 Competitive Prep'].map((tag, index) => (
                 <motion.span 
                   key={tag}
                   className="px-4 py-2 bg-white/10 text-white rounded-full text-sm font-semibold border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 cursor-pointer"
@@ -103,7 +102,7 @@ const HomePage = () => {
                 <Button asChild size="lg" className="px-12 py-6 text-base md:text-lg font-bold rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300">
                   <Link href="/dashboard">
                     <span className="flex items-center justify-center gap-3">
-                      🚀 START CREATING NOTES
+                      🎯 START YOUR JEE/NEET PREP
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
@@ -115,7 +114,7 @@ const HomePage = () => {
                 <Button asChild variant="outline" size="lg" className="px-12 py-6 text-base md:text-lg font-bold rounded-xl border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
                   <Link href="#features">
                     <span className="flex items-center justify-center gap-3">
-                      ✨ EXPLORE FEATURES
+                      📚 EXPLORE STUDY TOOLS
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
@@ -123,7 +122,6 @@ const HomePage = () => {
                   </Link>
                 </Button>
               </motion.div>
-              <BecomeMentorButton />
             </motion.div>
             
             <motion.div 
@@ -136,19 +134,19 @@ const HomePage = () => {
                 <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                Free to start
+                Formula Bank Included
               </span>
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                No credit card
+                PYQ Analysis
               </span>
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                Instant setup
+                Smart Flashcards
               </span>
             </motion.div>
             
@@ -282,55 +280,55 @@ const HomePage = () => {
               Everything you need for
               <br />
               <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                Smart Learning
+                IIT-JEE & NEET Success
               </span>
             </h2>
             <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
-              Discover the advanced AI capabilities that make Knowtasks the ultimate study companion for students worldwide.
+              Comprehensive study tools designed specifically for competitive exam preparation. Master Physics, Chemistry, Mathematics, and Biology with intelligent learning features.
             </p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: "🧠",
-                title: "Document Summarization",
-                description: "Advanced processing analyzes your documents and extracts key concepts, creating comprehensive summaries that capture the essence of any material.",
+                icon: "🧮",
+                title: "Formula Bank & Quick Reference",
+                description: "Comprehensive collection of Physics, Chemistry, and Mathematics formulas organized by chapters. Quick access to essential equations for JEE and NEET preparation.",
                 color: "from-blue-500 to-cyan-500",
                 delay: 0.2
               },
               {
-                icon: "⚡",
-                title: "Lightning Fast Processing",
-                description: "Upload documents up to 50MB and get intelligent notes in seconds. Our optimized AI processes even complex academic papers instantly.",
+                icon: "📝",
+                title: "Previous Year Question Analysis",
+                description: "Detailed analysis of JEE Main, JEE Advanced, and NEET previous year papers. Identify patterns, important topics, and exam trends.",
                 color: "from-purple-500 to-pink-500",
                 delay: 0.4
               },
               {
-                icon: "📚",
-                title: "Multi-Format Support",
-                description: "Works with PDFs, Word documents, text files, and more. Paste text directly or upload files - we handle all popular formats seamlessly.",
+                icon: "🃏",
+                title: "Smart Flashcards System",
+                description: "Interactive flashcards for concept revision with spaced repetition. Perfect for Biology terminology, Chemical reactions, and Physics concepts.",
                 color: "from-green-500 to-teal-500",
                 delay: 0.6
               },
               {
                 icon: "🎯",
-                title: "Subject-Specific Optimization",
-                description: "Tailored for IIT-JEE, NEET, digital skills, and academic subjects. Our AI understands context and generates relevant study materials.",
+                title: "Subject-Wise Organization",
+                description: "Dedicated sections for Physics, Chemistry, Mathematics, and Biology. Each subject optimized for competitive exam syllabus and pattern.",
                 color: "from-orange-500 to-red-500",
                 delay: 0.8
               },
               {
-                icon: "🔍",
-                title: "Smart Search & Organization",
-                description: "Find any note instantly with powerful search. Organize by subject, date, or custom tags. Your knowledge, perfectly structured.",
+                icon: "🧠",
+                title: "Concept Mapping & Mind Maps",
+                description: "Visual representation of complex topics and their interconnections. Understand relationships between concepts for deeper learning.",
                 color: "from-indigo-500 to-purple-500",
                 delay: 1.0
               },
               {
                 icon: "📊",
-                title: "Progress Tracking",
-                description: "Monitor your learning journey with detailed analytics. Track reading time, note creation, and study patterns to optimize your workflow.",
+                title: "Performance Analytics",
+                description: "Track your preparation progress with detailed analytics. Monitor weak areas, study time, and improvement trends across all subjects.",
                 color: "from-cyan-500 to-blue-500",
                 delay: 1.2
               }
