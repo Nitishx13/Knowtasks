@@ -224,6 +224,20 @@ const DashboardLayout = ({ children }) => {
                     {!sidebarCollapsed && <span className="ml-3">Knowledge Hub</span>}
                   </Link>
                 </li>
+                
+                <li>
+                  <Link href="/dashboard/data" className={cn(
+                    "flex items-center p-3 rounded-lg transition-colors",
+                    router.pathname === '/dashboard/data'
+                      ? "bg-gray-100 text-gray-900"
+                      : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                  )}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    {!sidebarCollapsed && <span className="ml-3">My Notes</span>}
+                  </Link>
+                </li>
               </>
             )}
           </ul>
@@ -344,9 +358,9 @@ const DashboardLayout = ({ children }) => {
         {isMobile && !router.pathname.startsWith('/admin/') && !router.pathname.startsWith('/mentor/') && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 shadow-lg">
             <div className="flex justify-around items-center h-16 px-2">
-              <Link href="/dashboard/summarize" className={cn(
+              <Link href="/dashboard/upload-task" className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                router.pathname.startsWith('/dashboard/summarize') ? "text-blue-600" : "text-gray-500"
+                router.pathname === '/dashboard/upload-task' ? "text-blue-600" : "text-gray-500"
               )}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -362,6 +376,16 @@ const DashboardLayout = ({ children }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-xs mt-1 font-medium">Hub</span>
+              </Link>
+              
+              <Link href="/dashboard/data" className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                router.pathname === '/dashboard/data' ? "text-blue-600" : "text-gray-500"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">My Notes</span>
               </Link>
             </div>
           </div>
@@ -460,16 +484,16 @@ const DashboardLayout = ({ children }) => {
                 {!router.pathname.startsWith('/admin/') && !router.pathname.startsWith('/mentor/') && (
                   <>
                     <li>
-                      <Link href="/dashboard/summarize" className={cn(
+                      <Link href="/dashboard/upload-task" className={cn(
                         "flex items-center p-3 rounded-lg transition-colors",
-                        router.pathname.startsWith('/dashboard/summarize')
+                        router.pathname === '/dashboard/upload-task'
                           ? "bg-gray-100 text-gray-900"
                           : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
                       )}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        <span className="ml-3">Upload</span>
+                        <span className="ml-3">Upload Task</span>
                       </Link>
                     </li>
                     
@@ -484,6 +508,20 @@ const DashboardLayout = ({ children }) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span className="ml-3">Knowledge Hub</span>
+                      </Link>
+                    </li>
+                    
+                    <li>
+                      <Link href="/dashboard/data" className={cn(
+                        "flex items-center p-3 rounded-lg transition-colors",
+                        router.pathname === '/dashboard/data'
+                          ? "bg-gray-100 text-gray-900"
+                          : "hover:bg-gray-50 text-gray-600 hover:text-gray-900"
+                      )}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span className="ml-3">My Notes</span>
                       </Link>
                     </li>
                   </>
