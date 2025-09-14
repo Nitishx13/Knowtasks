@@ -3,7 +3,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAuthHeaders } from '../../utils/auth';
 import { useRouter } from 'next/router';
-import PDFViewer from '../../components/ui/PDFViewer';
+// Removed PDFViewer import - using direct browser PDF viewing instead
 
 const LibraryPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -342,12 +342,10 @@ const LibraryPage = () => {
             </div>
             
             <div className="flex-1 p-4">
-              <PDFViewer
-                fileUrl={selectedPDF.fileUrl}
-                fileName={selectedPDF.fileName}
-                onError={(error) => {
-                  console.error('PDF load error:', error);
-                }}
+              <iframe
+                src={selectedPDF.fileUrl}
+                className="w-full h-full border-0"
+                title={selectedPDF.fileName || 'PDF Document'}
               />
             </div>
             

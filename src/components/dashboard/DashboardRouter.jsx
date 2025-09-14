@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import DashboardPage from '../../pages/dashboard/DashboardPage';
 import SuperAdminDashboard from '../../pages/dashboard/SuperAdminDashboard';
-import MentorDashboard from '../../pages/dashboard/MentorDashboard';
+import MentorDashboard from '../../pages/mentor/dashboard';
 
 const DashboardRouter = () => {
   const { user } = useAuth();

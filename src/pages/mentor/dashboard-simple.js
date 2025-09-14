@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
-import PDFViewer from '../../components/ui/PDFViewer';
+// Removed PDFViewer import - using direct browser PDF viewing instead
 
 const MentorDashboardSimple = () => {
   const [activeSection, setActiveSection] = useState('formula');
