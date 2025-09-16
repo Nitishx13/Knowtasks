@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive System Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .upload-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Comprehensive System Test</h1>
+        <p>Testing all components of the mentor upload system</p>
+
+        <!-- Test 1: Database Connection -->
+        <div class="test-section">
+            <h3>1. Database Connection Test</h3>
+            <button onclick="testDatabase()">Test Database</button>
+            <div id="dbResult"></div>
+        </div>
+
+        <!-- Test 2: Authentication -->
+        <div class="test-section">
+            <h3>2. Authentication Test</h3>
+            <button onclick="testAuth()">Test Authentication</button>
+            <div id="authResult"></div>
+        </div>
+
+        <!-- Test 3: API Endpoints -->
+        <div class="test-section">
+            <h3>3. API Endpoints Test</h3>
+            <button onclick="testAPIs()">Test All APIs</button>
+            <div id="apiResult"></div>
+        </div>
+
+        <!-- Test 4: File Upload -->
+        <div class="test-section">
+            <h3>4. File Upload Test</h3>
+            <div class="upload-form">
+                <form id="testUploadForm">
+                    <div class="form-group">
+                        <label for="testTitle">Title:</label>
+                        <input type="text" id="testTitle" value="Test Physics Notes" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="testDescription">Description:</label>
+                        <textarea id="testDescription" required>Test upload for comprehensive system verification</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="testSubject">Subject:</label>
+                        <select id="testSubject">
+                            <option value="physics">Physics</option>
+                            <option value="chemistry">Chemistry</option>
+                            <option value="mathematics">Mathematics</option>
+                            <option value="biology">Biology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="testCategory">Category:</label>
+                        <select id="testCategory">
+                            <option value="neet">NEET</option>
+                            <option value="jee">JEE</option>
+                            <option value="boards">Boards</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="testFile">PDF File:</label>
+                        <input type="file" id="testFile" accept=".pdf" required>
+                    </div>
+                    <button type="submit">Test Upload</button>
+                </form>
+            </div>
+            <div id="uploadResult"></div>
+        </div>
+
+        <!-- Test 5: Content Retrieval -->
+        <div class="test-section">
+            <h3>5. Content Retrieval Test</h3>
+            <button onclick="testContentRetrieval()">Test Content Fetch</button>
+            <div id="contentResult"></div>
+        </div>
+
+        <!-- Test 6: User Hub Integration -->
+        <div class="test-section">
+            <h3>6. User Hub Integration Test</h3>
+            <button onclick="testUserHub()">Test User Hub API</button>
+            <div id="hubResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test 1: Database Connection
+        async function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<div class="info">Testing database connection...</div>';
+            
+            try {
+                const response = await fetch('/api/mentor/profile', {
+                    headers: { 'user-id': 'test_user_123' }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '<div class="success">✅ Database connected successfully</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ Database connection failed</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Database error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 2: Authentication
+        async function testAuth() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = '<div class="info">Testing authentication...</div>';
+            
+            const testUsers = ['test_user_123', 'mentor_test_123', 'invalid_user'];
+            let results = [];
+            
+            for (const userId of testUsers) {
+                try {
+                    const response = await fetch('/api/mentor/profile', {
+                        headers: { 'user-id': userId }
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        results.push(`✅ ${userId}: Authenticated`);
+                    } else {
+                        results.push(`❌ ${userId}: ${data.error}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ ${userId}: Network error`);
+                }
+            }
+            
+            resultDiv.innerHTML = `<div class="info">${results.join('<br>')}</div>`;
+        }
+
+        // Test 3: API Endpoints
+        async function testAPIs() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<div class="info">Testing API endpoints...</div>';
+            
+            const endpoints = [
+                { name: 'Mentor Profile', url: '/api/mentor/profile', headers: { 'user-id': 'test_user_123' } },
+                { name: 'Mentor Content', url: '/api/uploads/get-mentor-content?type=notes', headers: { 'user-id': 'test_user_123' } },
+                { name: 'User Hub', url: '/api/user/mentor-content', headers: {} }
+            ];
+            
+            let results = [];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint.url, { headers: endpoint.headers });
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success !== false) {
+                        results.push(`✅ ${endpoint.name}: Working`);
+                    } else {
+                        results.push(`❌ ${endpoint.name}: ${data.error || 'Failed'}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ ${endpoint.name}: Network error`);
+                }
+            }
+            
+            resultDiv.innerHTML = `<div class="info">${results.join('<br>')}</div>`;
+        }
+
+        // Test 4: File Upload
+        document.getElementById('testUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const resultDiv = document.getElementById('uploadResult');
+            const formData = new FormData();
+            
+            const title = document.getElementById('testTitle').value;
+            const description = document.getElementById('testDescription').value;
+            const subject = document.getElementById('testSubject').value;
+            const category = document.getElementById('testCategory').value;
+            const file = document.getElementById('testFile').files[0];
+            
+            if (!file) {
+                resultDiv.innerHTML = '<div class="error">❌ Please select a PDF file</div>';
+                return;
+            }
+            
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                resultDiv.innerHTML = '<div class="error">❌ Please select a PDF file only</div>';
+                return;
+            }
+            
+            formData.append('file', file);
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('subject', subject);
+            formData.append('category', category);
+            formData.append('type', 'notes');
+            
+            resultDiv.innerHTML = '<div class="info">Uploading file...</div>';
+            
+            try {
+                console.log('Starting upload request...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                const response = await fetch('/api/uploads/mentor-content', {
+                    method: 'POST',
+                    headers: { 'user-id': 'test_user_123' },
+                    body: formData,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                console.log('Upload response received, status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Upload result:', result);
+                
+                if (result.success) {
+                    resultDiv.innerHTML = '<div class="success">✅ File uploaded successfully!</div>';
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Upload failed: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                if (error.name === 'AbortError') {
+                    resultDiv.innerHTML = '<div class="error">❌ Upload timeout - request took too long</div>';
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Upload error: ${error.message}</div>`;
+                }
+            }
+        });
+
+        // Test 5: Content Retrieval
+        async function testContentRetrieval() {
+            const resultDiv = document.getElementById('contentResult');
+            resultDiv.innerHTML = '<div class="info">Testing content retrieval...</div>';
+            
+            try {
+                const response = await fetch('/api/uploads/get-mentor-content?type=notes', {
+                    headers: { 'user-id': 'test_user_123' }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ Found ${data.uploads.length} notes</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Content retrieval failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Content error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 6: User Hub Integration
+        async function testUserHub() {
+            const resultDiv = document.getElementById('hubResult');
+            resultDiv.innerHTML = '<div class="info">Testing user hub integration...</div>';
+            
+            try {
+                const response = await fetch('/api/user/mentor-content');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<div class="success">✅ User hub working - ${data.total} total items</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ User hub failed: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Hub error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testDatabase();
+                testAuth();
+                testAPIs();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

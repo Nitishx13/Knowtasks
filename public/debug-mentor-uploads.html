@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Mentor Uploads Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; }
+        .container { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .status { margin: 15px 0; padding: 15px; border-radius: 8px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .data-table th { background-color: #f2f2f2; font-weight: bold; }
+        .console { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; max-height: 300px; overflow-y: auto; margin: 10px 0; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔍 Debug Mentor Uploads Data Flow</h2>
+        <p>Testing why mentor_uploads data exists but doesn't appear in library</p>
+        
+        <div class="section">
+            <h3>Step 1: Check Raw mentor_uploads Table</h3>
+            <button onclick="checkMentorUploadsTable()">Check mentor_uploads Table</button>
+            <div id="uploads-status"></div>
+            <div id="uploads-data"></div>
+        </div>
+        
+        <div class="section">
+            <h3>Step 2: Test Library API Query</h3>
+            <button onclick="testLibraryQuery()">Test Library API Query</button>
+            <div id="library-status"></div>
+            <div id="library-console" class="console"></div>
+        </div>
+        
+        <div class="section">
+            <h3>Step 3: Compare Data Processing</h3>
+            <button onclick="compareDataFlow()">Compare Data Flow</button>
+            <div id="compare-status"></div>
+            <div id="compare-data"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, elementId = 'library-console') {
+            const console = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            console.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        async function checkMentorUploadsTable() {
+            const status = document.getElementById('uploads-status');
+            const data = document.getElementById('uploads-data');
+            status.innerHTML = '<div class="info">Checking mentor_uploads table...</div>';
+            
+            try {
+                const response = await fetch('/api/uploads/get-mentor-content', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success && result.content) {
+                    status.innerHTML = `<div class="success">✅ Found ${result.content.length} items in mentor_uploads table</div>`;
+                    
+                    let html = '<table class="data-table"><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Subject</th><th>Category</th><th>File Name</th><th>User ID</th></tr></thead><tbody>';
+                    
+                    result.content.forEach(item => {
+                        html += `<tr>
+                            <td>${item.id}</td>
+                            <td>${item.title}</td>
+                            <td>${item.type}</td>
+                            <td>${item.subject || 'N/A'}</td>
+                            <td>${item.category || 'N/A'}</td>
+                            <td>${item.file_name}</td>
+                            <td>${item.user_id}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    data.innerHTML = html;
+                } else {
+                    status.innerHTML = '<div class="error">❌ No data found in mentor_uploads table</div>';
+                    data.innerHTML = '';
+                }
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                data.innerHTML = '';
+            }
+        }
+
+        async function testLibraryQuery() {
+            const status = document.getElementById('library-status');
+            const console = document.getElementById('library-console');
+            console.innerHTML = '';
+            status.innerHTML = '<div class="info">Testing library API query...</div>';
+            
+            try {
+                log('🔍 Making request to /api/library...');
+                
+                const response = await fetch('/api/library', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                log(`📡 Response status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                log(`✅ API Response received`);
+                log(`📊 Success: ${result.success}`);
+                log(`📚 Library array length: ${result.library ? result.library.length : 'undefined'}`);
+                log(`📈 Stats: ${JSON.stringify(result.stats)}`);
+                
+                if (result.library) {
+                    const mentorItems = result.library.filter(item => 
+                        item.content_type && item.content_type.startsWith('mentor_')
+                    );
+                    log(`👨‍🏫 Mentor items found: ${mentorItems.length}`);
+                    
+                    if (mentorItems.length > 0) {
+                        mentorItems.forEach((item, index) => {
+                            log(`  ${index + 1}. ${item.title} (${item.content_type})`);
+                        });
+                    } else {
+                        log('❌ No mentor items found in library response');
+                    }
+                } else {
+                    log('❌ No library data in response');
+                }
+                
+                status.innerHTML = '<div class="success">✅ Library API test completed - Check console above</div>';
+                
+            } catch (error) {
+                log(`💥 Error: ${error.message}`);
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function compareDataFlow() {
+            const status = document.getElementById('compare-status');
+            const data = document.getElementById('compare-data');
+            status.innerHTML = '<div class="info">Comparing data flow...</div>';
+            
+            try {
+                // Get raw mentor uploads
+                const uploadsResponse = await fetch('/api/uploads/get-mentor-content', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                const uploadsData = await uploadsResponse.json();
+                
+                // Get library data
+                const libraryResponse = await fetch('/api/library', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                const libraryData = await libraryResponse.json();
+                
+                const mentorItems = libraryData.library ? libraryData.library.filter(item => 
+                    item.content_type && item.content_type.startsWith('mentor_')
+                ) : [];
+                
+                let html = `
+                    <div class="section">
+                        <h4>📊 Data Comparison</h4>
+                        <table class="data-table">
+                            <tr>
+                                <th>Source</th>
+                                <th>Count</th>
+                                <th>Status</th>
+                            </tr>
+                            <tr>
+                                <td>mentor_uploads table</td>
+                                <td>${uploadsData.content ? uploadsData.content.length : 0}</td>
+                                <td>${uploadsData.success ? '✅ Success' : '❌ Failed'}</td>
+                            </tr>
+                            <tr>
+                                <td>Library API (all)</td>
+                                <td>${libraryData.library ? libraryData.library.length : 0}</td>
+                                <td>${libraryData.success ? '✅ Success' : '❌ Failed'}</td>
+                            </tr>
+                            <tr>
+                                <td>Library API (mentor only)</td>
+                                <td>${mentorItems.length}</td>
+                                <td>${mentorItems.length > 0 ? '✅ Found' : '❌ Missing'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                
+                if (uploadsData.content && uploadsData.content.length > 0 && mentorItems.length === 0) {
+                    html += `
+                        <div class="error">
+                            <h4>🚨 Issue Detected</h4>
+                            <p>Data exists in mentor_uploads table but not appearing in library API.</p>
+                            <p><strong>Possible causes:</strong></p>
+                            <ul>
+                                <li>JOIN query failing between mentor_uploads and mentor_users</li>
+                                <li>Data filtering removing all items</li>
+                                <li>Query syntax error in library API</li>
+                                <li>Authentication/user_id mismatch</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                data.innerHTML = html;
+                status.innerHTML = '<div class="success">✅ Data comparison completed</div>';
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                data.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>

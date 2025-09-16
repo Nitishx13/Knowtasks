@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Library Console</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; }
+        .container { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .console { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; max-height: 400px; overflow-y: auto; }
+        .mentor-card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #6366f1; }
+        .error { color: #ff4444; }
+        .success { color: #00ff00; }
+        .info { color: #44aaff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>🔍 Debug Library Console</h3>
+        <p>Real-time debugging of library data flow</p>
+        
+        <button onclick="testLibraryAPI()">Test Library API</button>
+        <button onclick="simulateLibraryPage()">Simulate Library Page Logic</button>
+        <button onclick="clearConsole()">Clear Console</button>
+        
+        <div id="console" class="console">Console output will appear here...</div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            console.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testLibraryAPI() {
+            log('🔍 Testing Library API...', 'info');
+            
+            try {
+                const response = await fetch('/api/library', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                log(`📡 Response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(`❌ Error response: ${errorText}`, 'error');
+                    return;
+                }
+                
+                const data = await response.json();
+                log(`✅ API Response received`, 'success');
+                log(`📊 Success: ${data.success}`, data.success ? 'success' : 'error');
+                
+                if (data.library) {
+                    log(`📚 Library array length: ${data.library.length}`, 'info');
+                    log(`📈 Stats: ${JSON.stringify(data.stats)}`, 'info');
+                    
+                    // Check mentor content specifically
+                    const mentorItems = data.library.filter(item => 
+                        item.content_type && item.content_type.startsWith('mentor_')
+                    );
+                    log(`👨‍🏫 Mentor items found: ${mentorItems.length}`, mentorItems.length > 0 ? 'success' : 'error');
+                    
+                    mentorItems.forEach((item, index) => {
+                        log(`  ${index + 1}. ${item.title} (${item.content_type})`, 'info');
+                        log(`     Mentor: ${item.mentor_name || 'Unknown'}`, 'info');
+                    });
+                } else {
+                    log(`❌ No library data in response`, 'error');
+                }
+                
+            } catch (error) {
+                log(`💥 Fetch error: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateLibraryPage() {
+            log('🎭 Simulating Library Page Logic...', 'info');
+            
+            try {
+                // Simulate the exact same logic as LibraryPage.jsx
+                const headers = {
+                    'user-id': 'test_user_123',
+                    'Authorization': 'Bearer test_token',
+                    'Content-Type': 'application/json'
+                };
+                
+                log('📡 Making request with headers...', 'info');
+                const response = await fetch('/api/library', {
+                    method: 'GET',
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log('✅ Response received', 'success');
+                
+                if (data.success && data.library && Array.isArray(data.library)) {
+                    log('✅ Data validation passed', 'success');
+                    
+                    const items = data.library.map(item => ({
+                        id: `${item.content_type || 'user'}-${item.id}`,
+                        title: item.title,
+                        type: item.content_type === 'mentor_formula' ? 'formula' :
+                              item.content_type === 'mentor_flashcard' ? 'flashcard' :
+                              item.content_type === 'mentor_pyq' ? 'pyq' :
+                              item.document_type?.toLowerCase() || 'notes',
+                        category: item.subject || item.category || 'General',
+                        uploadedBy: item.content_type?.startsWith('mentor_') ? 'mentor' : 'user',
+                        mentor_name: item.mentor_name,
+                        content_type: item.content_type
+                    }));
+                    
+                    log(`📋 Processed ${items.length} items`, 'success');
+                    
+                    const mentorItems = items.filter(item => item.uploadedBy === 'mentor');
+                    log(`👨‍🏫 Mentor items after filtering: ${mentorItems.length}`, mentorItems.length > 0 ? 'success' : 'error');
+                    
+                    // Display mentor items
+                    let resultsHtml = `<h4>👨‍🏫 Mentor Items (${mentorItems.length})</h4>`;
+                    mentorItems.forEach(item => {
+                        resultsHtml += `
+                            <div class="mentor-card">
+                                <strong>${item.title}</strong> (${item.type})<br>
+                                Content Type: ${item.content_type}<br>
+                                Category: ${item.category}<br>
+                                Mentor: ${item.mentor_name || 'Unknown'}<br>
+                                Uploaded By: ${item.uploadedBy}
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('results').innerHTML = resultsHtml;
+                    
+                } else {
+                    log('❌ Data validation failed', 'error');
+                    log(`Success: ${data.success}, Library exists: ${!!data.library}, Is array: ${Array.isArray(data.library)}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`💥 Simulation error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

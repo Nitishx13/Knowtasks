@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Simple Upload Test</h1>
+    
+    <div class="form-group">
+        <input type="file" id="file" accept=".pdf">
+    </div>
+    
+    <button onclick="testUpload()">Test Upload</button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        async function testUpload() {
+            const fileInput = document.getElementById('file');
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'Please select a PDF file first';
+                return;
+            }
+            
+            resultDiv.textContent = 'Testing upload...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('title', 'Test Upload');
+                formData.append('description', 'Simple test');
+                formData.append('category', 'Physics');
+                formData.append('subject', 'Physics');
+                formData.append('type', 'formula');
+                
+                console.log('Starting upload test...');
+                console.log('Sending headers:', {
+                    'Authorization': 'Bearer test_token',
+                    'user-id': 'mentor_test_123'
+                });
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    console.log('Upload timed out after 10 seconds');
+                    controller.abort();
+                }, 10000);
+                
+                const response = await fetch('/api/uploads/mentor-content', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer test_token',
+                        'user-id': 'mentor_test_123'
+                    },
+                    body: formData,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log('Response received:', response.status);
+                
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                if (response.ok) {
+                    const data = JSON.parse(text);
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `SUCCESS!\nFile: ${data.upload.title}\nID: ${data.upload.id}\nCreated: ${data.upload.created_at}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `FAILED (${response.status})\n${text}`;
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                resultDiv.className = 'result error';
+                
+                if (error.name === 'AbortError') {
+                    resultDiv.textContent = `TIMEOUT: Upload timed out after 10 seconds.\nThe server may be processing the file or there's a connection issue.`;
+                } else {
+                    resultDiv.textContent = `ERROR: ${error.message}\nType: ${error.name}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

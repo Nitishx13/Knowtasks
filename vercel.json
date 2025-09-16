@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm install && next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_USE_TEST_AUTH": "true"
+  },
+  "functions": {
+    "src/pages/api/**/*.js": {
+      "maxDuration": 60
+    }
+  }
+}

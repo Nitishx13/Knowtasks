@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 25 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 30 100% 60%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 35 100% 50%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/70;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-orange-500 text-white px-4 py-2 rounded-md transition-all shadow-sm hover:shadow-md;
+  }
+  
+  .btn-primary:hover {
+    @apply bg-orange-600;
+  }
+  
+  .btn-secondary {
+    @apply bg-orange-400 text-white px-4 py-2 rounded-md transition-all shadow-sm hover:shadow-md;
+  }
+  
+  .btn-secondary:hover {
+    @apply bg-orange-500;
+  }
+  
+  .btn-accent {
+    @apply bg-orange-600 text-white px-4 py-2 rounded-md transition-all shadow-sm hover:shadow-md;
+  }
+  
+  .btn-accent:hover {
+    @apply bg-orange-700;
+  }
+  
+  .btn-outline {
+    @apply border border-white text-white px-4 py-2 rounded-md hover:bg-white hover:text-black transition-all;
+  }
+  
+  .card {
+    @apply bg-gray-900 rounded-xl shadow-sm border border-gray-700 p-6 hover:shadow-md transition-all text-white;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

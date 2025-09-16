@@ -1,0 +1,537 @@
+// Card components styles
+@use '../variables' as *;
+
+// Base card styles
+.card {
+  background-color: white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-md;
+  }
+  
+  .card-header {
+    padding: $spacer * 1.5 $spacer * 1.5 $spacer;
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: $font-weight-bold;
+      margin: 0;
+    }
+    
+    .card-subtitle {
+      font-size: 0.875rem;
+      color: rgba($dark, 0.6);
+      margin-top: $spacer * 0.25;
+    }
+  }
+  
+  .card-body {
+    padding: 0 $spacer * 1.5 $spacer * 1.5;
+    
+    p {
+      color: rgba($dark, 0.7);
+      font-size: 0.875rem;
+      margin-bottom: $spacer;
+    }
+  }
+  
+  .card-footer {
+    padding: $spacer;
+    border-top: 1px solid rgba($dark, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .card-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Educational context cards
+.edu-card {
+  @extend .card;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
+  
+  &.iit::before {
+    background-color: $iit-color;
+  }
+  
+  &.neet::before {
+    background-color: $neet-color;
+  }
+  
+  &.digital::before {
+    background-color: $digital-color;
+  }
+  
+  .edu-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: $spacer * 1.5 $spacer * 1.5 $spacer;
+    
+    .edu-card-title {
+      font-size: 1.25rem;
+      font-weight: $font-weight-bold;
+      margin: 0;
+    }
+    
+    .edu-card-subject {
+      font-size: 0.75rem;
+      padding: $spacer * 0.25 $spacer * 0.5;
+      border-radius: $border-radius;
+      font-weight: $font-weight-medium;
+      
+      &.physics {
+        background-color: rgba(#3b82f6, 0.1);
+        color: #3b82f6;
+      }
+      
+      &.chemistry {
+        background-color: rgba(#ef4444, 0.1);
+        color: #ef4444;
+      }
+      
+      &.biology {
+        background-color: rgba(#10b981, 0.1);
+        color: #10b981;
+      }
+      
+      &.mathematics {
+        background-color: rgba(#f59e0b, 0.1);
+        color: #f59e0b;
+      }
+      
+      &.programming {
+        background-color: rgba(#8b5cf6, 0.1);
+        color: #8b5cf6;
+      }
+      
+      &.design {
+        background-color: rgba(#ec4899, 0.1);
+        color: #ec4899;
+      }
+    }
+  }
+  
+  .edu-card-meta {
+    padding: 0 $spacer * 1.5;
+    margin-bottom: $spacer;
+    display: flex;
+    align-items: center;
+    gap: $spacer;
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.75rem;
+      color: rgba($dark, 0.6);
+      
+      svg {
+        width: 14px;
+        height: 14px;
+        margin-right: $spacer * 0.25;
+      }
+    }
+  }
+  
+  .edu-card-content {
+    padding: 0 $spacer * 1.5 $spacer * 1.5;
+    
+    p {
+      color: rgba($dark, 0.7);
+      font-size: 0.875rem;
+      margin-bottom: $spacer;
+    }
+    
+    ul {
+      padding-left: $spacer * 1.5;
+      margin-bottom: $spacer;
+      
+      li {
+        margin-bottom: $spacer * 0.5;
+        font-size: 0.875rem;
+        color: rgba($dark, 0.8);
+      }
+    }
+  }
+  
+  .edu-card-footer {
+    padding: $spacer;
+    border-top: 1px solid rgba($dark, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .card-cta {
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+      display: flex;
+      align-items: center;
+      
+      svg {
+        margin-left: $spacer * 0.25;
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+      }
+      
+      &:hover svg {
+        transform: translateX(3px);
+      }
+      
+      &.iit {
+        color: $iit-color;
+      }
+      
+      &.neet {
+        color: $neet-color;
+      }
+      
+      &.digital {
+        color: $digital-color;
+      }
+    }
+  }
+}
+
+// Resource cards
+.resource-card {
+  @extend .card;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .resource-card-header {
+    padding: $spacer * 1.5 $spacer * 1.5 $spacer;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    
+    .resource-card-title {
+      font-size: 1.125rem;
+      font-weight: $font-weight-bold;
+      margin: 0;
+    }
+    
+    .resource-type {
+      font-size: 0.75rem;
+      padding: $spacer * 0.25 $spacer * 0.5;
+      border-radius: $border-radius;
+      font-weight: $font-weight-medium;
+      
+      &.video {
+        background-color: rgba($info, 0.1);
+        color: $info;
+      }
+      
+      &.pdf {
+        background-color: rgba($danger, 0.1);
+        color: $danger;
+      }
+      
+      
+      &.article {
+        background-color: rgba($success, 0.1);
+        color: $success;
+      }
+    }
+  }
+  
+  .resource-card-content {
+    padding: 0 $spacer * 1.5 $spacer * 1.5;
+    flex: 1;
+    
+    p {
+      color: rgba($dark, 0.7);
+      font-size: 0.875rem;
+      margin-bottom: $spacer;
+    }
+  }
+  
+  .resource-card-footer {
+    padding: $spacer;
+    border-top: 1px solid rgba($dark, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .resource-meta {
+      display: flex;
+      align-items: center;
+      gap: $spacer;
+      font-size: 0.75rem;
+      color: rgba($dark, 0.6);
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        
+        svg {
+          width: 14px;
+          height: 14px;
+          margin-right: $spacer * 0.25;
+        }
+      }
+    }
+    
+    .resource-cta {
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+      color: $primary;
+      display: flex;
+      align-items: center;
+      
+      svg {
+        margin-left: $spacer * 0.25;
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+      }
+      
+      &:hover svg {
+        transform: translateX(3px);
+      }
+    }
+  }
+}
+
+// Study plan cards
+.study-plan-card {
+  @extend .card;
+  border-top: 4px solid $primary;
+  
+  &.iit {
+    border-top-color: $iit-color;
+  }
+  
+  &.neet {
+    border-top-color: $neet-color;
+  }
+  
+  &.digital {
+    border-top-color: $digital-color;
+  }
+  
+  .plan-header {
+    padding: $spacer * 1.5 $spacer * 1.5 $spacer;
+    
+    .plan-title {
+      font-size: 1.25rem;
+      font-weight: $font-weight-bold;
+      margin: 0;
+      margin-bottom: $spacer * 0.5;
+    }
+    
+    .plan-subtitle {
+      font-size: 0.875rem;
+      color: rgba($dark, 0.6);
+    }
+  }
+  
+  .plan-progress {
+    padding: 0 $spacer * 1.5;
+    margin-bottom: $spacer;
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: $spacer * 0.25;
+      
+      .progress-percentage {
+        font-weight: $font-weight-medium;
+      }
+    }
+    
+    .progress-bar-container {
+      height: 6px;
+      background-color: rgba($dark, 0.1);
+      border-radius: $border-radius-full;
+      overflow: hidden;
+      
+      .progress-bar {
+        height: 100%;
+        border-radius: $border-radius-full;
+        transition: width 0.3s ease;
+        
+        &.iit {
+          background-color: $iit-color;
+        }
+        
+        &.neet {
+          background-color: $neet-color;
+        }
+        
+        &.digital {
+          background-color: $digital-color;
+        }
+      }
+    }
+  }
+  
+  .plan-content {
+    padding: 0 $spacer * 1.5 $spacer * 1.5;
+    
+    .plan-tasks {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      .task-item {
+        display: flex;
+        align-items: flex-start;
+        padding: $spacer * 0.5 0;
+        border-bottom: 1px solid rgba($dark, 0.05);
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .task-checkbox {
+          margin-right: $spacer * 0.75;
+          margin-top: 3px;
+          
+          input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba($dark, 0.2);
+            border-radius: $border-radius-sm;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            &:checked {
+              background-color: $primary;
+              border-color: $primary;
+              
+              &::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 6px;
+                width: 4px;
+                height: 8px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+              }
+            }
+            
+            &.iit:checked {
+              background-color: $iit-color;
+              border-color: $iit-color;
+            }
+            
+            &.neet:checked {
+              background-color: $neet-color;
+              border-color: $neet-color;
+            }
+            
+            &.digital:checked {
+              background-color: $digital-color;
+              border-color: $digital-color;
+            }
+          }
+        }
+        
+        .task-details {
+          flex: 1;
+          
+          .task-title {
+            font-size: 0.875rem;
+            font-weight: $font-weight-medium;
+            margin: 0;
+            margin-bottom: $spacer * 0.25;
+          }
+          
+          .task-meta {
+            display: flex;
+            align-items: center;
+            gap: $spacer * 0.75;
+            font-size: 0.75rem;
+            color: rgba($dark, 0.6);
+            
+            .meta-item {
+              display: flex;
+              align-items: center;
+              
+              svg {
+                width: 12px;
+                height: 12px;
+                margin-right: $spacer * 0.25;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .plan-footer {
+    padding: $spacer;
+    border-top: 1px solid rgba($dark, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .plan-cta {
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+      display: flex;
+      align-items: center;
+      
+      &.iit {
+        color: $iit-color;
+      }
+      
+      &.neet {
+        color: $neet-color;
+      }
+      
+      &.digital {
+        color: $digital-color;
+      }
+      
+      svg {
+        margin-left: $spacer * 0.25;
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+      }
+      
+      &:hover svg {
+        transform: translateX(3px);
+      }
+    }
+  }
+}
