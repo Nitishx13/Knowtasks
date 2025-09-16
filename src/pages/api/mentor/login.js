@@ -2,17 +2,22 @@ import { sql } from '@vercel/postgres';
 import bcrypt from 'bcrypt';
 
 export default async function handler(req, res) {
-  // Set CORS headers
+  // Set CORS headers and ensure JSON content type
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(200).json({ success: true });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ 
+      success: false, 
+      error: 'Method not allowed',
+      message: 'Only POST requests are allowed'
+    });
   }
 
   const { email, password, loginType = 'email' } = req.body;
@@ -34,7 +39,8 @@ export default async function handler(req, res) {
       console.error('Database connection error: POSTGRES_URL not found');
       return res.status(500).json({
         success: false,
-        message: 'Database configuration error'
+        message: 'Database configuration error',
+        error: 'Database not configured'
       });
     }
 
@@ -192,11 +198,17 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Mentor login error:', error);
     
-    // Return proper JSON error response
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error. Please try again later.',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
-    });
+    // Ensure we always return valid JSON
+    try {
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error. Please try again later.',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Server error'
+      });
+    } catch (jsonError) {
+      // Fallback if JSON response fails
+      console.error('Failed to send JSON response:', jsonError);
+      res.status(500).end('{"success":false,"message":"Server error"}');
+    }
   }
 }
