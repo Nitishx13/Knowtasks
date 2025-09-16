@@ -26,7 +26,7 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/mentor', {
+      const response = await fetch('/api/mentor/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const MentorLogin = () => {
 
       if (response.ok && data.success) {
         // Store mentor data in localStorage
-        const mentorData = data.data;
+        const mentorData = data.mentor;
         if (mentorData) {
           localStorage.setItem('mentorUserId', mentorData.id);
           localStorage.setItem('mentorName', mentorData.name);
@@ -92,7 +92,7 @@ const MentorLogin = () => {
           color: '#333',
           marginBottom: '30px'
         }}>
-          Mentor Login
+          Mentor Login v3
         </h1>
         
         <form onSubmit={handleLogin}>
