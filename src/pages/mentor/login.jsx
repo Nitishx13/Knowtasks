@@ -34,15 +34,14 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/mentor/login', {
+      const response = await fetch('/api/auth/mentor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email: credentials.email,
-          password: credentials.password,
-          loginType: loginType
+          password: credentials.password
         })
       });
 
@@ -58,12 +57,13 @@ const MentorLogin = () => {
       }
 
       if (response.ok && data.success) {
-        // Store mentor authentication data
+        // Store mentor authentication data - use data.data instead of data.mentor
+        const mentorData = data.data;
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
-          localStorage.setItem('mentorData', JSON.stringify(data.mentor));
-          localStorage.setItem('mentorUserId', data.mentor.id); // Store mentor ID for API calls
-          localStorage.setItem('userId', data.mentor.id); // Fallback for general user ID
+          localStorage.setItem('mentorData', JSON.stringify(mentorData));
+          localStorage.setItem('mentorUserId', mentorData.id); // Store mentor ID for API calls
+          localStorage.setItem('userId', mentorData.id); // Fallback for general user ID
           localStorage.setItem('authToken', 'mentor-token-' + Date.now());
         }
         
@@ -74,7 +74,7 @@ const MentorLogin = () => {
           router.push('/mentor/dashboard');
         }
       } else {
-        setError(data.message || 'Invalid email or password');
+        setError(data.message || data.error || 'Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);

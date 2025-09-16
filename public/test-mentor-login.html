@@ -118,15 +118,14 @@
                 
                 showResponse('Testing mentor login API...', 'info');
                 
-                const response = await fetch('/api/mentor/login', {
+                const response = await fetch('/api/auth/mentor', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         email: email,
-                        password: password,
-                        loginType: loginType
+                        password: password
                     })
                 });
                 
