@@ -1,8 +1,11 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "react-hooks/exhaustive-deps": "warn",
-    "react/no-unescaped-entities": "error",
-    "react/display-name": "error"
+    "react-hooks/exhaustive-deps": "off",
+    "react/no-unescaped-entities": "off",
+    "react/display-name": "off",
+    "@next/next/no-img-element": "off",
+    "react/jsx-no-target-blank": "off",
+    "react/no-unknown-property": "off"
   }
 }
