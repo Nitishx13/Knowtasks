@@ -18,7 +18,8 @@ export function authMiddleware(handler) {
                             req.url.includes('/api/summarize') ||
                             req.url.includes('/api/text/') ||
                             req.url.includes('/api/formulas/') ||
-                            req.url.includes('/api/concepts/');
+                            req.url.includes('/api/concepts/') ||
+                            req.url.includes('/api/notes/');
     
     if (!isProtectedRoute) {
       console.log('URL not protected, passing through');

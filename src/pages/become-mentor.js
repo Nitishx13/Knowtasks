@@ -100,7 +100,7 @@ const BecomeMentorPage = () => {
                 🎉 Application Submitted Successfully!
               </h1>
               <p className="text-lg text-gray-600 mb-8">
-                Thank you for your interest in becoming a mentor with Knowtasks. We've received your application and will review it carefully.
+                Thank you for your interest in becoming a mentor with Knowtasks. We&apos;ve received your application and will review it carefully.
                 You will be redirected to the admin dashboard shortly to manage your application.
               </p>
             </div>
@@ -123,7 +123,7 @@ const BecomeMentorPage = () => {
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">Interview Process</h3>
-                    <p className="text-gray-600 text-sm">If selected, we'll schedule a brief interview to discuss your teaching approach and goals.</p>
+                    <p className="text-gray-600 text-sm">If selected, we&apos;ll schedule a brief interview to discuss your teaching approach and goals.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
@@ -132,7 +132,7 @@ const BecomeMentorPage = () => {
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">Onboarding</h3>
-                    <p className="text-gray-600 text-sm">Welcome to the Knowtasks mentor community! We'll help you get started with our platform.</p>
+                    <p className="text-gray-600 text-sm">Welcome to the Knowtasks mentor community! We&apos;ll help you get started with our platform.</p>
                   </div>
                 </div>
               </div>
@@ -388,7 +388,7 @@ const BecomeMentorPage = () => {
               </div>
 
               <p className="text-xs text-gray-500 text-center">
-                By submitting this form, you agree to our terms and conditions. We'll review your application within 2-3 business days.
+                By submitting this form, you agree to our terms and conditions. We&apos;ll review your application within 2-3 business days.
               </p>
             </form>
           </div>

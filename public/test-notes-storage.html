@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notes Storage - Knowtasks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        button {
+            background: #ff6b35;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #e55a2b;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .notes-list {
+            margin-top: 30px;
+        }
+        .note-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .note-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        .note-meta {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .note-content {
+            color: #495057;
+            line-height: 1.5;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Test Notes Storage System</h1>
+        <p>Test the new notes storage functionality similar to formulas</p>
+
+        <form id="noteForm">
+            <div class="grid">
+                <div class="form-group">
+                    <label for="title">Note Title *</label>
+                    <input type="text" id="title" required placeholder="e.g., Thermodynamics Laws">
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject">
+                        <option value="Physics">⚛️ Physics</option>
+                        <option value="Chemistry">🧪 Chemistry</option>
+                        <option value="Mathematics">📐 Mathematics</option>
+                        <option value="Biology">🧬 Biology</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="chapter">Chapter/Topic</label>
+                    <input type="text" id="chapter" placeholder="e.g., Heat and Temperature">
+                </div>
+                <div class="form-group">
+                    <label for="difficulty">Difficulty Level</label>
+                    <select id="difficulty">
+                        <option value="easy">🟢 Easy (Basic Concepts)</option>
+                        <option value="medium">🟡 Medium (JEE Main Level)</option>
+                        <option value="hard">🔴 Hard (JEE Advanced/NEET)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="form-group">
+                    <label for="noteType">Note Type</label>
+                    <select id="noteType">
+                        <option value="general">📝 General Notes</option>
+                        <option value="formula">🧮 Formula & Derivation</option>
+                        <option value="concept">💡 Key Concept</option>
+                        <option value="question">❓ Practice Question</option>
+                        <option value="trick">⚡ Shortcut/Trick</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated)</label>
+                    <input type="text" id="tags" placeholder="e.g., important, exam, revision">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Note Content *</label>
+                <textarea id="content" required placeholder="Write your detailed notes here...
+
+• Include key concepts and definitions
+• Add formulas and derivations  
+• Mention important points to remember
+• Include examples and applications"></textarea>
+            </div>
+
+            <button type="submit" id="saveBtn">📝 Save Note</button>
+            <button type="button" id="loadBtn">📚 Load My Notes</button>
+            <button type="button" id="debugBtn">🔧 Test API</button>
+            <button type="button" id="clearBtn">🗑️ Clear Form</button>
+        </form>
+
+        <div id="result"></div>
+        <div id="notesList" class="notes-list"></div>
+    </div>
+
+    <script>
+        // Authentication headers function
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'user-id': 'test_user_123'
+            };
+        }
+
+        // Save note function
+        async function saveNote(noteData) {
+            try {
+                console.log('Saving note:', noteData);
+                
+                const response = await fetch('/api/notes/save', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(noteData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Check if response is actually JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Non-JSON response:', textResponse);
+                    return { success: false, error: 'Server returned non-JSON response: ' + textResponse.substring(0, 200) };
+                }
+
+                const result = await response.json();
+                console.log('Save response:', result);
+
+                if (response.ok) {
+                    return { success: true, data: result };
+                } else {
+                    return { success: false, error: result.error || result.message || 'Failed to save note' };
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Load notes function
+        async function loadNotes() {
+            try {
+                console.log('Loading notes...');
+                
+                const response = await fetch('/api/notes/get', {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                console.log('Load response:', result);
+
+                if (response.ok) {
+                    return { success: true, data: result.notes || [] };
+                } else {
+                    return { success: false, error: result.error || 'Failed to load notes' };
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Display result function
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.textContent = message;
+        }
+
+        // Display notes function
+        function displayNotes(notes) {
+            const notesListDiv = document.getElementById('notesList');
+            
+            if (!notes || notes.length === 0) {
+                notesListDiv.innerHTML = '<h3>📚 My Notes</h3><p>No notes found. Create your first note above!</p>';
+                return;
+            }
+
+            let html = `<h3>📚 My Notes (${notes.length})</h3>`;
+            
+            notes.forEach(note => {
+                const tags = Array.isArray(note.tags) ? note.tags.join(', ') : (note.tags || '');
+                const createdDate = new Date(note.created_at).toLocaleDateString();
+                
+                html += `
+                    <div class="note-item">
+                        <div class="note-title">${note.title}</div>
+                        <div class="note-meta">
+                            📚 ${note.subject} • 📖 ${note.chapter || 'No chapter'} • 
+                            ${note.difficulty === 'easy' ? '🟢' : note.difficulty === 'medium' ? '🟡' : '🔴'} ${note.difficulty} • 
+                            ${note.note_type === 'general' ? '📝' : note.note_type === 'formula' ? '🧮' : note.note_type === 'concept' ? '💡' : note.note_type === 'question' ? '❓' : '⚡'} ${note.note_type} • 
+                            ${note.word_count || 0} words • ${createdDate}
+                            ${tags ? `<br>🏷️ Tags: ${tags}` : ''}
+                        </div>
+                        <div class="note-content">${note.content.substring(0, 200)}${note.content.length > 200 ? '...' : ''}</div>
+                    </div>
+                `;
+            });
+            
+            notesListDiv.innerHTML = html;
+        }
+
+        // Form submit handler
+        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = '💾 Saving...';
+
+            const noteData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                subject: document.getElementById('subject').value,
+                chapter: document.getElementById('chapter').value,
+                difficulty: document.getElementById('difficulty').value,
+                noteType: document.getElementById('noteType').value,
+                tags: document.getElementById('tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+            };
+
+            const result = await saveNote(noteData);
+            
+            if (result.success) {
+                showResult(`✅ Note "${noteData.title}" saved successfully to ${noteData.subject}!`, true);
+                document.getElementById('noteForm').reset();
+                // Auto-load notes after saving
+                setTimeout(() => {
+                    document.getElementById('loadBtn').click();
+                }, 1000);
+            } else {
+                showResult(`❌ Error: ${result.error}`, false);
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = '📝 Save Note';
+        });
+
+        // Load notes button handler
+        document.getElementById('loadBtn').addEventListener('click', async () => {
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.disabled = true;
+            loadBtn.textContent = '📥 Loading...';
+
+            const result = await loadNotes();
+            
+            if (result.success) {
+                displayNotes(result.data);
+                showResult(`✅ Loaded ${result.data.length} notes successfully!`, true);
+            } else {
+                showResult(`❌ Error loading notes: ${result.error}`, false);
+            }
+
+            loadBtn.disabled = false;
+            loadBtn.textContent = '📚 Load My Notes';
+        });
+
+        // Debug API button handler
+        document.getElementById('debugBtn').addEventListener('click', async () => {
+            const debugBtn = document.getElementById('debugBtn');
+            debugBtn.disabled = true;
+            debugBtn.textContent = '🔧 Testing...';
+
+            try {
+                const response = await fetch('/api/notes/debug', {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                console.log('Debug response status:', response.status);
+                const contentType = response.headers.get('content-type');
+                console.log('Debug content type:', contentType);
+
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Debug non-JSON response:', textResponse);
+                    showResult(`❌ API Debug Failed: Server returned HTML instead of JSON. Response: ${textResponse.substring(0, 300)}`, false);
+                } else {
+                    const result = await response.json();
+                    console.log('Debug response:', result);
+                    showResult(`✅ API Debug Success: ${JSON.stringify(result, null, 2)}`, true);
+                }
+            } catch (error) {
+                console.error('Debug error:', error);
+                showResult(`❌ API Debug Error: ${error.message}`, false);
+            }
+
+            debugBtn.disabled = false;
+            debugBtn.textContent = '🔧 Test API';
+        });
+
+        // Clear form button handler
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('noteForm').reset();
+            document.getElementById('result').innerHTML = '';
+            showResult('📝 Form cleared. Ready for new note!', true);
+        });
+
+        // Auto-load notes on page load
+        window.addEventListener('load', () => {
+            document.getElementById('debugBtn').click();
+        });
+    </script>
+</body>
+</html>

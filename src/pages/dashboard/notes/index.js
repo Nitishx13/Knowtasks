@@ -1,4 +1,8 @@
 // DELETED - Folder removed to eliminate duplicate routes
-export default function() {
+const NotesPage = () => {
   return null;
-}
+};
+
+NotesPage.displayName = 'NotesPage';
+
+export default NotesPage;

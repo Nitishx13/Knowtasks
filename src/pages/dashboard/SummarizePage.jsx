@@ -10,7 +10,7 @@ const SummarizePage = () => {
   const [error, setError] = useState(null);
   const [summaries, setSummaries] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'text', 'formula', 'concept'
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload', 'text', 'notes', 'formula', 'concept'
   const [textInput, setTextInput] = useState('');
   const [isProcessingText, setIsProcessingText] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState('Physics');
@@ -20,6 +20,7 @@ const SummarizePage = () => {
   const [tags, setTags] = useState([]);
   const [formulaData, setFormulaData] = useState({ name: '', formula: '', description: '', applications: '' });
   const [conceptData, setConceptData] = useState({ title: '', description: '', keyPoints: '', examples: '' });
+  const [noteData, setNoteData] = useState({ title: '', content: '', tags: '' });
   const [savedNotes, setSavedNotes] = useState([]);
   const [savedFormulas, setSavedFormulas] = useState([]);
   const [savedConcepts, setSavedConcepts] = useState([]);
@@ -354,6 +355,50 @@ const SummarizePage = () => {
     }
   };
 
+  const handleSaveNote = async () => {
+    if (!noteData.title || !noteData.content) {
+      setError('Please provide both note title and content');
+      return;
+    }
+
+    try {
+      const authHeaders = await getAuthHeaders(user?.id);
+      console.log('Auth headers for note save:', authHeaders);
+      
+      const response = await fetch('/api/notes/save', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({
+          ...noteData,
+          subject: selectedSubject,
+          chapter,
+          difficulty,
+          noteType,
+          tags: noteData.tags ? noteData.tags.split(',').map(tag => tag.trim()) : [],
+          userId: user?.id
+        }),
+      });
+
+      const responseData = await response.json();
+      console.log('Note save response:', responseData);
+
+      if (response.ok) {
+        // Reset form
+        setNoteData({ title: '', content: '', tags: '' });
+        setChapter('');
+        alert(`Note saved to ${selectedSubject} successfully!`);
+        // Refresh saved data
+        fetchSavedData();
+      } else {
+        console.error('Note save failed:', responseData);
+        throw new Error(responseData.error || responseData.message || 'Failed to save note');
+      }
+    } catch (error) {
+      console.error('Error saving note:', error);
+      setError('Failed to save note. Please try again.');
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
       <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
@@ -542,6 +587,7 @@ const SummarizePage = () => {
             </button>
           </div>
         )}
+
 
         {/* Formula Input Section */}
         {activeTab === 'formula' && (
@@ -840,9 +886,9 @@ const SummarizePage = () => {
                     </div>
                     <div className="bg-gray-50 p-2 rounded border-l-2 border-blue-300 mb-2">
                       <p className="text-gray-700 text-xs md:text-sm line-clamp-2 italic">
-                        "{summary.summary && summary.summary.length > 120 
+                        &quot;{summary.summary && summary.summary.length > 120 
                           ? summary.summary.substring(0, 120) + '...' 
-                          : summary.summary || 'Intelligence extraction in progress...'}"
+                          : summary.summary || 'Intelligence extraction in progress...'}&quot;
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs text-gray-500">
