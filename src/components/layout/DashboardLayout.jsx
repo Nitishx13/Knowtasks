@@ -36,7 +36,7 @@ const DashboardLayout = ({ children }) => {
 
       // For SuperAdmin routes (skip auth check for login page)
       if (currentPath.startsWith('/admin/') && currentPath !== '/admin/login') {
-        const isAuthenticated = localStorage.getItem('superadmin_authenticated');
+        const isAuthenticated = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('superadmin_authenticated') : null;
         if (!isAuthenticated) {
           router.push('/admin/login');
           return;
@@ -45,7 +45,7 @@ const DashboardLayout = ({ children }) => {
 
       // For Mentor routes (skip auth check for login page)
       if (currentPath.startsWith('/mentor/') && currentPath !== '/mentor/login') {
-        const isAuthenticated = localStorage.getItem('isMentorAuthenticated');
+        const isAuthenticated = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('isMentorAuthenticated') : null;
         if (!isAuthenticated) {
           router.push('/mentor/login');
           return;
@@ -278,9 +278,11 @@ const DashboardLayout = ({ children }) => {
                   variant="outline" 
                   className="text-sm font-medium px-4 py-2 mr-2 flex items-center shadow-sm hover:shadow-md transition-all border-gray-300 text-gray-700 hover:bg-gray-50"
                   onClick={() => {
-                    localStorage.removeItem('superadmin_authenticated');
-                    localStorage.removeItem('superadmin_email');
-                    localStorage.removeItem('superadmin_login_time');
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      localStorage.removeItem('superadmin_authenticated');
+                      localStorage.removeItem('superadmin_email');
+                      localStorage.removeItem('superadmin_login_time');
+                    }
                     router.push('/admin/login');
                   }}
                 >
@@ -294,9 +296,11 @@ const DashboardLayout = ({ children }) => {
                   variant="outline" 
                   className="text-sm font-medium px-4 py-2 mr-2 flex items-center shadow-sm hover:shadow-md transition-all border-gray-300 text-gray-700 hover:bg-gray-50"
                   onClick={() => {
-                    localStorage.removeItem('isMentorAuthenticated');
-                    localStorage.removeItem('mentorData');
-                    localStorage.removeItem('authToken');
+                    if (typeof window !== 'undefined' && window.localStorage) {
+                      localStorage.removeItem('isMentorAuthenticated');
+                      localStorage.removeItem('mentorData');
+                      localStorage.removeItem('authToken');
+                    }
                     router.push('/mentor/login');
                   }}
                 >

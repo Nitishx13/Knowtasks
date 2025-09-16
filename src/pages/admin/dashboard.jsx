@@ -8,7 +8,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     // Check if SuperAdmin is authenticated
-    const isAuthenticated = localStorage.getItem('superadmin_authenticated');
+    const isAuthenticated = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('superadmin_authenticated') : null;
     
     if (!isAuthenticated) {
       router.push('/admin/login');

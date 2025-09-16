@@ -8,7 +8,7 @@ const MentorDashboardPage = () => {
 
   useEffect(() => {
     // Check if Mentor is authenticated
-    const isAuthenticated = localStorage.getItem('isMentorAuthenticated');
+    const isAuthenticated = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('isMentorAuthenticated') : null;
     
     if (!isAuthenticated) {
       router.push('/mentor/login');

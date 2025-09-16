@@ -36,11 +36,17 @@ const MentorDashboardSimple = () => {
 
   // Get authenticated user ID from localStorage
   const getAuthenticatedUserId = () => {
-    return localStorage.getItem('mentorUserId') || localStorage.getItem('userId');
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    try {
+      return localStorage.getItem('mentorUserId') || localStorage.getItem('userId');
+    } catch (error) {
+      return null;
+    }
   };
 
   // Get mentor data from localStorage (fallback method)
   const getMentorDataFromStorage = () => {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
     try {
       const mentorData = localStorage.getItem('mentorData');
       if (mentorData) {

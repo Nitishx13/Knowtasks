@@ -83,10 +83,14 @@ export const getAuthToken = async () => {
       }
       
       // Fallback to localStorage for testing
-      if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
-        const testToken = localStorage.getItem('auth_test_token');
-        if (testToken) {
-          return testToken;
+      if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && window.localStorage) {
+        try {
+          const testToken = localStorage.getItem('auth_test_token');
+          if (testToken) {
+            return testToken;
+          }
+        } catch (error) {
+          console.warn('localStorage not available during SSR');
         }
       }
     }
@@ -108,8 +112,12 @@ export const getAuthHeaders = async (userId) => {
   
   // For development/testing, ensure we always have a userId
   let effectiveUserId = userId;
-  if (!effectiveUserId && typeof window !== 'undefined') {
-    effectiveUserId = localStorage.getItem('auth_test_user_id') || 'test_user_123';
+  if (!effectiveUserId && typeof window !== 'undefined' && window.localStorage) {
+    try {
+      effectiveUserId = localStorage.getItem('auth_test_user_id') || 'test_user_123';
+    } catch (error) {
+      effectiveUserId = 'test_user_123';
+    }
   }
   
   return {
@@ -128,13 +136,22 @@ export const getCurrentUser = () => {
   
   try {
     // Try to get from test auth first
-    if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true') {
-      return {
-        id: localStorage.getItem('auth_test_user_id') || 'test_user_123',
-        role: localStorage.getItem('auth_test_user_role') || USER_ROLES.STUDENT,
-        name: 'Test User',
-        email: 'test@example.com'
-      };
+    if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && window.localStorage) {
+      try {
+        return {
+          id: localStorage.getItem('auth_test_user_id') || 'test_user_123',
+          role: localStorage.getItem('auth_test_user_role') || USER_ROLES.STUDENT,
+          name: 'Test User',
+          email: 'test@example.com'
+        };
+      } catch (error) {
+        return {
+          id: 'test_user_123',
+          role: USER_ROLES.STUDENT,
+          name: 'Test User',
+          email: 'test@example.com'
+        };
+      }
     }
     
     // Try to get from Clerk
@@ -159,7 +176,11 @@ export const getCurrentUser = () => {
  * @param {string} role - User role to set
  */
 export const setTestUserRole = (role) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_test_user_role', role);
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem('auth_test_user_role', role);
+    } catch (error) {
+      console.warn('localStorage not available during SSR');
+    }
   }
 };
