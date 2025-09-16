@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     };
     
     // Store test user ID in localStorage for API calls
-    if (typeof window !== 'undefined') {
+    if (window?.localStorage) {
       localStorage.setItem('auth_test_user_id', effectiveUser.id);
       localStorage.setItem('auth_test_token', 'test_token');
     }

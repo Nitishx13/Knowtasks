@@ -73,25 +73,26 @@ export const getAuthToken = async () => {
     }
     
     // Check if Clerk is available in the window object
-    if (typeof window !== 'undefined') {
-      // Try to get the token from the Clerk object
-      if (window.Clerk?.session) {
-        const token = await window.Clerk.session.getToken();
-        if (token) {
-          return token;
-        }
+    if (window?.Clerk?.session) {
+      const token = await window.Clerk.session.getToken();
+      if (token) {
+        return {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'user-id': 'anonymous'
+        };
       }
-      
-      // Fallback to localStorage for testing
-      if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && window.localStorage) {
-        try {
-          const testToken = localStorage.getItem('auth_test_token');
-          if (testToken) {
-            return testToken;
-          }
-        } catch (error) {
-          console.warn('localStorage not available during SSR');
+    }
+    
+    // Fallback to localStorage for testing
+    if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && window?.localStorage) {
+      try {
+        const testToken = localStorage.getItem('auth_test_token');
+        if (testToken) {
+          return testToken;
         }
+      } catch (error) {
+        console.warn('localStorage not available during SSR');
       }
     }
     
@@ -112,11 +113,11 @@ export const getAuthHeaders = async (userId) => {
   
   // For development/testing, ensure we always have a userId
   let effectiveUserId = userId;
-  if (!effectiveUserId && typeof window !== 'undefined' && window.localStorage) {
+  if (!effectiveUserId && window?.localStorage) {
     try {
       effectiveUserId = localStorage.getItem('auth_test_user_id') || 'test_user_123';
     } catch (error) {
-      effectiveUserId = 'test_user_123';
+      console.warn('localStorage not available during SSR');
     }
   }
   
@@ -132,24 +133,21 @@ export const getAuthHeaders = async (userId) => {
  * @returns {Object|null} User information
  */
 export const getCurrentUser = () => {
-  if (typeof window === 'undefined') return null;
+  if (!window) return null;
   
   try {
     // Try to get from test auth first
     if (process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true' && window.localStorage) {
-      try {
+      const testUserId = localStorage.getItem('auth_test_user_id');
+      const testToken = localStorage.getItem('auth_test_token');
+      const testRole = localStorage.getItem('auth_test_user_role') || 'user';
+      
+      if (testUserId && testToken) {
         return {
-          id: localStorage.getItem('auth_test_user_id') || 'test_user_123',
-          role: localStorage.getItem('auth_test_user_role') || USER_ROLES.STUDENT,
-          name: 'Test User',
-          email: 'test@example.com'
-        };
-      } catch (error) {
-        return {
-          id: 'test_user_123',
-          role: USER_ROLES.STUDENT,
-          name: 'Test User',
-          email: 'test@example.com'
+          id: testUserId,
+          role: testRole,
+          isAuthenticated: true,
+          authMethod: 'test'
         };
       }
     }
@@ -158,9 +156,10 @@ export const getCurrentUser = () => {
     if (window.Clerk?.user) {
       return {
         id: window.Clerk.user.id,
-        role: window.Clerk.user.publicMetadata?.role || USER_ROLES.STUDENT,
-        name: `${window.Clerk.user.firstName} ${window.Clerk.user.lastName}`.trim(),
-        email: window.Clerk.user.primaryEmailAddress?.emailAddress
+        email: window.Clerk.user.primaryEmailAddress?.emailAddress,
+        role: 'user',
+        isAuthenticated: true,
+        authMethod: 'clerk'
       };
     }
     
@@ -176,7 +175,7 @@ export const getCurrentUser = () => {
  * @param {string} role - User role to set
  */
 export const setTestUserRole = (role) => {
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (window?.localStorage) {
     try {
       localStorage.setItem('auth_test_user_role', role);
     } catch (error) {
