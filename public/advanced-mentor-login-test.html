@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Mentor Login Diagnostics</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .success {
+            background: linear-gradient(45deg, #00b894, #00a085);
+        }
+        .warning {
+            background: linear-gradient(45deg, #fdcb6e, #e17055);
+        }
+        .info {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        .status.success { background: rgba(0, 184, 148, 0.3); }
+        .status.error { background: rgba(255, 107, 107, 0.3); }
+        .status.warning { background: rgba(253, 203, 110, 0.3); }
+        .status.info { background: rgba(116, 185, 255, 0.3); }
+        h1, h2 { text-align: center; margin-bottom: 20px; }
+        h2 { color: #74b9ff; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Advanced Mentor Login Diagnostics</h1>
+        
+        <!-- API Endpoint Tests -->
+        <div class="test-section">
+            <h2>🌐 API Endpoint Tests</h2>
+            <div class="grid">
+                <div>
+                    <button onclick="testEndpointExists()" class="info">Test Endpoint Exists</button>
+                    <button onclick="testCORS()" class="info">Test CORS</button>
+                    <button onclick="testDatabase()" class="warning">Test Database Connection</button>
+                </div>
+                <div>
+                    <button onclick="createTestMentor()" class="success">Create Test Mentor</button>
+                    <button onclick="listMentors()" class="info">List All Mentors</button>
+                    <button onclick="clearResults()" class="warning">Clear Results</button>
+                </div>
+            </div>
+            <div id="apiResults" class="result"></div>
+        </div>
+
+        <!-- Login Tests -->
+        <div class="test-section">
+            <h2>🔐 Login Tests</h2>
+            <div class="form-group">
+                <label>Test Scenario:</label>
+                <select id="testScenario">
+                    <option value="test1">Test Mentor 1 (test@mentor.com / password123)</option>
+                    <option value="test2">Test Mentor 2 (mentor@test.com / test123)</option>
+                    <option value="custom">Custom Credentials</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="testEmail" value="test@mentor.com">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="testPassword" value="password123">
+            </div>
+            <div>
+                <button onclick="testLogin()" class="success">Test Login</button>
+                <button onclick="testLoginVerbose()" class="info">Verbose Login Test</button>
+                <button onclick="testMultipleEndpoints()" class="warning">Test All Endpoints</button>
+            </div>
+            <div id="loginResults" class="result"></div>
+        </div>
+
+        <!-- Network Diagnostics -->
+        <div class="test-section">
+            <h2>🌍 Network Diagnostics</h2>
+            <div>
+                <button onclick="testNetworkConnectivity()" class="info">Test Network</button>
+                <button onclick="testVercelStatus()" class="info">Test Vercel Status</button>
+                <button onclick="testDNS()" class="warning">Test DNS Resolution</button>
+            </div>
+            <div id="networkResults" class="result"></div>
+        </div>
+
+        <!-- Status Display -->
+        <div id="statusDisplay"></div>
+    </div>
+
+    <script>
+        // Update test credentials based on scenario
+        document.getElementById('testScenario').addEventListener('change', function() {
+            const scenario = this.value;
+            const emailInput = document.getElementById('testEmail');
+            const passwordInput = document.getElementById('testPassword');
+            
+            switch(scenario) {
+                case 'test1':
+                    emailInput.value = 'test@mentor.com';
+                    passwordInput.value = 'password123';
+                    break;
+                case 'test2':
+                    emailInput.value = 'mentor@test.com';
+                    passwordInput.value = 'test123';
+                    break;
+                case 'custom':
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                    break;
+            }
+        });
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusDisplay');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function appendResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent += content + '\n';
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('apiResults').textContent = '';
+            document.getElementById('loginResults').textContent = '';
+            document.getElementById('networkResults').textContent = '';
+            document.getElementById('statusDisplay').innerHTML = '';
+        }
+
+        // Test if endpoint exists
+        async function testEndpointExists() {
+            showStatus('Testing if /api/mentorauth endpoint exists...', 'info');
+            appendResult('apiResults', '=== ENDPOINT EXISTENCE TEST ===');
+            
+            try {
+                const response = await fetch('/api/mentorauth', {
+                    method: 'OPTIONS'
+                });
+                
+                appendResult('apiResults', `OPTIONS Response Status: ${response.status}`);
+                appendResult('apiResults', `Response Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+                
+                if (response.status === 200) {
+                    showStatus('✅ Endpoint exists and responds to OPTIONS', 'success');
+                } else {
+                    showStatus('⚠️ Endpoint exists but unexpected OPTIONS response', 'warning');
+                }
+            } catch (error) {
+                appendResult('apiResults', `ERROR: ${error.message}`);
+                showStatus('❌ Endpoint test failed', 'error');
+            }
+        }
+
+        // Test CORS
+        async function testCORS() {
+            showStatus('Testing CORS configuration...', 'info');
+            appendResult('apiResults', '=== CORS TEST ===');
+            
+            try {
+                const response = await fetch('/api/mentorauth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    },
+                    body: JSON.stringify({})
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                appendResult('apiResults', `CORS Headers: ${JSON.stringify(corsHeaders, null, 2)}`);
+                showStatus('✅ CORS test completed', 'success');
+            } catch (error) {
+                appendResult('apiResults', `CORS ERROR: ${error.message}`);
+                showStatus('❌ CORS test failed', 'error');
+            }
+        }
+
+        // Test database connection
+        async function testDatabase() {
+            showStatus('Testing database connection...', 'info');
+            appendResult('apiResults', '=== DATABASE CONNECTION TEST ===');
+            
+            try {
+                const response = await fetch('/api/mentorauth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'nonexistent@test.com',
+                        password: 'test'
+                    })
+                });
+                
+                const data = await response.json();
+                appendResult('apiResults', `Database Test Response: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.message === 'Invalid credentials') {
+                    showStatus('✅ Database connection working (got expected invalid credentials response)', 'success');
+                } else {
+                    showStatus('⚠️ Unexpected database response', 'warning');
+                }
+            } catch (error) {
+                appendResult('apiResults', `DATABASE ERROR: ${error.message}`);
+                showStatus('❌ Database connection test failed', 'error');
+            }
+        }
+
+        // Create test mentor
+        async function createTestMentor() {
+            showStatus('Creating test mentor account...', 'info');
+            appendResult('apiResults', '=== CREATE TEST MENTOR ===');
+            
+            try {
+                // First, try to create via the create-login API
+                const response = await fetch('/api/mentors/create-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@mentor.com',
+                        password: 'password123',
+                        name: 'Test Mentor',
+                        subject: 'Mathematics'
+                    })
+                });
+                
+                const data = await response.json();
+                appendResult('apiResults', `Create Mentor Response: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.success) {
+                    showStatus('✅ Test mentor created successfully', 'success');
+                } else {
+                    showStatus('⚠️ Test mentor creation failed or already exists', 'warning');
+                }
+            } catch (error) {
+                appendResult('apiResults', `CREATE MENTOR ERROR: ${error.message}`);
+                showStatus('❌ Failed to create test mentor', 'error');
+            }
+        }
+
+        // List all mentors
+        async function listMentors() {
+            showStatus('Fetching mentor list...', 'info');
+            appendResult('apiResults', '=== MENTOR LIST ===');
+            
+            try {
+                // This is a diagnostic endpoint we'll create
+                const response = await fetch('/api/mentors/list-debug', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    appendResult('apiResults', `Mentors in database: ${JSON.stringify(data, null, 2)}`);
+                    showStatus(`✅ Found ${data.mentors ? data.mentors.length : 0} mentors`, 'success');
+                } else {
+                    appendResult('apiResults', `List mentors failed: ${response.status} ${response.statusText}`);
+                    showStatus('⚠️ Could not fetch mentor list', 'warning');
+                }
+            } catch (error) {
+                appendResult('apiResults', `LIST MENTORS ERROR: ${error.message}`);
+                showStatus('❌ Failed to list mentors', 'error');
+            }
+        }
+
+        // Test login
+        async function testLogin() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            showStatus('Testing mentor login...', 'info');
+            appendResult('loginResults', '=== LOGIN TEST ===');
+            appendResult('loginResults', `Testing with: ${email} / ${password}`);
+            
+            try {
+                const response = await fetch('/api/mentorauth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                appendResult('loginResults', `Response Status: ${response.status}`);
+                appendResult('loginResults', `Response Data: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.success) {
+                    showStatus('✅ Login successful!', 'success');
+                } else {
+                    showStatus(`❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                appendResult('loginResults', `LOGIN ERROR: ${error.message}`);
+                showStatus('❌ Login test failed', 'error');
+            }
+        }
+
+        // Verbose login test
+        async function testLoginVerbose() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            
+            showStatus('Running verbose login test...', 'info');
+            appendResult('loginResults', '=== VERBOSE LOGIN TEST ===');
+            
+            try {
+                // Test 1: Check request format
+                const requestBody = JSON.stringify({ email, password });
+                appendResult('loginResults', `Request Body: ${requestBody}`);
+                
+                // Test 2: Make request with detailed logging
+                const startTime = Date.now();
+                const response = await fetch('/api/mentorauth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: requestBody
+                });
+                const endTime = Date.now();
+                
+                appendResult('loginResults', `Request Duration: ${endTime - startTime}ms`);
+                appendResult('loginResults', `Response Status: ${response.status} ${response.statusText}`);
+                appendResult('loginResults', `Response Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+                
+                // Test 3: Parse response
+                const responseText = await response.text();
+                appendResult('loginResults', `Raw Response: ${responseText}`);
+                
+                try {
+                    const data = JSON.parse(responseText);
+                    appendResult('loginResults', `Parsed Response: ${JSON.stringify(data, null, 2)}`);
+                    
+                    if (data.success) {
+                        showStatus('✅ Verbose login test successful!', 'success');
+                    } else {
+                        showStatus(`❌ Login failed: ${data.message || 'Unknown error'}`, 'error');
+                    }
+                } catch (parseError) {
+                    appendResult('loginResults', `JSON Parse Error: ${parseError.message}`);
+                    showStatus('❌ Server returned invalid JSON', 'error');
+                }
+                
+            } catch (error) {
+                appendResult('loginResults', `VERBOSE LOGIN ERROR: ${error.message}`);
+                showStatus('❌ Verbose login test failed', 'error');
+            }
+        }
+
+        // Test multiple endpoints
+        async function testMultipleEndpoints() {
+            showStatus('Testing multiple authentication endpoints...', 'info');
+            appendResult('loginResults', '=== MULTIPLE ENDPOINT TEST ===');
+            
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const credentials = { email, password };
+            
+            const endpoints = [
+                '/api/mentorauth',
+                '/api/mentor/login',
+                '/api/auth/mentor',
+                '/api/mentors/login'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    appendResult('loginResults', `\nTesting: ${endpoint}`);
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(credentials)
+                    });
+                    
+                    appendResult('loginResults', `  Status: ${response.status}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        appendResult('loginResults', `  Success: ${JSON.stringify(data, null, 2)}`);
+                    } else {
+                        const errorText = await response.text();
+                        appendResult('loginResults', `  Error: ${errorText}`);
+                    }
+                } catch (error) {
+                    appendResult('loginResults', `  Exception: ${error.message}`);
+                }
+            }
+            
+            showStatus('✅ Multiple endpoint test completed', 'success');
+        }
+
+        // Network connectivity test
+        async function testNetworkConnectivity() {
+            showStatus('Testing network connectivity...', 'info');
+            appendResult('networkResults', '=== NETWORK CONNECTIVITY TEST ===');
+            
+            try {
+                // Test basic connectivity
+                const response = await fetch('/', { method: 'HEAD' });
+                appendResult('networkResults', `Base URL Status: ${response.status}`);
+                
+                // Test API base
+                const apiResponse = await fetch('/api', { method: 'GET' });
+                appendResult('networkResults', `API Base Status: ${apiResponse.status}`);
+                
+                showStatus('✅ Network connectivity test completed', 'success');
+            } catch (error) {
+                appendResult('networkResults', `NETWORK ERROR: ${error.message}`);
+                showStatus('❌ Network connectivity issues detected', 'error');
+            }
+        }
+
+        // Test Vercel status
+        async function testVercelStatus() {
+            showStatus('Checking Vercel deployment status...', 'info');
+            appendResult('networkResults', '=== VERCEL STATUS TEST ===');
+            
+            try {
+                appendResult('networkResults', `Current URL: ${window.location.href}`);
+                appendResult('networkResults', `User Agent: ${navigator.userAgent}`);
+                appendResult('networkResults', `Timestamp: ${new Date().toISOString()}`);
+                
+                showStatus('✅ Vercel status check completed', 'success');
+            } catch (error) {
+                appendResult('networkResults', `VERCEL STATUS ERROR: ${error.message}`);
+                showStatus('❌ Vercel status check failed', 'error');
+            }
+        }
+
+        // Test DNS resolution
+        async function testDNS() {
+            showStatus('Testing DNS resolution...', 'info');
+            appendResult('networkResults', '=== DNS RESOLUTION TEST ===');
+            
+            try {
+                const hostname = window.location.hostname;
+                appendResult('networkResults', `Current hostname: ${hostname}`);
+                
+                // Test if we can resolve the current domain
+                const testUrl = `${window.location.protocol}//${hostname}`;
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                appendResult('networkResults', `DNS Resolution Status: ${response.status}`);
+                
+                showStatus('✅ DNS resolution test completed', 'success');
+            } catch (error) {
+                appendResult('networkResults', `DNS ERROR: ${error.message}`);
+                showStatus('❌ DNS resolution issues detected', 'error');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', function() {
+            showStatus('🚀 Advanced Mentor Login Diagnostics Ready', 'info');
+            setTimeout(() => {
+                testEndpointExists();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
