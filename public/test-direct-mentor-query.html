@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Direct Mentor Query</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .container { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px; }
+        .status { margin-top: 15px; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .mentor-item { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #6366f1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>🔍 Test Direct Mentor Query</h3>
+        <p>Testing mentor_uploads table directly</p>
+        
+        <button onclick="testMentorUploadsAPI()">Test Mentor Uploads API</button>
+        <button onclick="testUserMentorContentAPI()">Test User Mentor Content API</button>
+        <button onclick="testLibraryAPIWithLogs()">Test Library API (Check Server Logs)</button>
+        
+        <div id="status"></div>
+        <div id="content"></div>
+    </div>
+
+    <script>
+        // Test mentor uploads API directly
+        async function testMentorUploadsAPI() {
+            const status = document.getElementById('status');
+            const content = document.getElementById('content');
+            status.innerHTML = '<div class="info">Testing mentor uploads API...</div>';
+            
+            try {
+                const response = await fetch('/api/uploads/get-mentor-content', {
+                    headers: {
+                        'user-id': 'test_user_123'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.innerHTML = '<div class="success">✅ Mentor uploads API working</div>';
+                    
+                    let html = `<h4>👨‍🏫 Direct Mentor Uploads (${data.content.length} items)</h4>`;
+                    
+                    data.content.forEach(item => {
+                        html += `
+                            <div class="mentor-item">
+                                <strong>${item.title}</strong> (${item.type})<br>
+                                Subject: ${item.subject} | Category: ${item.category}<br>
+                                File: ${item.file_name} | Size: ${item.file_size} bytes<br>
+                                User ID: ${item.user_id} | Created: ${new Date(item.created_at).toLocaleDateString()}
+                            </div>
+                        `;
+                    });
+                    
+                    content.innerHTML = html;
+                } else {
+                    throw new Error(data.error || 'API returned success: false');
+                }
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                content.innerHTML = '';
+            }
+        }
+        
+        // Test user mentor content API
+        async function testUserMentorContentAPI() {
+            const status = document.getElementById('status');
+            const content = document.getElementById('content');
+            status.innerHTML = '<div class="info">Testing user mentor content API...</div>';
+            
+            try {
+                const response = await fetch('/api/user/mentor-content');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.innerHTML = '<div class="success">✅ User mentor content API working</div>';
+                    
+                    let html = `<h4>📊 Public Mentor Content (${data.content.length} items)</h4>`;
+                    
+                    data.content.forEach(item => {
+                        html += `
+                            <div class="mentor-item">
+                                <strong>${item.title}</strong> (${item.type})<br>
+                                Subject: ${item.subject} | Category: ${item.category}<br>
+                                Mentor: ${item.mentor_name || 'Unknown'}<br>
+                                File: ${item.file_name} | Size: ${item.file_size} bytes<br>
+                                Created: ${new Date(item.created_at).toLocaleDateString()}
+                            </div>
+                        `;
+                    });
+                    
+                    content.innerHTML = html;
+                } else {
+                    throw new Error(data.error || 'API returned success: false');
+                }
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                content.innerHTML = '';
+            }
+        }
+        
+        // Test library API and check server logs
+        async function testLibraryAPIWithLogs() {
+            const status = document.getElementById('status');
+            const content = document.getElementById('content');
+            status.innerHTML = '<div class="info">Testing library API (check server console for logs)...</div>';
+            
+            try {
+                const response = await fetch('/api/library', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                status.innerHTML = '<div class="success">✅ Library API responded - Check server console for detailed logs</div>';
+                
+                let html = `<h4>📚 Library API Response</h4>`;
+                html += `<p><strong>Success:</strong> ${data.success}</p>`;
+                html += `<p><strong>Library Length:</strong> ${data.library ? data.library.length : 'undefined'}</p>`;
+                html += `<p><strong>Stats:</strong> ${JSON.stringify(data.stats)}</p>`;
+                
+                if (data.library && data.library.length > 0) {
+                    html += `<h5>Items:</h5>`;
+                    data.library.forEach((item, index) => {
+                        html += `
+                            <div class="mentor-item">
+                                ${index + 1}. <strong>${item.title}</strong><br>
+                                Content Type: ${item.content_type}<br>
+                                Mentor: ${item.mentor_name || 'N/A'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                content.innerHTML = html;
+                
+            } catch (error) {
+                status.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                content.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>

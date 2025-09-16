@@ -20,7 +20,43 @@ const SummarizePage = () => {
   const [tags, setTags] = useState([]);
   const [formulaData, setFormulaData] = useState({ name: '', formula: '', description: '', applications: '' });
   const [conceptData, setConceptData] = useState({ title: '', description: '', keyPoints: '', examples: '' });
+  const [savedNotes, setSavedNotes] = useState([]);
+  const [savedFormulas, setSavedFormulas] = useState([]);
+  const [savedConcepts, setSavedConcepts] = useState([]);
   const { user } = useAuth();
+
+  // Function to fetch saved data
+  const fetchSavedData = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      const authHeaders = await getAuthHeaders(user.id);
+      
+      // Fetch notes, formulas, and concepts in parallel
+      const [notesRes, formulasRes, conceptsRes] = await Promise.all([
+        fetch('/api/notes/get', { headers: authHeaders }),
+        fetch('/api/formulas/get', { headers: authHeaders }),
+        fetch('/api/concepts/get', { headers: authHeaders })
+      ]);
+      
+      if (notesRes.ok) {
+        const notesData = await notesRes.json();
+        setSavedNotes(notesData.notes || []);
+      }
+      
+      if (formulasRes.ok) {
+        const formulasData = await formulasRes.json();
+        setSavedFormulas(formulasData.formulas || []);
+      }
+      
+      if (conceptsRes.ok) {
+        const conceptsData = await conceptsRes.json();
+        setSavedConcepts(conceptsData.concepts || []);
+      }
+    } catch (error) {
+      console.error('Error fetching saved data:', error);
+    }
+  }, [user?.id]);
 
   // Function to fetch text files
   const fetchTextFiles = useCallback(async () => {
@@ -77,8 +113,8 @@ const SummarizePage = () => {
   // Fetch existing summaries and text files on component mount
   useEffect(() => {
     fetchSummaries();
-    fetchTextFiles();
-  }, [fetchSummaries, fetchTextFiles]);
+    fetchSavedData();
+  }, [fetchSummaries, fetchSavedData]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -180,13 +216,18 @@ const SummarizePage = () => {
       console.log('Text processing successful:', summaryData);
       
       // Then, save the text file with the summary and user ID
-      const saveResponse = await fetch(`/api/text/save${userId ? `?userId=${userId}` : ''}`, {
+      const authHeaders = await getAuthHeaders(user?.id);
+      const saveResponse = await fetch('/api/text/save', {
         method: 'POST',
-        headers,
+        headers: authHeaders,
         body: JSON.stringify({ 
           text: textInput,
-          title: 'Text Input',
-          summary: summaryData.summary
+          title: 'Text Notes',
+          summary: summaryData.summary,
+          subject: selectedSubject,
+          chapter,
+          difficulty,
+          noteType
         }),
       });
       
@@ -210,8 +251,9 @@ const SummarizePage = () => {
         fileId: savedData.fileId
       });
       
-      // Refresh summaries list
+      // Refresh summaries list and saved data
       await fetchSummaries();
+      await fetchSavedData();
     } catch (error) {
       console.error('Text processing error:', error);
       setError(error.message || 'Text processing failed');
@@ -235,11 +277,12 @@ const SummarizePage = () => {
     }
 
     try {
+      const authHeaders = await getAuthHeaders(user?.id);
+      console.log('Auth headers for formula save:', authHeaders);
+      
       const response = await fetch('/api/formulas/save', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           ...formulaData,
           subject: selectedSubject,
@@ -249,13 +292,19 @@ const SummarizePage = () => {
         }),
       });
 
+      const responseData = await response.json();
+      console.log('Formula save response:', responseData);
+
       if (response.ok) {
         // Reset form
         setFormulaData({ name: '', formula: '', description: '', applications: '' });
         setChapter('');
         alert(`Formula saved to ${selectedSubject} bank successfully!`);
+        // Refresh saved data
+        fetchSavedData();
       } else {
-        throw new Error('Failed to save formula');
+        console.error('Formula save failed:', responseData);
+        throw new Error(responseData.error || responseData.message || 'Failed to save formula');
       }
     } catch (error) {
       console.error('Error saving formula:', error);
@@ -270,11 +319,12 @@ const SummarizePage = () => {
     }
 
     try {
+      const authHeaders = await getAuthHeaders(user?.id);
+      console.log('Auth headers for concept save:', authHeaders);
+      
       const response = await fetch('/api/concepts/save', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           ...conceptData,
           subject: selectedSubject,
@@ -284,13 +334,19 @@ const SummarizePage = () => {
         }),
       });
 
+      const responseData = await response.json();
+      console.log('Concept save response:', responseData);
+
       if (response.ok) {
         // Reset form
         setConceptData({ title: '', description: '', keyPoints: '', examples: '' });
         setChapter('');
         alert(`Concept map saved for ${selectedSubject} successfully!`);
+        // Refresh saved data
+        fetchSavedData();
       } else {
-        throw new Error('Failed to save concept');
+        console.error('Concept save failed:', responseData);
+        throw new Error(responseData.error || responseData.message || 'Failed to save concept');
       }
     } catch (error) {
       console.error('Error saving concept:', error);
@@ -657,6 +713,85 @@ const SummarizePage = () => {
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Saved Data Display */}
+      {(savedNotes.length > 0 || savedFormulas.length > 0 || savedConcepts.length > 0) && (
+        <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
+          <h2 className="text-lg md:text-xl font-semibold mb-4">📚 Your Saved Study Materials</h2>
+          
+          {/* Saved Notes */}
+          {savedNotes.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-md font-semibold text-blue-700 mb-3">✍️ Notes ({savedNotes.length})</h3>
+              <div className="space-y-3">
+                {savedNotes.map((note) => (
+                  <div key={note.id} className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-blue-900">{note.title}</h4>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{note.subject}</span>
+                    </div>
+                    <p className="text-sm text-blue-800 mb-2">{note.summary || note.content.substring(0, 150)}...</p>
+                    <div className="flex justify-between text-xs text-blue-600">
+                      <span>{note.chapter && `Chapter: ${note.chapter}`}</span>
+                      <span>{note.difficulty} • {note.word_count} words</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Saved Formulas */}
+          {savedFormulas.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-md font-semibold text-green-700 mb-3">🧮 Formulas ({savedFormulas.length})</h3>
+              <div className="space-y-3">
+                {savedFormulas.map((formula) => (
+                  <div key={formula.id} className="border border-green-200 rounded-lg p-3 bg-green-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-green-900">{formula.name}</h4>
+                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">{formula.subject}</span>
+                    </div>
+                    <div className="bg-white p-2 rounded border font-mono text-sm mb-2">{formula.formula}</div>
+                    <p className="text-sm text-green-800 mb-2">{formula.description}</p>
+                    <div className="flex justify-between text-xs text-green-600">
+                      <span>{formula.chapter && `Chapter: ${formula.chapter}`}</span>
+                      <span>{formula.difficulty}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Saved Concepts */}
+          {savedConcepts.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-md font-semibold text-purple-700 mb-3">💡 Concepts ({savedConcepts.length})</h3>
+              <div className="space-y-3">
+                {savedConcepts.map((concept) => (
+                  <div key={concept.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-medium text-purple-900">{concept.title}</h4>
+                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">{concept.subject}</span>
+                    </div>
+                    <p className="text-sm text-purple-800 mb-2">{concept.description}</p>
+                    {concept.key_points && (
+                      <div className="text-sm text-purple-700 mb-2">
+                        <strong>Key Points:</strong> {concept.key_points.substring(0, 100)}...
+                      </div>
+                    )}
+                    <div className="flex justify-between text-xs text-purple-600">
+                      <span>{concept.chapter && `Chapter: ${concept.chapter}`}</span>
+                      <span>{concept.difficulty}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

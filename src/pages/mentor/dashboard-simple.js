@@ -3,13 +3,20 @@ import { Button } from '../../components/ui/Button';
 // Removed PDFViewer import - using direct browser PDF viewing instead
 
 const MentorDashboardSimple = () => {
-  const [activeSection, setActiveSection] = useState('formula');
+  const [activeSection, setActiveSection] = useState('notes');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [userInfo, setUserInfo] = useState({
+    userId: null,
+    name: 'Loading...',
+    title: 'Educational Guide',
+    email: null,
+    experience: 0
+  });
 
   // State for different content types
   const [formulaItems, setFormulaItems] = useState([]);
@@ -21,16 +28,102 @@ const MentorDashboardSimple = () => {
   const [uploadForm, setUploadForm] = useState({
     title: '',
     description: '',
-    category: 'Physics',
-    subject: 'Physics',
+    category: 'neet',
+    subject: 'physics',
     year: new Date().getFullYear(),
-    examType: 'Midterm'
+    examType: 'neet'
   });
+
+  // Get authenticated user ID from localStorage
+  const getAuthenticatedUserId = () => {
+    return localStorage.getItem('mentorUserId') || localStorage.getItem('userId');
+  };
+
+  // Get mentor data from localStorage (fallback method)
+  const getMentorDataFromStorage = () => {
+    try {
+      const mentorData = localStorage.getItem('mentorData');
+      if (mentorData) {
+        return JSON.parse(mentorData);
+      }
+    } catch (error) {
+      console.error('Error parsing mentor data from localStorage:', error);
+    }
+    return null;
+  };
+
+  // Load profile using multiple approaches
+  const loadMentorProfile = async () => {
+    const userId = getAuthenticatedUserId();
+    
+    // Method 1: Try to get data from localStorage first (immediate display)
+    const storedMentorData = getMentorDataFromStorage();
+    if (storedMentorData) {
+      console.log('Using stored mentor data:', storedMentorData);
+      setUserInfo({
+        userId: storedMentorData.id || userId,
+        name: storedMentorData.name || 'Mentor User',
+        title: 'Educational Guide',
+        email: storedMentorData.email || 'No email provided',
+        experience: storedMentorData.experience || 0
+      });
+    }
+    
+    // Method 2: Try API call to get fresh data (if available)
+    if (userId) {
+      try {
+        const response = await fetch('/api/mentor/profile', {
+          headers: {
+            'user-id': userId
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Profile API response:', data);
+          
+          if (data.success && data.mentor) {
+            setUserInfo({
+              userId: data.mentor.userId || data.mentor.id,
+              name: data.mentor.name,
+              title: 'Educational Guide',
+              email: data.mentor.email,
+              experience: data.mentor.experience || 0
+            });
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('API call failed:', error);
+      }
+    }
+    
+    // Method 3: Fallback to basic user info if all else fails
+    if (!storedMentorData) {
+      setUserInfo({
+        userId: userId || 'Unknown',
+        name: 'Mentor User',
+        title: 'Educational Guide', 
+        email: 'Please update your profile',
+        experience: 0
+      });
+    }
+  };
 
   // Fetch content from server (display only)
   const fetchContent = async (type) => {
     try {
-      const response = await fetch(`/api/uploads/get-mentor-content?type=${type}`);
+      const userId = getAuthenticatedUserId();
+      if (!userId) {
+        console.error('No authenticated user ID found for content fetch');
+        return;
+      }
+
+      const response = await fetch(`/api/uploads/get-mentor-content?type=${type}`, {
+        headers: {
+          'user-id': userId
+        }
+      });
       const data = await response.json();
       if (data.success) {
         switch (type) {
@@ -54,24 +147,70 @@ const MentorDashboardSimple = () => {
   };
 
   useEffect(() => {
+    loadMentorProfile();
     fetchContent('formula');
     fetchContent('flashcard');
     fetchContent('pyq');
     fetchContent('notes');
   }, []);
 
-  // Handle file upload
+  // Handle file upload with improved authentication
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!e.target.file.files[0]) return;
+    console.log('Upload form submitted');
+    
+    const fileInput = e.target.file;
+    const selectedFile = fileInput?.files[0];
+    
+    console.log('File input:', fileInput);
+    console.log('Selected file:', selectedFile);
+    
+    if (!selectedFile) {
+      alert('Please select a PDF file to upload');
+      return;
+    }
+    
+    // Validate file type
+    if (selectedFile.type !== 'application/pdf') {
+      alert('Please select a PDF file only');
+      return;
+    }
+    
+    // Validate form data
+    if (!uploadForm.title.trim()) {
+      alert('Please enter a title');
+      return;
+    }
+    
+    if (!uploadForm.description.trim()) {
+      alert('Please enter a description');
+      return;
+    }
 
     setUploading(true);
     
     try {
+      const userId = getAuthenticatedUserId();
+      if (!userId) {
+        alert('Authentication error: Please log in again');
+        setUploading(false);
+        return;
+      }
+      
+      console.log('Creating FormData with:', {
+        file: selectedFile.name,
+        title: uploadForm.title,
+        description: uploadForm.description,
+        category: uploadForm.category,
+        subject: uploadForm.subject,
+        type: activeSection,
+        userId: userId
+      });
+
       const formData = new FormData();
-      formData.append('file', e.target.file.files[0]);
-      formData.append('title', uploadForm.title);
-      formData.append('description', uploadForm.description);
+      formData.append('file', selectedFile);
+      formData.append('title', uploadForm.title.trim());
+      formData.append('description', uploadForm.description.trim());
       formData.append('category', uploadForm.category);
       formData.append('subject', uploadForm.subject);
       formData.append('type', activeSection);
@@ -81,24 +220,32 @@ const MentorDashboardSimple = () => {
         formData.append('examType', uploadForm.examType);
       }
 
+      console.log('Sending upload request...');
       const response = await fetch('/api/uploads/mentor-content', {
         method: 'POST',
+        headers: {
+          'user-id': userId  // Simplified header for mentor authentication
+        },
         body: formData
       });
 
+      console.log('Upload response status:', response.status);
       const data = await response.json();
+      console.log('Upload response data:', data);
 
       if (data.success) {
+        console.log('Upload successful, refreshing content...');
         await fetchContent(activeSection);
         alert(`${getSectionTitle(activeSection)} uploaded successfully!`);
         setShowUploadModal(false);
         resetForm();
       } else {
-        alert('Upload failed: ' + data.error);
+        console.error('Upload failed:', data);
+        alert('Upload failed: ' + (data.error || data.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed. Please try again.');
+      alert('Upload failed: ' + error.message);
     } finally {
       setUploading(false);
     }
@@ -115,21 +262,74 @@ const MentorDashboardSimple = () => {
     });
   };
 
-  // Handle PDF viewing
-  const handleViewPDF = (item) => {
-    // Use ID-based API endpoint to serve PDF files
-    const pdfUrl = `/api/uploads/serve-pdf-by-id?id=${item.id}`;
-    window.open(pdfUrl, '_blank');
+  // Handle PDF viewing with authentication
+  const handleViewPDF = async (item) => {
+    const userId = getAuthenticatedUserId();
+    if (!userId) {
+      alert('Authentication required to view PDF');
+      return;
+    }
+    
+    try {
+      // Fetch the PDF with authentication headers
+      const response = await fetch(`/api/uploads/serve-pdf-by-id?id=${item.id}`, {
+        headers: {
+          'user-id': userId
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load PDF');
+      }
+      
+      // Create blob URL and open in new tab
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      
+      // Clean up the blob URL after a delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+      
+    } catch (error) {
+      console.error('View PDF error:', error);
+      alert('Failed to view PDF');
+    }
   };
 
-  // Handle PDF download
-  const handleDownloadPDF = (item) => {
-    const link = document.createElement('a');
-    link.href = `/api/uploads/serve-pdf-by-id?id=${item.id}`;
-    link.download = `${item.title}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Handle PDF download with authentication
+  const handleDownloadPDF = async (item) => {
+    const userId = getAuthenticatedUserId();
+    if (!userId) {
+      alert('Authentication required to download PDF');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/uploads/serve-pdf-by-id?id=${item.id}`, {
+        headers: {
+          'user-id': userId
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${item.title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download file');
+    }
   };
 
   // Handle edit item
@@ -151,10 +351,18 @@ const MentorDashboardSimple = () => {
     e.preventDefault();
     
     try {
+      const userId = getAuthenticatedUserId();
+      if (!userId) {
+        alert('Authentication error: Please log in again');
+        return;
+      }
+
       const response = await fetch('/api/uploads/update-mentor-content', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer test_token',
+          'user-id': userId
         },
         body: JSON.stringify({
           id: editingItem.id,
@@ -188,10 +396,18 @@ const MentorDashboardSimple = () => {
   const handleDeleteItem = async (item) => {
     if (confirm(`Are you sure you want to delete "${item.title}"?`)) {
       try {
+        const userId = getAuthenticatedUserId();
+        if (!userId) {
+          alert('Authentication error: Please log in again');
+          return;
+        }
+
         const response = await fetch('/api/uploads/delete-mentor-content', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer test_token',
+            'user-id': userId
           },
           body: JSON.stringify({ id: item.id })
         });
@@ -211,13 +427,24 @@ const MentorDashboardSimple = () => {
     }
   };
 
+  // Helper functions
   const getSectionTitle = (section) => {
     switch (section) {
       case 'formula': return 'Formula Bank';
       case 'flashcard': return 'Flashcards';
       case 'pyq': return 'Previous Year Questions';
       case 'notes': return 'Notes';
-      default: return 'Content';
+      default: return section;
+    }
+  };
+
+  const getSectionColor = (section) => {
+    switch (section) {
+      case 'formula': return 'bg-blue-600 text-white';
+      case 'flashcard': return 'bg-green-600 text-white';
+      case 'pyq': return 'bg-purple-600 text-white';
+      case 'notes': return 'bg-orange-600 text-white';
+      default: return 'bg-gray-600 text-white';
     }
   };
 
@@ -234,68 +461,36 @@ const MentorDashboardSimple = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
+        {/* User Info Header */}
+        <div className="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Mentor Dashboard</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-gray-300 text-sm">Welcome back, {userInfo.name}</p>
+                <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                  {userInfo.title}
+                </span>
+              </div>
+              {userInfo.email && (
+                <p className="text-gray-400 text-xs mt-1">{userInfo.email}</p>
+              )}
+            </div>
+            <div className="text-right">
+              <p className="text-gray-400 text-xs">User ID</p>
+              <p className="text-yellow-400 font-mono text-sm">{userInfo.userId}</p>
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-center mb-2">Mentor Content Upload</h1>
           <p className="text-gray-400 text-center">Upload and manage your educational content</p>
         </div>
 
-        {/* Upload Cards */}
+        {/* Upload Cards - All Content Types */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Formula Bank */}
-          <div 
-            className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
-            onClick={() => {
-              setActiveSection('formula');
-              setShowUploadModal(true);
-            }}
-          >
-            <div className="text-center">
-              <div className="text-4xl mb-4">📐</div>
-              <h3 className="text-xl font-bold mb-2">Formula Bank</h3>
-              <p className="text-blue-200 text-sm mb-4">Upload mathematical formulas and equations</p>
-              <div className="bg-blue-500/30 rounded-lg p-2">
-                <span className="text-sm font-medium">Click to Upload</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Flashcards */}
-          <div 
-            className="bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
-            onClick={() => {
-              setActiveSection('flashcard');
-              setShowUploadModal(true);
-            }}
-          >
-            <div className="text-center">
-              <div className="text-4xl mb-4">🃏</div>
-              <h3 className="text-xl font-bold mb-2">Flashcards</h3>
-              <p className="text-green-200 text-sm mb-4">Create interactive study flashcards</p>
-              <div className="bg-green-500/30 rounded-lg p-2">
-                <span className="text-sm font-medium">Click to Upload</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Previous Year Questions */}
-          <div 
-            className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
-            onClick={() => {
-              setActiveSection('pyq');
-              setShowUploadModal(true);
-            }}
-          >
-            <div className="text-center">
-              <div className="text-4xl mb-4">📝</div>
-              <h3 className="text-xl font-bold mb-2">Previous Year Questions</h3>
-              <p className="text-purple-200 text-sm mb-4">Upload past exam questions and papers</p>
-              <div className="bg-purple-500/30 rounded-lg p-2">
-                <span className="text-sm font-medium">Click to Upload</span>
-              </div>
-            </div>
-          </div>
-
           {/* Notes */}
           <div 
             className="bg-gradient-to-br from-orange-600 to-orange-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
@@ -313,21 +508,75 @@ const MentorDashboardSimple = () => {
               </div>
             </div>
           </div>
+
+          {/* Formula */}
+          <div 
+            className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => {
+              setActiveSection('formula');
+              setShowUploadModal(true);
+            }}
+          >
+            <div className="text-center">
+              <div className="text-4xl mb-4">🧮</div>
+              <h3 className="text-xl font-bold mb-2">Formula</h3>
+              <p className="text-blue-200 text-sm mb-4">Upload formula sheets and references</p>
+              <div className="bg-blue-500/30 rounded-lg p-2">
+                <span className="text-sm font-medium">Click to Upload</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Flashcard */}
+          <div 
+            className="bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => {
+              setActiveSection('flashcard');
+              setShowUploadModal(true);
+            }}
+          >
+            <div className="text-center">
+              <div className="text-4xl mb-4">🃏</div>
+              <h3 className="text-xl font-bold mb-2">Flashcard</h3>
+              <p className="text-green-200 text-sm mb-4">Upload flashcards and quick revision</p>
+              <div className="bg-green-500/30 rounded-lg p-2">
+                <span className="text-sm font-medium">Click to Upload</span>
+              </div>
+            </div>
+          </div>
+
+          {/* PYQ */}
+          <div 
+            className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-6 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg"
+            onClick={() => {
+              setActiveSection('pyq');
+              setShowUploadModal(true);
+            }}
+          >
+            <div className="text-center">
+              <div className="text-4xl mb-4">📝</div>
+              <h3 className="text-xl font-bold mb-2">PYQ</h3>
+              <p className="text-purple-200 text-sm mb-4">Upload previous year questions</p>
+              <div className="bg-purple-500/30 rounded-lg p-2">
+                <span className="text-sm font-medium">Click to Upload</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Content Display */}
         <div className="bg-gray-800/50 rounded-xl p-6">
           <h2 className="text-2xl font-bold mb-6">Uploaded Content</h2>
           
-          {/* Tabs */}
+          {/* Tabs - All Content Types */}
           <div className="flex flex-wrap gap-2 mb-6">
-            {['formula', 'flashcard', 'pyq', 'notes'].map((section) => (
+            {['notes', 'formula', 'flashcard', 'pyq'].map((section) => (
               <button
                 key={section}
                 onClick={() => setActiveSection(section)}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeSection === section
-                    ? 'bg-blue-600 text-white'
+                    ? getSectionColor(section)
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >

@@ -21,7 +21,7 @@ async function handler(req, res) {
     const { type } = req.query;
 
     let query;
-    if (type && ['formula', 'flashcard', 'pyq'].includes(type)) {
+    if (type && ['formula', 'flashcard', 'pyq', 'notes'].includes(type)) {
       query = sql`
         SELECT id, title, description, category, subject, type, year, exam_type,
                file_name, file_size, created_at
@@ -41,10 +41,14 @@ async function handler(req, res) {
 
     const result = await query;
 
+    // Ensure result and rows exist to prevent undefined errors
+    const rows = result && result.rows ? result.rows : [];
+
     return res.status(200).json({
       success: true,
-      uploads: result.rows,
-      count: result.rows.length
+      content: rows,
+      uploads: rows,
+      count: rows.length
     });
 
   } catch (error) {

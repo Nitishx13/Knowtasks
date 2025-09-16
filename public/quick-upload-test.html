@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .progress {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>⚡ Quick Upload Test</h2>
+        <p>Fast mentor content upload with timeout handling</p>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" value="Quick Test Notes" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" rows="3" required>Quick upload test for mentor system</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject:</label>
+                <select id="subject">
+                    <option value="physics">Physics</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="biology">Biology</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select id="category">
+                    <option value="neet">NEET</option>
+                    <option value="jee">JEE</option>
+                    <option value="boards">Boards</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="file">PDF File:</label>
+                <input type="file" id="file" accept=".pdf" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">Upload Now</button>
+        </form>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        let uploadActive = false;
+        
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (uploadActive) return;
+            uploadActive = true;
+            
+            const statusDiv = document.getElementById('status');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            
+            const file = document.getElementById('file').files[0];
+            
+            if (!file) {
+                showStatus('error', '❌ Please select a PDF file');
+                resetButton();
+                return;
+            }
+            
+            if (file.type !== 'application/pdf') {
+                showStatus('error', '❌ Only PDF files are allowed');
+                resetButton();
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('subject', document.getElementById('subject').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('type', 'notes');
+            
+            showStatus('progress', '📤 Uploading file...');
+            
+            const controller = new AbortController();
+            const timeout = setTimeout(() => {
+                controller.abort();
+                showStatus('error', '❌ Upload timeout (30s exceeded)');
+                resetButton();
+            }, 30000);
+            
+            try {
+                const response = await fetch('/api/uploads/mentor-content', {
+                    method: 'POST',
+                    headers: {
+                        'user-id': 'test_user_123'
+                    },
+                    body: formData,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeout);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('success', '✅ Upload successful!');
+                    document.getElementById('uploadForm').reset();
+                } else {
+                    showStatus('error', `❌ Upload failed: ${result.error || 'Unknown error'}`);
+                }
+                
+            } catch (error) {
+                clearTimeout(timeout);
+                
+                if (error.name === 'AbortError') {
+                    showStatus('error', '❌ Upload was cancelled due to timeout');
+                } else {
+                    showStatus('error', `❌ Upload error: ${error.message}`);
+                }
+            }
+            
+            resetButton();
+        });
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        function resetButton() {
+            uploadActive = false;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload Now';
+        }
+    </script>
+</body>
+</html>

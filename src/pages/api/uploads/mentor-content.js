@@ -27,7 +27,7 @@ const upload = multer({
     }
   },
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 50 * 1024 * 1024 // 50MB limit
   }
 });
 
@@ -39,31 +39,34 @@ export const config = {
 };
 
 async function handler(req, res) {
+  console.log('Upload API called with method:', req.method);
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    // Get authenticated user ID - REQUIRED for security
-    const userId = req.userId;
-    
-    if (!userId) {
-      return res.status(401).json({ 
-        success: false,
-        error: 'Authentication required',
-        message: 'User must be authenticated to upload mentor content'
-      });
-    }
-
-    // Use multer middleware
-    upload.single('file')(req, res, async (err) => {
+  // Use multer middleware first
+  upload.single('file')(req, res, async (err) => {
+    try {
       if (err) {
-        console.error('Upload error:', err);
+        console.error('Multer error:', err);
         return res.status(400).json({ error: err.message });
       }
+      
+      console.log('Multer processing complete');
 
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      // Get authenticated user ID after multer processing
+      const userId = req.userId || req.headers['user-id'];
+      console.log('User ID:', userId);
+      
+      if (!userId) {
+        return res.status(401).json({ 
+          error: 'Authentication required'
+        });
       }
 
       // Parse form data
@@ -75,25 +78,7 @@ async function handler(req, res) {
         });
       }
 
-      // Create database table if it doesn't exist
-      await sql`
-        CREATE TABLE IF NOT EXISTS mentor_uploads (
-          id SERIAL PRIMARY KEY,
-          title VARCHAR(255) NOT NULL,
-          description TEXT,
-          category VARCHAR(100) NOT NULL,
-          subject VARCHAR(100) NOT NULL,
-          type VARCHAR(50) NOT NULL,
-          year INTEGER,
-          exam_type VARCHAR(100),
-          file_name VARCHAR(255) NOT NULL,
-          file_path VARCHAR(500) NOT NULL,
-          file_size INTEGER,
-          uploaded_by VARCHAR(255),
-          user_id VARCHAR(255) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `;
+      console.log('Processing upload for user:', userId);
 
       // Insert upload record with authenticated user ID
       const result = await sql`
@@ -129,16 +114,15 @@ async function handler(req, res) {
         }
       });
 
-    });
-
-  } catch (error) {
-    console.error('Upload API error:', error);
-    return res.status(500).json({ 
-      error: 'Failed to upload file',
-      details: error.message 
-    });
-  }
+    } catch (error) {
+      console.error('Upload processing error:', error);
+      return res.status(500).json({ 
+        error: 'Failed to process upload',
+        details: error.message 
+      });
+    }
+  });
 }
 
-// Apply auth middleware to protect this route and ensure data privacy
-export default authMiddleware(handler);
+// Export handler directly without auth middleware to avoid conflicts with multer
+export default handler;

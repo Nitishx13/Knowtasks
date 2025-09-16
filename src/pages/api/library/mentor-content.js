@@ -30,7 +30,7 @@ async function handler(req, res) {
           fb.file_name, fb.file_path, fb.created_at, fb.download_count,
           mu.name as mentor_name, mu.email as mentor_email
         FROM formula_bank fb
-        LEFT JOIN mentor_users mu ON fb.user_id = mu.id
+        LEFT JOIN mentor_users mu ON fb.user_id = mu.user_id
         WHERE fb.status = 'active'
       `;
       
@@ -59,7 +59,9 @@ async function handler(req, res) {
 
       const formulas = await sql.query(formulaQuery, params);
       
-      mentorContent.push(...formulas.rows.map(item => ({
+      // Ensure formulas.rows exists before mapping
+      const formulaRows = formulas && formulas.rows ? formulas.rows : [];
+      mentorContent.push(...formulaRows.map(item => ({
         ...item,
         content_type: 'mentor_formula',
         document_type: 'Formula'
@@ -74,7 +76,7 @@ async function handler(req, res) {
           fc.created_at,
           mu.name as mentor_name, mu.email as mentor_email
         FROM flashcards fc
-        LEFT JOIN mentor_users mu ON fc.user_id = mu.id
+        LEFT JOIN mentor_users mu ON fc.user_id = mu.user_id
         WHERE 1=1
       `;
       
@@ -103,7 +105,9 @@ async function handler(req, res) {
 
       const flashcards = await sql.query(flashcardQuery, params);
       
-      mentorContent.push(...flashcards.rows.map(item => ({
+      // Ensure flashcards.rows exists before mapping
+      const flashcardRows = flashcards && flashcards.rows ? flashcards.rows : [];
+      mentorContent.push(...flashcardRows.map(item => ({
         ...item,
         content_type: 'mentor_flashcard',
         document_type: 'Flashcard'
@@ -112,46 +116,50 @@ async function handler(req, res) {
 
     // Get mentor PYQs
     if (!type || type === 'pyq') {
-      let pyqQuery = `
-        SELECT 
-          pyq.id, pyq.title, pyq.description, pyq.category, pyq.subject,
-          pyq.year, pyq.exam_type, pyq.created_at,
-          mu.name as mentor_name, mu.email as mentor_email
-        FROM pyq
-        LEFT JOIN mentor_users mu ON pyq.user_id = mu.id
-        WHERE 1=1
-      `;
-      
-      const params = [];
-      let paramCount = 0;
-
-      if (category && category !== 'all') {
-        paramCount++;
-        pyqQuery += ` AND pyq.category = $${paramCount}`;
-        params.push(category);
+      try {
+        const pyqs = await sql`
+          SELECT 
+            mu.id, mu.title, mu.description, mu.category, mu.subject,
+            mu.year, mu.exam_type, mu.file_name, mu.file_path, mu.created_at,
+            'PYQ' as document_type, 'mentor_pyq' as content_type
+          FROM mentor_uploads mu
+          WHERE mu.type = 'pyq'
+          ${category && category !== 'all' ? sql`AND mu.category = ${category}` : sql``}
+          ${subject && subject !== 'all' ? sql`AND mu.subject = ${subject}` : sql``}
+          ${search ? sql`AND (mu.title ILIKE ${`%${search}%`} OR mu.description ILIKE ${`%${search}%`})` : sql``}
+          ORDER BY mu.created_at DESC LIMIT 50
+        `;
+        
+        // Ensure pyqs.rows exists before spreading
+        const pyqRows = pyqs && pyqs.rows ? pyqs.rows : [];
+        mentorContent.push(...pyqRows);
+      } catch (error) {
+        console.error('Error fetching PYQs:', error);
       }
+    }
 
-      if (subject && subject !== 'all') {
-        paramCount++;
-        pyqQuery += ` AND pyq.subject = $${paramCount}`;
-        params.push(subject);
+    // Get mentor notes
+    if (!type || type === 'notes') {
+      try {
+        const notes = await sql`
+          SELECT 
+            mu.id, mu.title, mu.description, mu.category, mu.subject,
+            mu.file_name, mu.file_path, mu.created_at,
+            'Notes' as document_type, 'mentor_notes' as content_type
+          FROM mentor_uploads mu
+          WHERE mu.type = 'notes'
+          ${category && category !== 'all' ? sql`AND mu.category = ${category}` : sql``}
+          ${subject && subject !== 'all' ? sql`AND mu.subject = ${subject}` : sql``}
+          ${search ? sql`AND (mu.title ILIKE ${`%${search}%`} OR mu.description ILIKE ${`%${search}%`})` : sql``}
+          ORDER BY mu.created_at DESC LIMIT 50
+        `;
+        
+        // Ensure notes.rows exists before spreading
+        const noteRows = notes && notes.rows ? notes.rows : [];
+        mentorContent.push(...noteRows);
+      } catch (error) {
+        console.error('Error fetching notes:', error);
       }
-
-      if (search) {
-        paramCount++;
-        pyqQuery += ` AND (pyq.title ILIKE $${paramCount} OR pyq.description ILIKE $${paramCount})`;
-        params.push(`%${search}%`);
-      }
-
-      pyqQuery += ` ORDER BY pyq.created_at DESC LIMIT 50`;
-
-      const pyqs = await sql.query(pyqQuery, params);
-      
-      mentorContent.push(...pyqs.rows.map(item => ({
-        ...item,
-        content_type: 'mentor_pyq',
-        document_type: 'PYQ'
-      })));
     }
 
     // Sort all content by creation date

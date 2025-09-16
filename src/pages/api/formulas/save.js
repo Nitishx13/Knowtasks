@@ -1,17 +1,26 @@
-import { sql } from '@vercel/postgres';
+const { sql } = require('@vercel/postgres');
 import { authMiddleware } from '../../../middleware/authMiddleware';
 
 async function handler(req, res) {
-  // Set proper headers for JSON response
-  res.setHeader('Content-Type', 'application/json');
-  
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
   try {
+    // Set proper headers for JSON response
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, user-id');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     // Get authenticated user ID - REQUIRED for security
     const userId = req.userId;
+    
+    console.log('Formula save API - User ID:', userId);
     
     if (!userId) {
       return res.status(401).json({ 
@@ -22,6 +31,8 @@ async function handler(req, res) {
     }
 
     const { name, formula, description, applications, subject, chapter, difficulty } = req.body;
+    
+    console.log('Formula save data:', { name, formula, subject, userId });
 
     if (!name || !formula || !subject) {
       return res.status(400).json({ error: 'Missing required fields: name, formula, subject' });

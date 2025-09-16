@@ -62,6 +62,8 @@ const MentorLogin = () => {
         if (typeof window !== 'undefined') {
           localStorage.setItem('isMentorAuthenticated', 'true');
           localStorage.setItem('mentorData', JSON.stringify(data.mentor));
+          localStorage.setItem('mentorUserId', data.mentor.id); // Store mentor ID for API calls
+          localStorage.setItem('userId', data.mentor.id); // Fallback for general user ID
           localStorage.setItem('authToken', 'mentor-token-' + Date.now());
         }
         

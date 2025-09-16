@@ -1,58 +1,75 @@
-import { createTextFile } from '../../../lib/textDatabase';
+const { sql } = require('@vercel/postgres');
+import { authMiddleware } from '../../../middleware/authMiddleware';
 
-export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
-
-  // Handle OPTIONS request for CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+async function handler(req, res) {
   try {
-    const { text, title, summary } = req.body;
+    // Set proper headers for JSON response
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, user-id');
     
-    if (!text) {
-      return res.status(400).json({
-        success: false,
-        error: 'Text content is required'
-      });
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
     }
     
-    // Get user ID from the request query parameters
-    const userId = req.query.userId || req.headers['user-id'] || 'anonymous';
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    // Get authenticated user ID - REQUIRED for security
+    const userId = req.userId;
     
-    // Prepare text data for database
-    const textData = {
-      title: title || 'Text Input',
-      content: text,
-      summary: summary || '',
-      wordCount: text.split(/\s+/).length
-    };
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required',
+        message: 'User must be authenticated to save notes'
+      });
+    }
+
+    const { text, title, summary, subject, chapter, difficulty, noteType } = req.body;
     
-    // Save to database
-    const savedFile = await createTextFile(userId, textData);
-    
-    res.status(200).json({
-      success: true,
-      fileId: savedFile.id,
-      title: savedFile.title,
-      content: savedFile.content,
-      summary: savedFile.summary,
-      wordCount: savedFile.word_count,
-      createdAt: savedFile.created_at
+    if (!text || !subject) {
+      return res.status(400).json({ error: 'Missing required fields: text, subject' });
+    }
+
+    // Insert note into database
+    const result = await sql`
+      INSERT INTO notes (
+        title, content, summary, subject, chapter, difficulty, note_type, word_count, user_id, created_at
+      ) VALUES (
+        ${title || 'Text Notes'}, ${text}, ${summary || ''}, 
+        ${subject}, ${chapter || ''}, ${difficulty || 'medium'}, 
+        ${noteType || 'general'}, ${text.split(/\s+/).length}, ${userId}, NOW()
+      ) RETURNING id
+    `;
+
+    const noteId = result.rows[0].id;
+
+    res.status(200).json({ 
+      success: true, 
+      noteId,
+      message: `Notes saved successfully to ${subject}` 
     });
+
   } catch (error) {
-    console.error('Error saving text file:', error);
-    res.status(500).json({ error: 'Failed to save text file: ' + error.message });
+    console.error('Error saving note:', error);
+    
+    // Handle specific database errors
+    if (error.message.includes('relation "notes" does not exist')) {
+      return res.status(500).json({ 
+        error: 'Database table not found. Please run database setup first.',
+        details: 'The notes table needs to be created.'
+      });
+    }
+
+    res.status(500).json({ 
+      error: 'Failed to save note',
+      details: error.message 
+    });
   }
 }
+
+// Apply auth middleware to protect this route and ensure data privacy
+export default authMiddleware(handler);

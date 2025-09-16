@@ -14,10 +14,14 @@ function formatTotalSize(bytes) {
 
 const DataPage = () => {
   const [files, setFiles] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [formulas, setFormulas] = useState([]);
+  const [concepts, setConcepts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState('notes');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -25,7 +29,7 @@ const DataPage = () => {
   // Get current user from auth context
   const { user } = useAuth();
 
-  const fetchFiles = useCallback(async () => {
+  const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -36,21 +40,31 @@ const DataPage = () => {
         return;
       }
       
-      // Get auth headers and pass user ID to API to fetch only this user's files
       const headers = await getAuthHeaders(user.id);
-      const response = await fetch(`/api/data/files?userId=${user.id}`, {
-        headers
-      });
-      const data = await response.json();
       
-      if (data.success) {
-        setFiles(data.files);
-      } else {
-        setError(data.error || 'Failed to fetch files');
-      }
+      // Fetch all data in parallel
+      const [filesRes, notesRes, formulasRes, conceptsRes] = await Promise.all([
+        fetch(`/api/data/files?userId=${user.id}`, { headers }),
+        fetch('/api/notes/get', { headers }),
+        fetch('/api/formulas/get', { headers }),
+        fetch('/api/concepts/get', { headers })
+      ]);
+      
+      const [filesData, notesData, formulasData, conceptsData] = await Promise.all([
+        filesRes.json(),
+        notesRes.json(),
+        formulasRes.json(),
+        conceptsRes.json()
+      ]);
+      
+      if (filesData.success) setFiles(filesData.files || []);
+      if (notesData.success) setNotes(notesData.notes || []);
+      if (formulasData.success) setFormulas(formulasData.formulas || []);
+      if (conceptsData.success) setConcepts(conceptsData.concepts || []);
+      
     } catch (err) {
-      setError('Failed to fetch files');
-      console.error('Error fetching files:', err);
+      setError('Failed to fetch data');
+      console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
     }
@@ -58,7 +72,7 @@ const DataPage = () => {
 
   useEffect(() => {
     if (user) {
-      fetchFiles();
+      fetchAllData();
     }
     
     // Cleanup function to reset selection when component unmounts
@@ -66,7 +80,7 @@ const DataPage = () => {
       setSelectedFiles([]);
       setSelectAll(false);
     };
-  }, [fetchFiles, user]);
+  }, [fetchAllData, user]);
 
   // Prevent SSR issues by only rendering on client
   if (typeof window === 'undefined') {
@@ -244,11 +258,11 @@ const DataPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Data Management</h1>
-          <p className="text-gray-600 mt-2">View and manage all uploaded files</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">📚 My Study Materials</h1>
+          <p className="text-gray-600 mt-2">View and manage all your notes, formulas, concepts, and files</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={fetchFiles} variant="outline" className="flex items-center gap-2">
+          <Button onClick={fetchAllData} variant="outline" className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -261,113 +275,129 @@ const DataPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
-            <CardTitle className="text-xs md:text-sm font-medium">Total Files</CardTitle>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+            <CardTitle className="text-xs md:text-sm font-medium">✍️ Notes</CardTitle>
+            <span className="text-blue-600">📝</span>
           </CardHeader>
           <CardContent className="px-3 md:px-6 pb-3 md:pb-6 pt-1 md:pt-2">
+            <div className="text-xl md:text-2xl font-bold">{notes.length}</div>
+            <p className="text-[10px] md:text-xs text-muted-foreground">Study notes</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium">🧮 Formulas</CardTitle>
+            <span className="text-green-600">📐</span>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl md:text-2xl font-bold">{formulas.length}</div>
+            <p className="text-xs text-muted-foreground">Saved formulas</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium">💡 Concepts</CardTitle>
+            <span className="text-purple-600">🧠</span>
+          </CardHeader>
+          <CardContent>
+            <div className="text-xl md:text-2xl font-bold">{concepts.length}</div>
+            <p className="text-xs text-muted-foreground">Concept maps</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium">📁 Files</CardTitle>
+            <span className="text-gray-600">📄</span>
+          </CardHeader>
+          <CardContent>
             <div className="text-xl md:text-2xl font-bold">{files.length}</div>
-            <p className="text-[10px] md:text-xs text-muted-foreground">Uploaded files</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Total Size</CardTitle>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl md:text-2xl font-bold">
-              {formatTotalSize(files.reduce((sum, file) => sum + (file.fileSize || 0), 0))}
-            </div>
-            <p className="text-xs text-muted-foreground">Combined size</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">PDF Files</CardTitle>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl md:text-2xl font-bold">
-              {files.filter(file => file.fileName.toLowerCase().endsWith('.pdf')).length}
-            </div>
-            <p className="text-xs text-muted-foreground">PDF documents</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs md:text-sm font-medium">Active Files</CardTitle>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl md:text-2xl font-bold">
-              {files.filter(file => file.status === 'uploaded').length}
-            </div>
-            <p className="text-xs text-muted-foreground">Ready for processing</p>
+            <p className="text-xs text-muted-foreground">Uploaded files</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Tab Navigation */}
       <Card>
         <CardHeader>
-          <CardTitle>Filters & Search</CardTitle>
-          <CardDescription>Find specific files quickly</CardDescription>
+          <CardTitle>Study Materials</CardTitle>
+          <CardDescription>Browse your saved content by category</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <button
+              onClick={() => setActiveTab('notes')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'notes'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              ✍️ Notes ({notes.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('formulas')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'formulas'
+                  ? 'bg-green-100 text-green-700 border border-green-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              🧮 Formulas ({formulas.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('concepts')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'concepts'
+                  ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              💡 Concepts ({concepts.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('files')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'files'
+                  ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              📁 Files ({files.length})
+            </button>
+          </div>
+          
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <div className="flex-1">
-              <label htmlFor="search" className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                Search Files
-              </label>
               <input
                 type="text"
-                id="search"
-                placeholder="Search by filename or source..."
+                placeholder={`Search ${activeTab}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <div>
-              <label htmlFor="status" className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2">
-                Status Filter
-              </label>
-              <select
-                id="status"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All Status</option>
-                <option value="uploaded">Uploaded</option>
-                <option value="processing">Processing</option>
-                <option value="completed">Completed</option>
-                <option value="error">Error</option>
-              </select>
-            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Files Table */}
+      {/* Content Display */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
             <div>
-              <CardTitle>Uploaded Files</CardTitle>
+              <CardTitle>
+                {activeTab === 'notes' && '✍️ My Notes'}
+                {activeTab === 'formulas' && '🧮 My Formulas'}
+                {activeTab === 'concepts' && '💡 My Concepts'}
+                {activeTab === 'files' && '📁 Uploaded Files'}
+              </CardTitle>
               <CardDescription>
-                {filteredFiles.length} of {files.length} files
+                {activeTab === 'notes' && `${notes.filter(note => note.title?.toLowerCase().includes(searchTerm.toLowerCase()) || note.content?.toLowerCase().includes(searchTerm.toLowerCase())).length} of ${notes.length} notes`}
+                {activeTab === 'formulas' && `${formulas.filter(formula => formula.name?.toLowerCase().includes(searchTerm.toLowerCase()) || formula.description?.toLowerCase().includes(searchTerm.toLowerCase())).length} of ${formulas.length} formulas`}
+                {activeTab === 'concepts' && `${concepts.filter(concept => concept.title?.toLowerCase().includes(searchTerm.toLowerCase()) || concept.description?.toLowerCase().includes(searchTerm.toLowerCase())).length} of ${concepts.length} concepts`}
+                {activeTab === 'files' && `${filteredFiles.length} of ${files.length} files`}
               </CardDescription>
             </div>
             {selectedFiles.length > 0 && (
@@ -396,17 +426,146 @@ const DataPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          {filteredFiles.length === 0 ? (
-            <div className="text-center py-8 md:py-12">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-3 md:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p className="text-gray-500 text-base md:text-lg">No files found</p>
-              <p className="text-gray-400">Try adjusting your search or filters</p>
+          {/* Notes Display */}
+          {activeTab === 'notes' && (
+            <div className="space-y-4">
+              {notes.filter(note => 
+                note.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                note.content?.toLowerCase().includes(searchTerm.toLowerCase())
+              ).length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">📝</div>
+                  <p className="text-gray-500">No notes found</p>
+                  <p className="text-gray-400 text-sm">Start creating notes in the Upload Task page</p>
+                </div>
+              ) : (
+                notes.filter(note => 
+                  note.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  note.content?.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map((note) => (
+                  <div key={note.id} className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-blue-900">{note.title}</h3>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{note.subject}</span>
+                    </div>
+                    <p className="text-sm text-blue-800 mb-3">{note.summary || note.content?.substring(0, 200)}...</p>
+                    <div className="flex justify-between items-center text-xs text-blue-600">
+                      <div className="flex gap-4">
+                        {note.chapter && <span>Chapter: {note.chapter}</span>}
+                        <span>{note.difficulty}</span>
+                        <span>{note.word_count} words</span>
+                      </div>
+                      <span>{new Date(note.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          ) : (
+          )}
+
+          {/* Formulas Display */}
+          {activeTab === 'formulas' && (
+            <div className="space-y-4">
+              {formulas.filter(formula => 
+                formula.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                formula.description?.toLowerCase().includes(searchTerm.toLowerCase())
+              ).length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">🧮</div>
+                  <p className="text-gray-500">No formulas found</p>
+                  <p className="text-gray-400 text-sm">Start adding formulas in the Upload Task page</p>
+                </div>
+              ) : (
+                formulas.filter(formula => 
+                  formula.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  formula.description?.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map((formula) => (
+                  <div key={formula.id} className="border border-green-200 rounded-lg p-4 bg-green-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-green-900">{formula.name}</h3>
+                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">{formula.subject}</span>
+                    </div>
+                    <div className="bg-white p-3 rounded border font-mono text-sm mb-3">{formula.formula}</div>
+                    <p className="text-sm text-green-800 mb-3">{formula.description}</p>
+                    {formula.applications && (
+                      <div className="text-sm text-green-700 mb-3">
+                        <strong>Applications:</strong> {formula.applications}
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs text-green-600">
+                      <div className="flex gap-4">
+                        {formula.chapter && <span>Chapter: {formula.chapter}</span>}
+                        <span>{formula.difficulty}</span>
+                      </div>
+                      <span>{new Date(formula.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Concepts Display */}
+          {activeTab === 'concepts' && (
+            <div className="space-y-4">
+              {concepts.filter(concept => 
+                concept.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                concept.description?.toLowerCase().includes(searchTerm.toLowerCase())
+              ).length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">💡</div>
+                  <p className="text-gray-500">No concepts found</p>
+                  <p className="text-gray-400 text-sm">Start creating concept maps in the Upload Task page</p>
+                </div>
+              ) : (
+                concepts.filter(concept => 
+                  concept.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  concept.description?.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map((concept) => (
+                  <div key={concept.id} className="border border-purple-200 rounded-lg p-4 bg-purple-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-purple-900">{concept.title}</h3>
+                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">{concept.subject}</span>
+                    </div>
+                    <p className="text-sm text-purple-800 mb-3">{concept.description}</p>
+                    {concept.key_points && (
+                      <div className="text-sm text-purple-700 mb-3">
+                        <strong>Key Points:</strong>
+                        <div className="mt-1 whitespace-pre-line">{concept.key_points}</div>
+                      </div>
+                    )}
+                    {concept.examples && (
+                      <div className="text-sm text-purple-700 mb-3">
+                        <strong>Examples:</strong> {concept.examples}
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs text-purple-600">
+                      <div className="flex gap-4">
+                        {concept.chapter && <span>Chapter: {concept.chapter}</span>}
+                        <span>{concept.difficulty}</span>
+                      </div>
+                      <span>{new Date(concept.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Files Display */}
+          {activeTab === 'files' && (
             <>
-              {/* Desktop Table View - Hidden on Mobile */}
+              {filteredFiles.length === 0 ? (
+                <div className="text-center py-8 md:py-12">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 md:h-12 md:w-12 text-gray-400 mx-auto mb-3 md:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-gray-500 text-base md:text-lg">No files found</p>
+                  <p className="text-gray-400">Try adjusting your search or filters</p>
+                </div>
+              ) : (
+                <>
+                  {/* Desktop Table View - Hidden on Mobile */}
               <div className="hidden md:block overflow-x-auto -mx-4 md:mx-0">
                 <table className="w-full min-w-[800px]">
                   <thead className="bg-gray-50 text-[10px] md:text-xs">
@@ -587,6 +746,8 @@ const DataPage = () => {
                   </div>
                 ))}
               </div>
+                </>
+              )}
             </>
           )}
         </CardContent>

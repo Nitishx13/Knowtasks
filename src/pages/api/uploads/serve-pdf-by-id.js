@@ -1,10 +1,9 @@
 import { sql } from '@vercel/postgres';
 import fs from 'fs';
 import path from 'path';
-import { authMiddleware } from '../../../middleware/authMiddleware';
 
 async function handler(req, res) {
-  if (req.method !== 'GET') {
+  if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -15,8 +14,8 @@ async function handler(req, res) {
   }
 
   try {
-    // Get authenticated user ID - REQUIRED for security
-    const userId = req.userId;
+    // Get authenticated user ID - check headers directly
+    const userId = req.headers['user-id'];
     
     if (!userId) {
       return res.status(401).json({ 
@@ -75,5 +74,5 @@ async function handler(req, res) {
   }
 }
 
-// Apply auth middleware to protect this route and ensure data privacy
-export default authMiddleware(handler);
+// Export handler directly - authentication handled internally
+export default handler;

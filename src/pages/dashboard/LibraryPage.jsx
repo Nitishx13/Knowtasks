@@ -12,6 +12,7 @@ const LibraryPage = () => {
   const [libraryItems, setLibraryItems] = useState([]);
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
+  const [subjectFilter, setSubjectFilter] = useState('all');
   
   const { user } = useAuth();
   const router = useRouter();
@@ -130,7 +131,7 @@ const LibraryPage = () => {
   const fetchLibraryItems = useCallback(async () => {
     setLoading(true);
     try {
-      const headers = getAuthHeaders();
+      const headers = await getAuthHeaders();
       
       // Fetch from unified library API that includes user content + shared mentor content
       const response = await fetch('/api/library', {
@@ -138,9 +139,13 @@ const LibraryPage = () => {
         headers: headers
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
       
-      if (data.success && data.library) {
+      if (data.success && data.library && Array.isArray(data.library)) {
         const items = data.library.map(item => ({
           id: `${item.content_type || 'user'}-${item.id}`,
           title: item.title,
@@ -148,7 +153,8 @@ const LibraryPage = () => {
                 item.content_type === 'mentor_flashcard' ? 'flashcard' :
                 item.content_type === 'mentor_pyq' ? 'pyq' :
                 item.document_type?.toLowerCase() || 'notes',
-          category: item.subject || item.category || 'General',
+          category: item.category || 'General',
+          subject: item.subject || item.category || 'General',
           date: new Date(item.created_at).toLocaleDateString(),
           size: item.content_type?.startsWith('mentor_') ? 
                 (item.content_type === 'mentor_formula' ? 'Formula PDF' :
@@ -172,18 +178,20 @@ const LibraryPage = () => {
         }));
         
         console.log('Library stats:', data.stats);
+        console.log('Processed library items:', items);
+        console.log('Mentor items:', items.filter(item => item.uploadedBy === 'mentor'));
         setLibraryItems(items);
       } else {
-        console.error('Failed to fetch library items:', data.error);
-        // Fallback to mock data
-        setLibraryItems(mockLibraryItems);
+        console.error('Failed to fetch library items:', data.error || 'Invalid response format');
+        // No fallback to mock data - show empty state instead
+        setLibraryItems([]);
       }
       
       setLoading(false);
     } catch (error) {
       console.error('Error loading library items from API:', error);
-      // Fallback to mock data
-      setLibraryItems(mockLibraryItems);
+      // No fallback to mock data - show empty state instead
+      setLibraryItems([]);
       setLoading(false);
     }
   }, [activeTab, searchQuery, mockLibraryItems]);
@@ -197,19 +205,22 @@ const LibraryPage = () => {
   const filteredItems = libraryItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Handle content type filtering
-    const matchesContentType = activeTab === 'all' || 
-                               activeTab === 'user' || 
-                               activeTab === 'mentor' || 
-                               item.type === activeTab;
+    // Subject filtering
+    const matchesSubject = subjectFilter === 'all' || 
+                          (item.subject && item.subject.toLowerCase() === subjectFilter.toLowerCase()) ||
+                          (item.category && item.category.toLowerCase() === subjectFilter.toLowerCase());
     
-    // Handle source filtering
-    const matchesSource = activeTab === 'all' || 
-                         (activeTab === 'user' && item.uploadedBy === 'user') ||
-                         (activeTab === 'mentor' && item.uploadedBy === 'mentor') ||
-                         (activeTab !== 'user' && activeTab !== 'mentor' && activeTab !== 'all');
-    
-    return matchesSearch && matchesContentType && matchesSource;
+    // Handle filtering logic
+    if (activeTab === 'all') {
+      return matchesSearch && matchesSubject;
+    } else if (activeTab === 'user') {
+      return matchesSearch && matchesSubject && item.uploadedBy === 'user';
+    } else if (activeTab === 'mentor') {
+      return matchesSearch && matchesSubject && item.uploadedBy === 'mentor';
+    } else {
+      // Filter by content type (formula, flashcard, pyq, notes)
+      return matchesSearch && matchesSubject && item.type === activeTab;
+    }
   });
 
   // Handle PDF viewing
@@ -391,7 +402,7 @@ const LibraryPage = () => {
                 variant={activeTab === 'mentor' ? 'default' : 'outline'}
                 className={`text-xs md:text-sm px-3 py-1.5 ${activeTab === 'mentor' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
               >
-                👨‍🏫 Mentor Content
+                👨‍🏫 Expert Mentor Content
               </Button>
             </div>
           </div>
@@ -400,19 +411,128 @@ const LibraryPage = () => {
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Subjects</p>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 bg-red-100 text-red-800 text-xs font-medium rounded-full border border-red-200">⚛️ Physics</span>
-              <span className="px-3 py-1.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full border border-blue-200">🧪 Chemistry</span>
-              <span className="px-3 py-1.5 bg-purple-100 text-purple-800 text-xs font-medium rounded-full border border-purple-200">📊 Mathematics</span>
-              <span className="px-3 py-1.5 bg-green-100 text-green-800 text-xs font-medium rounded-full border border-green-200">🧬 Biology</span>
+              <Button 
+                onClick={() => setSubjectFilter('all')}
+                variant={subjectFilter === 'all' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${subjectFilter === 'all' ? 'bg-gray-600 text-white hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🌟 All Subjects
+              </Button>
+              <Button 
+                onClick={() => setSubjectFilter('physics')}
+                variant={subjectFilter === 'physics' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${subjectFilter === 'physics' ? 'bg-red-600 text-white hover:bg-red-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                ⚛️ Physics
+              </Button>
+              <Button 
+                onClick={() => setSubjectFilter('chemistry')}
+                variant={subjectFilter === 'chemistry' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${subjectFilter === 'chemistry' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🧪 Chemistry
+              </Button>
+              <Button 
+                onClick={() => setSubjectFilter('mathematics')}
+                variant={subjectFilter === 'mathematics' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${subjectFilter === 'mathematics' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                📊 Mathematics
+              </Button>
+              <Button 
+                onClick={() => setSubjectFilter('biology')}
+                variant={subjectFilter === 'biology' ? 'default' : 'outline'}
+                className={`text-xs md:text-sm px-3 py-1.5 ${subjectFilter === 'biology' ? 'bg-green-600 text-white hover:bg-green-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              >
+                🧬 Biology
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
+
+      {/* Filter Results Summary */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              Showing <strong>{filteredItems.length}</strong> of <strong>{libraryItems.length}</strong> items
+            </span>
+            {activeTab !== 'all' && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                Filter: {activeTab === 'user' ? 'My Content' : 
+                        activeTab === 'mentor' ? 'Mentor Content' :
+                        activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+              </span>
+            )}
+            {subjectFilter !== 'all' && (
+              <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                Subject: {subjectFilter.charAt(0).toUpperCase() + subjectFilter.slice(1)}
+              </span>
+            )}
+          </div>
+          {(activeTab !== 'all' || subjectFilter !== 'all') && (
+            <button 
+              onClick={() => {
+                setActiveTab('all');
+                setSubjectFilter('all');
+                setSearchQuery('');
+              }}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Special Header for Mentor Content Filter */}
+      {activeTab === 'mentor' && (
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">👨‍🏫 Expert Mentor Content</h2>
+              <p className="text-gray-600">High-quality study materials curated by experienced mentors</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Library Items */}
       <div className="space-y-4">
-        {filteredItems.map((item) => (
-          <div key={item.id} className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:border-blue-300">
+        {filteredItems.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Found</h3>
+            <p className="text-gray-500 mb-4">
+              {searchQuery ? `No results found for "${searchQuery}"` : 
+               activeTab !== 'all' ? `No ${activeTab} content available` :
+               'No content available with current filters'}
+            </p>
+            <button 
+              onClick={() => {
+                setActiveTab('all');
+                setSubjectFilter('all');
+                setSearchQuery('');
+              }}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear filters to see all content
+            </button>
+          </div>
+        ) : (
+          filteredItems.map((item) => (
+            <div key={item.id} className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200 hover:border-blue-300">
             <div className="flex flex-col gap-4">
               {/* Header Section */}
               <div className="flex items-start justify-between">
@@ -563,7 +683,8 @@ const LibraryPage = () => {
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {filteredItems.length === 0 && (

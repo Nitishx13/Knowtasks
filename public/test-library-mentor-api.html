@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Library Mentor Content API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 20px; }
+        .container { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .status { margin: 15px 0; padding: 15px; border-radius: 8px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .mentor-card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #6366f1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .api-response { background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 8px; font-family: monospace; max-height: 300px; overflow-y: auto; margin: 10px 0; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .stat-card { background: white; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🧪 Library Mentor Content API Test</h2>
+        <p>Comprehensive testing of mentor content retrieval and display</p>
+        
+        <div class="test-section">
+            <h3>📊 API Endpoints Testing</h3>
+            <button onclick="testLibraryMentorAPI()">Test /api/library/mentor-content</button>
+            <button onclick="testMainLibraryAPI()">Test /api/library (Main)</button>
+            <button onclick="testUserMentorAPI()">Test /api/user/mentor-content</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        function clearResults() {
+            document.getElementById('status').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testLibraryMentorAPI() {
+            showStatus('🔍 Testing /api/library/mentor-content...', 'info');
+            
+            try {
+                const response = await fetch('/api/library/mentor-content', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showStatus('✅ Library Mentor Content API Response Received', 'success');
+                
+                let html = `
+                    <div class="test-section">
+                        <h4>📋 /api/library/mentor-content Results</h4>
+                        <div class="api-response">${JSON.stringify(data, null, 2)}</div>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <strong>Success</strong><br>
+                                ${data.success ? '✅ True' : '❌ False'}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Total Items</strong><br>
+                                ${data.total || 0}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Content Array</strong><br>
+                                ${data.content ? data.content.length : 0} items
+                            </div>
+                        </div>
+                `;
+                
+                if (data.content && data.content.length > 0) {
+                    html += `<h5>📚 Content Items:</h5>`;
+                    data.content.forEach((item, index) => {
+                        html += `
+                            <div class="mentor-card">
+                                <strong>${index + 1}. ${item.title || 'No Title'}</strong><br>
+                                <strong>Type:</strong> ${item.content_type || item.document_type || 'Unknown'}<br>
+                                <strong>Subject:</strong> ${item.subject || 'N/A'} | 
+                                <strong>Category:</strong> ${item.category || 'N/A'}<br>
+                                <strong>Mentor:</strong> ${item.mentor_name || 'Unknown'}<br>
+                                <strong>Created:</strong> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="error">❌ No content items found</div>`;
+                }
+                
+                html += `</div>`;
+                document.getElementById('results').innerHTML = html;
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                document.getElementById('results').innerHTML = `
+                    <div class="test-section">
+                        <div class="error">Failed to fetch mentor content: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function testMainLibraryAPI() {
+            showStatus('🔍 Testing /api/library (Main Library)...', 'info');
+            
+            try {
+                const response = await fetch('/api/library', {
+                    headers: {
+                        'user-id': 'test_user_123',
+                        'Authorization': 'Bearer test_token'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showStatus('✅ Main Library API Response Received', 'success');
+                
+                // Filter mentor items
+                const mentorItems = data.library ? data.library.filter(item => 
+                    item.content_type && item.content_type.startsWith('mentor_')
+                ) : [];
+                
+                let html = `
+                    <div class="test-section">
+                        <h4>📋 /api/library (Main) Results</h4>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <strong>Success</strong><br>
+                                ${data.success ? '✅ True' : '❌ False'}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Total Library</strong><br>
+                                ${data.library ? data.library.length : 0}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Mentor Items</strong><br>
+                                ${mentorItems.length}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Stats</strong><br>
+                                ${JSON.stringify(data.stats || {})}
+                            </div>
+                        </div>
+                `;
+                
+                if (mentorItems.length > 0) {
+                    html += `<h5>👨‍🏫 Mentor Items from Main Library:</h5>`;
+                    mentorItems.forEach((item, index) => {
+                        html += `
+                            <div class="mentor-card">
+                                <strong>${index + 1}. ${item.title || 'No Title'}</strong><br>
+                                <strong>Content Type:</strong> ${item.content_type}<br>
+                                <strong>Subject:</strong> ${item.subject || 'N/A'} | 
+                                <strong>Category:</strong> ${item.category || 'N/A'}<br>
+                                <strong>Mentor:</strong> ${item.mentor_name || 'Unknown'}<br>
+                                <strong>Creator ID:</strong> ${item.creator_id || 'N/A'}
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="error">❌ No mentor items found in main library</div>`;
+                }
+                
+                html += `</div>`;
+                document.getElementById('results').innerHTML = html;
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                document.getElementById('results').innerHTML = `
+                    <div class="test-section">
+                        <div class="error">Failed to fetch main library: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function testUserMentorAPI() {
+            showStatus('🔍 Testing /api/user/mentor-content...', 'info');
+            
+            try {
+                const response = await fetch('/api/user/mentor-content');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showStatus('✅ User Mentor Content API Response Received', 'success');
+                
+                let html = `
+                    <div class="test-section">
+                        <h4>📋 /api/user/mentor-content Results</h4>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <strong>Success</strong><br>
+                                ${data.success ? '✅ True' : '❌ False'}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Total Items</strong><br>
+                                ${data.total || 0}
+                            </div>
+                            <div class="stat-card">
+                                <strong>Content Array</strong><br>
+                                ${data.content ? data.content.length : 0}
+                            </div>
+                        </div>
+                `;
+                
+                if (data.content && data.content.length > 0) {
+                    html += `<h5>📚 Public Mentor Content:</h5>`;
+                    data.content.forEach((item, index) => {
+                        html += `
+                            <div class="mentor-card">
+                                <strong>${index + 1}. ${item.title || 'No Title'}</strong><br>
+                                <strong>Type:</strong> ${item.type || 'Unknown'}<br>
+                                <strong>Subject:</strong> ${item.subject || 'N/A'} | 
+                                <strong>Category:</strong> ${item.category || 'N/A'}<br>
+                                <strong>Mentor:</strong> ${item.mentor ? item.mentor.name : 'Unknown'}<br>
+                                <strong>Experience:</strong> ${item.mentor ? item.mentor.experience : 'N/A'}<br>
+                                <strong>File:</strong> ${item.fileName || 'N/A'}
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="error">❌ No public mentor content found</div>`;
+                }
+                
+                html += `</div>`;
+                document.getElementById('results').innerHTML = html;
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                document.getElementById('results').innerHTML = `
+                    <div class="test-section">
+                        <div class="error">Failed to fetch user mentor content: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

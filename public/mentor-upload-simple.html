@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Upload - Simple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .auth-section {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .auth-section h3 {
+            color: #334155;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: #f8fafc;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #4f46e5;
+            background: #f1f5f9;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            cursor: pointer;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .status.info {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #dbeafe;
+        }
+
+        .upload-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-btn {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .section-btn.active {
+            border-color: #4f46e5;
+            background: #f0f9ff;
+            color: #4f46e5;
+        }
+
+        .section-btn:hover {
+            border-color: #4f46e5;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Mentor Upload Portal</h1>
+            <p>Share your knowledge with students</p>
+        </div>
+
+        <div class="content">
+            <!-- Authentication Section -->
+            <div class="auth-section">
+                <h3>🔐 Mentor Authentication</h3>
+                <div class="form-group">
+                    <label for="mentorId">Mentor ID:</label>
+                    <input type="text" id="mentorId" placeholder="Enter your mentor ID (e.g., mentor_123)" value="mentor_test_123">
+                </div>
+                <button type="button" class="btn" onclick="authenticateMentor()">Authenticate</button>
+                <div id="authStatus"></div>
+            </div>
+
+            <!-- Upload Form -->
+            <div id="uploadForm" class="hidden">
+                <h3>📤 Upload Content</h3>
+                
+                <!-- Content Type Selection -->
+                <div class="upload-sections">
+                    <div class="section-btn active" data-type="notes">
+                        📝 Notes
+                    </div>
+                    <div class="section-btn" data-type="formula">
+                        🧮 Formula Bank
+                    </div>
+                    <div class="section-btn" data-type="flashcard">
+                        🎯 Flashcards
+                    </div>
+                    <div class="section-btn" data-type="pyq">
+                        📋 Previous Year Questions
+                    </div>
+                </div>
+
+                <form id="contentUploadForm">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required placeholder="Enter content title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" name="description" rows="3" required placeholder="Describe the content"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Select Subject</option>
+                            <option value="physics">Physics</option>
+                            <option value="chemistry">Chemistry</option>
+                            <option value="mathematics">Mathematics</option>
+                            <option value="biology">Biology</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="neet">NEET</option>
+                            <option value="jee">JEE</option>
+                            <option value="boards">Boards</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+
+                    <!-- PYQ Specific Fields -->
+                    <div id="pyqFields" class="hidden">
+                        <div class="form-group">
+                            <label for="year">Year:</label>
+                            <input type="number" id="year" name="year" min="2000" max="2024" placeholder="2023">
+                        </div>
+                        <div class="form-group">
+                            <label for="examType">Exam Type:</label>
+                            <select id="examType" name="examType">
+                                <option value="">Select Exam</option>
+                                <option value="neet">NEET</option>
+                                <option value="jee-main">JEE Main</option>
+                                <option value="jee-advanced">JEE Advanced</option>
+                                <option value="boards">Board Exam</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload PDF File:</label>
+                        <div class="file-upload">
+                            <input type="file" id="pdfFile" name="file" accept=".pdf" required>
+                            <label for="pdfFile" class="file-upload-label">
+                                📎 Click to select PDF file
+                            </label>
+                            <p style="margin-top: 10px; color: #6b7280; font-size: 14px;">
+                                Maximum file size: 50MB
+                            </p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="uploadBtn">
+                        🚀 Upload Content
+                    </button>
+                </form>
+
+                <div id="uploadStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMentorId = null;
+        let currentContentType = 'notes';
+
+        // Content type selection
+        document.querySelectorAll('.section-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentContentType = btn.dataset.type;
+                
+                // Show/hide PYQ specific fields
+                const pyqFields = document.getElementById('pyqFields');
+                if (currentContentType === 'pyq') {
+                    pyqFields.classList.remove('hidden');
+                } else {
+                    pyqFields.classList.add('hidden');
+                }
+            });
+        });
+
+        // File upload label update
+        document.getElementById('pdfFile').addEventListener('change', function(e) {
+            const label = document.querySelector('.file-upload-label');
+            if (e.target.files.length > 0) {
+                label.textContent = `📎 ${e.target.files[0].name}`;
+            } else {
+                label.textContent = '📎 Click to select PDF file';
+            }
+        });
+
+        async function authenticateMentor() {
+            const mentorId = document.getElementById('mentorId').value.trim();
+            const statusDiv = document.getElementById('authStatus');
+            
+            if (!mentorId) {
+                showStatus(statusDiv, 'Please enter your mentor ID', 'error');
+                return;
+            }
+
+            try {
+                showStatus(statusDiv, 'Authenticating...', 'info');
+                
+                const response = await fetch('/api/mentor/profile', {
+                    method: 'GET',
+                    headers: {
+                        'user-id': mentorId,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                console.log('Auth response:', data);
+
+                if (response.ok && data.success) {
+                    currentMentorId = mentorId;
+                    showStatus(statusDiv, `✅ Welcome ${data.mentor.name || mentorId}!`, 'success');
+                    document.getElementById('uploadForm').classList.remove('hidden');
+                } else {
+                    showStatus(statusDiv, `❌ Authentication failed: ${data.error || 'Invalid mentor ID'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                showStatus(statusDiv, `❌ Authentication error: ${error.message}`, 'error');
+            }
+        }
+
+        document.getElementById('contentUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!currentMentorId) {
+                alert('Please authenticate first');
+                return;
+            }
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a PDF file');
+                return;
+            }
+
+            if (file.type !== 'application/pdf') {
+                alert('Please select a PDF file only');
+                return;
+            }
+
+            // Add form data
+            formData.append('file', file);
+            formData.append('title', document.getElementById('title').value.trim());
+            formData.append('description', document.getElementById('description').value.trim());
+            formData.append('subject', document.getElementById('subject').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('type', currentContentType);
+
+            // Add PYQ specific fields if needed
+            if (currentContentType === 'pyq') {
+                formData.append('year', document.getElementById('year').value);
+                formData.append('examType', document.getElementById('examType').value);
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '⏳ Uploading...';
+                showStatus(statusDiv, 'Uploading file...', 'info');
+
+                console.log('Uploading with mentor ID:', currentMentorId);
+                console.log('Content type:', currentContentType);
+
+                const response = await fetch('/api/uploads/mentor-content', {
+                    method: 'POST',
+                    headers: {
+                        'user-id': currentMentorId
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Upload response:', data);
+
+                if (data.success) {
+                    showStatus(statusDiv, `✅ ${getContentTypeName(currentContentType)} uploaded successfully!`, 'success');
+                    document.getElementById('contentUploadForm').reset();
+                    document.querySelector('.file-upload-label').textContent = '📎 Click to select PDF file';
+                } else {
+                    showStatus(statusDiv, `❌ Upload failed: ${data.error || data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus(statusDiv, `❌ Upload error: ${error.message}`, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Upload Content';
+            }
+        });
+
+        function showStatus(element, message, type) {
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function getContentTypeName(type) {
+            const names = {
+                'notes': 'Notes',
+                'formula': 'Formula Bank',
+                'flashcard': 'Flashcards',
+                'pyq': 'Previous Year Questions'
+            };
+            return names[type] || type;
+        }
+    </script>
+</body>
+</html>

@@ -46,16 +46,30 @@ const BecomeMentorPage = () => {
     setIsSubmitting(true);
 
     try {
+      // Transform form data to match API expectations
+      const apiData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subjects.join(', '), // Convert array to comma-separated string
+        experience: formData.experience,
+        bio: `Qualification: ${formData.qualification}\nTeaching Mode: ${formData.teachingMode}\nAvailability: ${formData.availability}\nMotivation: ${formData.motivation}\nPortfolio: ${formData.portfolio || 'Not provided'}`
+      };
+
       const response = await fetch('/api/mentors/apply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       });
 
       if (response.ok) {
         setSubmitted(true);
+        // Redirect to admin dashboard mentor management section after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/admin/dashboard?section=Mentor%20Management';
+        }, 2000);
       } else {
         throw new Error('Failed to submit application');
       }
@@ -87,6 +101,7 @@ const BecomeMentorPage = () => {
               </h1>
               <p className="text-lg text-gray-600 mb-8">
                 Thank you for your interest in becoming a mentor with Knowtasks. We've received your application and will review it carefully.
+                You will be redirected to the admin dashboard shortly to manage your application.
               </p>
             </div>
 
