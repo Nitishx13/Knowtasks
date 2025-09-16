@@ -231,12 +231,14 @@ const LibraryPage = () => {
 
   // Handle PDF download
   const handleDownloadPDF = (item) => {
-    const link = document.createElement('a');
-    link.href = item.fileUrl || `/uploads/${encodeURIComponent(item.fileName)}`;
-    link.download = item.fileName || item.title;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const link = document.createElement('a');
+      link.href = item.fileUrl || `/uploads/${encodeURIComponent(item.fileName)}`;
+      link.download = item.fileName || item.title;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const getStatusColor = (status) => {

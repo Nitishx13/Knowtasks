@@ -168,13 +168,15 @@ const FilesPage = () => {
                 </div>
                 <button
                   onClick={() => {
-                    const element = document.createElement('a');
-                    const file = new Blob([selectedFile.content], {type: 'text/plain'});
-                    element.href = URL.createObjectURL(file);
-                    element.download = `${selectedFile.title || 'text-file'}.txt`;
-                    document.body.appendChild(element);
-                    element.click();
-                    document.body.removeChild(element);
+                    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+                      const element = document.createElement('a');
+                      const file = new Blob([selectedFile.content], {type: 'text/plain'});
+                      element.href = URL.createObjectURL(file);
+                      element.download = `${selectedFile.title || 'text-file'}.txt`;
+                      document.body.appendChild(element);
+                      element.click();
+                      document.body.removeChild(element);
+                    }
                   }}
                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                 >
