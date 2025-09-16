@@ -34,7 +34,7 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/mentor', {
+      const response = await fetch('/api/mentorauth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
