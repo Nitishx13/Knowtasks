@@ -274,7 +274,7 @@ const MentorLogin = () => {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-400 text-sm">
-            2024 Knowtasks - Advanced Mentor Portal v2
+            2024 Knowtasks - Advanced Mentor Portal v2.1
           </p>
         </div>
       </div>

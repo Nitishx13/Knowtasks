@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Cache Refresh - Mentor Login Fix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .status {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .success { background: linear-gradient(45deg, #00b894, #00a085); }
+        .info { background: linear-gradient(45deg, #74b9ff, #0984e3); }
+        .steps {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .steps h3 {
+            color: #74b9ff;
+            margin-top: 0;
+        }
+        .steps ol {
+            line-height: 1.8;
+        }
+        .highlight {
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Cache Refresh Required</h1>
+        
+        <div class="status">
+            <strong>Issue Detected:</strong> Cached JavaScript files still using old API endpoint<br>
+            <strong>File:</strong> login-2a95f483e50ddac2.js<br>
+            <strong>Status:</strong> Source code updated, waiting for deployment
+        </div>
+
+        <div class="steps">
+            <h3>🛠️ How to Fix This Issue:</h3>
+            <ol>
+                <li><strong>Hard Refresh:</strong> Press <span class="highlight">Ctrl + F5</span> (Windows) or <span class="highlight">Cmd + Shift + R</span> (Mac)</li>
+                <li><strong>Clear Browser Cache:</strong> Go to browser settings and clear cache/cookies</li>
+                <li><strong>Incognito Mode:</strong> Open the site in a private/incognito window</li>
+                <li><strong>Wait for Deployment:</strong> New deployment will generate fresh JavaScript files</li>
+            </ol>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <a href="/mentor/login" class="button success">Try Mentor Login Again</a>
+            <a href="/advanced-mentor-login-test.html" class="button info">Run Diagnostics</a>
+        </div>
+
+        <div class="status">
+            <strong>Expected Fix:</strong> Once cache is cleared or new deployment completes,<br>
+            the mentor login will use the correct <code>/api/auth/mentor</code> endpoint
+        </div>
+
+        <script>
+            // Auto-refresh detection
+            function checkEndpoint() {
+                fetch('/api/auth/mentor', { method: 'OPTIONS' })
+                    .then(response => {
+                        if (response.status === 200) {
+                            document.querySelector('.status').innerHTML = 
+                                '<strong style="color: #00b894;">✅ API Endpoint Working!</strong><br>' +
+                                'The /api/auth/mentor endpoint is responding correctly.<br>' +
+                                'Clear your browser cache and try logging in again.';
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Still checking endpoint...', error);
+                    });
+            }
+
+            // Check endpoint every 5 seconds
+            setInterval(checkEndpoint, 5000);
+            checkEndpoint(); // Initial check
+
+            // Force cache busting
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

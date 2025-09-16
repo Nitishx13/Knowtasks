@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Mentor Login - No Cache</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            color: white;
+        }
+        h1 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .status.success {
+            background: rgba(0, 184, 148, 0.3);
+            color: #00b894;
+            border: 1px solid rgba(0, 184, 148, 0.5);
+        }
+        .status.error {
+            background: rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.5);
+        }
+        .status.info {
+            background: rgba(116, 185, 255, 0.3);
+            color: #74b9ff;
+            border: 1px solid rgba(116, 185, 255, 0.5);
+        }
+        .test-accounts {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .test-accounts h3 {
+            color: #74b9ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .account-btn {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin: 5px 0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .account-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .debug-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="header">
+            <div class="logo">🎓</div>
+            <h1>Mentor Login</h1>
+            <p class="subtitle">Direct Access - No Cache Issues</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span id="btnText">Login to Dashboard</span>
+                <span id="btnLoading" class="loading" style="display: none;"></span>
+            </button>
+        </form>
+
+        <div id="statusMessage"></div>
+        <div id="debugInfo" class="debug-info" style="display: none;"></div>
+
+        <div class="test-accounts">
+            <h3>🧪 Test Accounts (Click to Auto-fill)</h3>
+            <button type="button" class="account-btn" onclick="fillCredentials('nitishdigital@gmail.com', 'test123')">
+                nitishdigital@gmail.com
+            </button>
+            <button type="button" class="account-btn" onclick="fillCredentials('test.mentor@example.com', 'password123')">
+                test.mentor@example.com
+            </button>
+            <button type="button" class="account-btn" onclick="fillCredentials('adarsh@gmail.com', 'test123')">
+                adarsh@gmail.com
+            </button>
+            <button type="button" class="account-btn" onclick="fillCredentials('nitish@gmail.com', 'test123')">
+                nitish@gmail.com
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Prevent any caching
+        const timestamp = Date.now();
+        
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function showDebug(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.style.display = 'block';
+            debugDiv.textContent += message + '\n';
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+
+        function fillCredentials(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            showStatus(`Filled credentials for ${email}`, 'info');
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('loginBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            btn.disabled = loading;
+            btnText.style.display = loading ? 'none' : 'inline';
+            btnLoading.style.display = loading ? 'inline-block' : 'none';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showStatus('Please enter both email and password', 'error');
+                return;
+            }
+
+            setLoading(true);
+            showStatus('Attempting login...', 'info');
+            showDebug(`=== LOGIN ATTEMPT ===`);
+            showDebug(`Email: ${email}`);
+            showDebug(`Timestamp: ${new Date().toISOString()}`);
+
+            try {
+                // Use the correct endpoint with cache busting
+                const apiUrl = `/api/auth/mentor?t=${timestamp}`;
+                showDebug(`API URL: ${apiUrl}`);
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                showDebug(`Response Status: ${response.status} ${response.statusText}`);
+                showDebug(`Response Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+
+                // Get response text first to handle potential HTML errors
+                const responseText = await response.text();
+                showDebug(`Raw Response: ${responseText.substring(0, 200)}...`);
+
+                // Try to parse as JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    showDebug(`Parsed JSON: ${JSON.stringify(data, null, 2)}`);
+                } catch (parseError) {
+                    showDebug(`JSON Parse Error: ${parseError.message}`);
+                    throw new Error(`Server returned HTML instead of JSON. Status: ${response.status}`);
+                }
+
+                if (response.ok && data.success) {
+                    showStatus('✅ Login successful! Redirecting...', 'success');
+                    showDebug(`Login Success: ${JSON.stringify(data.data, null, 2)}`);
+                    
+                    // Store mentor data
+                    if (data.data) {
+                        localStorage.setItem('mentorUserId', data.data.id);
+                        localStorage.setItem('userId', data.data.id);
+                        localStorage.setItem('mentorName', data.data.name);
+                        localStorage.setItem('mentorEmail', data.data.email);
+                        localStorage.setItem('authToken', 'mentor-token-' + Date.now());
+                    }
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/mentor/dashboard';
+                    }, 1500);
+                    
+                } else {
+                    const errorMsg = data.error || data.message || 'Login failed';
+                    showStatus(`❌ ${errorMsg}`, 'error');
+                    showDebug(`Login Failed: ${errorMsg}`);
+                }
+
+            } catch (error) {
+                showStatus(`❌ Network Error: ${error.message}`, 'error');
+                showDebug(`Network Error: ${error.message}`);
+                console.error('Login error:', error);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Test API endpoint on page load
+        window.addEventListener('load', async function() {
+            showStatus('Testing API endpoint...', 'info');
+            
+            try {
+                const response = await fetch('/api/auth/mentor', { 
+                    method: 'OPTIONS',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                
+                if (response.status === 200) {
+                    showStatus('✅ API endpoint is working! Ready to login.', 'success');
+                } else {
+                    showStatus(`⚠️ API endpoint returned ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showStatus('❌ Cannot reach API endpoint', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
