@@ -26,7 +26,7 @@ const MentorLogin = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/mentor-auth', {
+      const response = await fetch('/api/mentor/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const MentorLogin = () => {
           color: '#333',
           marginBottom: '30px'
         }}>
-          Mentor Login v3
+          Mentor Login
         </h1>
         
         <form onSubmit={handleLogin}>
