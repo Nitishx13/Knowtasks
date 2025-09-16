@@ -43,29 +43,34 @@ export function authMiddleware(handler) {
           console.log('Using mentor auth with user-id header, userId:', userId);
         }
       } else {
-        console.log('User route detected, checking Clerk authentication');
+        console.log('User route detected, checking authentication');
         
-        // For user routes, prioritize Clerk authentication
-        try {
-          const auth = getAuth(req);
-          console.log('Clerk auth result:', auth?.userId ? 'Found' : 'Not found');
-          
-          if (auth?.userId) {
-            userId = auth.userId;
-            console.log('Using Clerk auth, userId:', userId);
-          } else {
-            // Development fallback only if no Clerk auth
-            if (process.env.NODE_ENV === 'development' && req.headers['user-id']) {
-              userId = req.headers['user-id'];
-              console.log('Using development fallback with user-id header, userId:', userId);
-            }
-          }
-        } catch (clerkError) {
-          console.error('Clerk authentication error:', clerkError);
-          // Development fallback on Clerk error
-          if (process.env.NODE_ENV === 'development' && req.headers['user-id']) {
+        // Check if test auth is enabled (works in both development and production)
+        const useTestAuth = process.env.NEXT_PUBLIC_USE_TEST_AUTH === 'true';
+        console.log('Test auth enabled:', useTestAuth);
+        
+        if (useTestAuth) {
+          // Test authentication mode - use user-id header
+          if (req.headers['user-id']) {
             userId = req.headers['user-id'];
-            console.log('Using fallback due to Clerk error, userId:', userId);
+            console.log('Using test auth with user-id header, userId:', userId);
+          } else {
+            // Fallback to default test user
+            userId = 'test_user_123';
+            console.log('Using fallback test user, userId:', userId);
+          }
+        } else {
+          // Production Clerk authentication
+          try {
+            const auth = getAuth(req);
+            console.log('Clerk auth result:', auth?.userId ? 'Found' : 'Not found');
+            
+            if (auth?.userId) {
+              userId = auth.userId;
+              console.log('Using Clerk auth, userId:', userId);
+            }
+          } catch (clerkError) {
+            console.error('Clerk authentication error:', clerkError);
           }
         }
       }
