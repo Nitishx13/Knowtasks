@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useAuth as useClerkAuth, useUser } from '@clerk/nextjs';
 
 // Create the authentication context
@@ -46,14 +46,16 @@ export const AuthProvider = ({ children }) => {
       bio: 'Test user for development'
     };
     
-    // Store test user ID in localStorage for API calls
-    if (window?.localStorage) {
+    console.log('Using test user for development:', effectiveUser.id);
+  }
+
+  // Handle localStorage operations only on client side
+  useEffect(() => {
+    if (useTestUser && effectiveUser && typeof window !== 'undefined') {
       localStorage.setItem('auth_test_user_id', effectiveUser.id);
       localStorage.setItem('auth_test_token', 'test_token');
     }
-    
-    console.log('Using test user for development:', effectiveUser.id);
-  }
+  }, [useTestUser, effectiveUser]);
 
   // Value to be provided by the context
   const value = {

@@ -94,7 +94,7 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, [user.id]);
+  }, [user?.id]);
   
   const { metrics, statistics, recentSummaries } = dashboardData;
 
